@@ -1,0 +1,4 @@
+aiohttp
+pandas
+geopandas
+requests

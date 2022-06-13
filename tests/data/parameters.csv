@@ -1,0 +1,11 @@
+id,name,parameter_type,unit,display_unit,uses_datum,parameter_group
+WATHTE [m] [NAP] [OW],Waterhoogte [m] [NAP] [OW],instantaneous,m,m,true,Hoogte
+Q [m3/s] [NVT] [OW],Debiet [m3/s] [NVT] [OW],instantaneous,m3/s,m3/s,false,Debiet_m3
+Dummy,Dummy,instantaneous,-,-,false,Dummy
+T [oC] [NVT] [GW],Temperatuur [oC][NVT][GW],instantaneous,oC,oC,false,T [oC]
+GELDHD [mS/m] [25oC] [GW],Geleidendheid [mS/m][25oC][GW],instantaneous,mS/m,mS/m,false,GELDHD [mS/m]
+STIJGHTE [m] [NAP] [GW],Stijghoogte [m] [NAP] [GW],instantaneous,m,m,true,Hoogte
+Ntot [mg/l] [N] [OW],stikstof totaal [mg/l][N][OW],instantaneous,mg/l,mg/l,false,CONCTTE [mg/l]
+Ptot [mg/l] [P] [OW],fosfor totaal [mg/l][P][OW],instantaneous,mg/l,mg/l,false,CONCTTE [mg/l]
+T [oC] [NVT] [LT],Temperatuur [oC][NVT][LT],instantaneous,oC,oC,false,T [oC]
+NEERSG [mm] [NVT] [LT],Neerslag [mm][NVT][LT],instantaneous,mm,mm,false,NEERSG [mm]

@@ -127,3 +127,9 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# PyCharm .idea-folder
+.idea/*
+
+# Anything that can be executed by Windows
+*.cmd
