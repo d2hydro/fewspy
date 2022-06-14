@@ -4,7 +4,7 @@ A Python API for the Deltares FEWS PI REST Web Service
 ## Installation
 1. Make sure you have git [Git](https://gitforwindows.org/) installed.
 2. Make sure you have a copy of [Anaconda](https://www.anaconda.com/) or [Miniconda](https://veranostech.github.io/docs-korean-conda-docs/docs/build/html/miniconda.html) installed.
-3. Clone the *fewspy*, e.g. via GIT:
+3. Clone the **fewspy**, e.g. via GIT:
 ```
 git clone https://github.com/d2hydro/fewspy.git
 ```
