@@ -3,14 +3,18 @@ A Python API for the Deltares FEWS PI REST Web Service
 
 ## Install
 
-1. Click on download button in the GitHub repository and download the source code to archive
-2. Unzip the code
-3. `cd` into the main project directory (e.g. `fewspy-master`)
-4. Run: `pip install .` from that directory
+1. Make sure you have all requirements in [environment.yml](envs/environment.yml)  installed in a Anaconda environment:
+```
+conda env create -f environment.yml
+```
+2. Click on download button in the GitHub repository and download the source code to archive
+3. Unzip the code
+4. `cd` into the main project directory (e.g. `fewspy-master`)
+5. Run: `pip install .` from that directory
 
 ## Install for development
 
-1. Make sure you have the fewspy development environment installed, using the environment_dev.yml. By e.g. Anaconda:
+1. Make sure you have the fewspy development environment installed, using the [environment_dev.yml](envs/environment_dev.yml). By e.g. Anaconda:
 ```
 conda env create -f environment_dev.yml
 ```
