@@ -11,6 +11,8 @@ A Python API for the Deltares FEWS PI REST Web Service
 ## Install for development
 
 1. Make sure you have the fewspy development environment installed, using the environment_dev.yml. By e.g. Anaconda:
+2. Make sure you have git for [Windows](https://gitforwindows.org/) or [Linux](https://git-scm.com/) installed.
+
 ```
 conda env create -f environment_dev.yml
 ```
