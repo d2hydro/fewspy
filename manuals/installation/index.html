@@ -373,50 +373,43 @@
 
 
 <h1 id="installation">Installation</h1>
+<h2 id="installation-for-regular-use">Installation for regular use</h2>
+<p>Fewspy can be installed with pip in any environment with the following Python-packages properly installed:</p>
+<ul>
+<li>requests</li>
+<li>aiohttp</li>
+<li>pandas</li>
+<li>geopandas</li>
+</ul>
+<p>In that activated environment you can add fewspy via pip by:</p>
+<pre><code>pip install fewspy
+</code></pre>
+<p>We recommend to build your environment using <a href="https://www.anaconda.com/">Anaconda</a>. You can build an environment ánd install fewspy by conda in one go using this <a href="https://github.com/d2hydro/fewspy/blob/main/envs/environment.yml" target="_blank">environment.yml</a> from the command-line:</p>
+<pre><code>conda env create -f environment.yml
+</code></pre>
+<h2 id="installation-for-development">Installation for development</h2>
+<p>For development we recommend the following approach:</p>
 <ol>
 <li>Make sure you have git <a href="https://gitforwindows.org/">Git</a> installed.</li>
 <li>Make sure you have a copy of <a href="https://www.anaconda.com/">Anaconda</a> or <a href="https://veranostech.github.io/docs-korean-conda-docs/docs/build/html/miniconda.html">Miniconda</a> installed.</li>
-<li>Clone the <strong>fewspy</strong>, e.g. via GIT:</li>
+<li>
+<p>Clone the <strong>fewspy</strong>, e.g. via GIT:</p>
+<p><code>git clone https://github.com/d2hydro/fewspy.git</code></p>
+</li>
+<li>
+<p>Make sure you have the fewspy development environment installed, using the <a href="envs/environment_dev.yml">environment_dev.yml</a>. By e.g. Anaconda:</p>
+<p><code>conda env create -f environment_dev.yml</code></p>
+</li>
+<li>
+<p>Activate the environment in the Command Prompt (or Anaconda Prompt) by:</p>
+<p><code>conda activate fewspy</code></p>
+</li>
+<li>
+<p>Now <code>cd</code> to the clone on your disk and install <strong>fewspy</strong> in dev-mode (so with <strong>-e</strong>):</p>
+<p><code>cd path\to\fewspy
+pip install -e .</code></p>
+</li>
 </ol>
-<pre><code>git clone https://github.com/d2hydro/fewspy.git
-</code></pre>
-<p>Developers continue to <a href="#installation-for-development">Install for development</a>.</p>
-<p>For regular use continue below</p>
-<h2 id="installation-for-regular-use">Installation for regular use</h2>
-<ol>
-<li>Make sure you have all requirements in <a href="envs/environment.yml">environment.yml</a>  installed in a Anaconda environment:</li>
-</ol>
-<pre><code>conda env create -f environment.yml
-</code></pre>
-<ol>
-<li>Activate the environment in the Command Prompt (or Anaconda Prompt) by:</li>
-</ol>
-<pre><code>conda activate fewspy
-</code></pre>
-<ol>
-<li>Now navigate to the clone on your disk and install <strong>fewspy</strong> (so with <strong>-e</strong>):</li>
-</ol>
-<pre><code>cd path\to\fewspy
-pip install .
-</code></pre>
-<h2 id="installation-for-development">Installation for development</h2>
-
-<ol>
-<li>Make sure you have the fewspy development environment installed, using the <a href="envs/environment_dev.yml">environment_dev.yml</a>. By e.g. Anaconda:</li>
-</ol>
-<pre><code>conda env create -f environment_dev.yml
-</code></pre>
-<ol>
-<li>Activate the environment in the Command Prompt (or Anaconda Prompt) by:</li>
-</ol>
-<pre><code>conda activate fewspy
-</code></pre>
-<ol>
-<li>Now <code>cd</code> to the clone on your disk and install <strong>fewspy</strong> in dev-mode (so with <strong>-e</strong>):</li>
-</ol>
-<pre><code>cd path\to\fewspy
-pip install -e .
-</code></pre>
 
               
             </article>
