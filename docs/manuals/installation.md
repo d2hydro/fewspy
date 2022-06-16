@@ -5,10 +5,10 @@
 ```
 git clone https://github.com/d2hydro/fewspy.git
 ```
-Developers continue to [Install for development](#install-for-development).
+Developers continue to [Install for development](#installation-for-development).
 
 For regular use continue below
-## Install for regular use
+## Installation for regular use
 4. Make sure you have all requirements in [environment.yml](envs/environment.yml)  installed in a Anaconda environment:
 ```
 conda env create -f environment.yml
@@ -22,7 +22,7 @@ conda activate fewspy
 cd path\to\fewspy
 pip install .
 ```
-<h2 id="install-for-development">Install for development</h2>
+<h2 id="installation-for-development">Installation for development</h2>
 
 4. Make sure you have the fewspy development environment installed, using the [environment_dev.yml](envs/environment_dev.yml). By e.g. Anaconda:
 ```

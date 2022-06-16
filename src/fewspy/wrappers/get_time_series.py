@@ -1,10 +1,10 @@
 import requests
 import pandas as pd
 import logging
-from .utils.timer import Timer
-from .utils.transformations import parameters_to_fews
+from ..utils.timer import Timer
+from ..utils.transformations import parameters_to_fews
 from typing import List, Union
-from .time_series import TimeSeriesSet
+from ..time_series import TimeSeriesSet
 from datetime import datetime
 import aiohttp
 import asyncio
@@ -41,10 +41,20 @@ def get_time_series(
     Args:
         url (str): url Delft-FEWS PI REST WebService.
         E.g. http://localhost:8080/FewsWebServices/rest/fewspiservice/v1/qualifiers
+        filter_id (str): the FEWS id of the filter to pass as request parameter
+        location_ids (list): list with FEWS location ids to extract timeseries from. Defaults to None.
+        parameter_ids (list): list with FEWS parameter ids to extract timeseries from. Defaults to None.
+        qualifier_ids (list): list with FEWS qualifier ids to extract timeseries from. Defaults to None.
+        start_time (datetime.datetime): datetime-object with start datetime to use in request. Defaults to None.
+        end_time (datetime.datetime): datetime-object with end datetime to use in request. Defaults to None.
+        thinning (int): integer value for thinning parameter to use in request. Defaults to None.
+        only_headers (bool): if True, only headers will be returned. Defaults to False.
+        show_statistics (bool): if True, time series statistics will be included in header. Defaults to False.
+        document_format (str): request document format to return. Defaults to PI_JSON.
         verify (bool, optional): passed to requests.get verify parameter.
         Defaults to False.
         logger (logging.Logger, optional): Logger to pass logging to. By
-        default a logger will ge created.
+        default, a logger will ge created.
 
     Returns:
         df (pandas.DataFrame): Pandas dataframe with index "id" and columns

@@ -4,10 +4,10 @@ theme:
   name: "material"
   language: en
   logo: icons/logo/globe_only.png
-  favicon: icons/logo/globe_only.png
+  favicon: icons/logo/favicon.png
   highlightjs: true
   palette: 
-    primary: cyan
+    primary: blue
 
 plugins:
   - search
@@ -23,3 +23,4 @@ nav:
     - Contribute: manuals/contribute.md
     - Code Reference:
         - Api: reference/api.md
+        - Wrappers: reference/wrappers.md

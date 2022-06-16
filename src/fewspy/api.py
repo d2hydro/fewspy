@@ -10,12 +10,13 @@ from .utils.timer import Timer
 import logging
 import urllib3
 
-from .get_qualifiers import get_qualifiers
-from .get_time_series import get_time_series
-from .get_time_series_async import get_time_series_async
-from .get_locations import get_locations
-from .get_filters import get_filters
-from .get_parameters import get_parameters
+from .wrappers import (
+    get_time_series_async,
+    get_qualifiers,
+    get_time_series,
+    get_locations,
+    get_filters,
+    get_parameters)
 
 LOGGER = logging.getLogger(__name__)
 
@@ -24,10 +25,9 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 class Api:
     """
-    FEWS PI-REST api it needs an server url and a logger.
+    Python API for the Deltares FEWS PI REST Web Service.
 
-    All variables related to PI-REST variables are defined camelCase. All others are
-    snake_case.
+    For more info on how-to work with the FEWS REST Web Service, visit the Deltares Website: https://publicwiki.deltares.nl/display/FEWSDOC/FEWS+PI+REST+Web+Service
     """
 
     def __init__(self, url, logger=LOGGER, ssl_verify=False):
@@ -52,6 +52,17 @@ class Api:
         return kwargs
 
     def get_parameters(self, filter_id=None):
+        """
+         Get FEWS qualifiers as a pandas DataFrame
+
+         Args:
+             filter_id (str): the FEWS id of the filter to pass as request parameter
+
+         Returns:
+             df (pandas.DataFrame): Pandas dataframe with index "id" and columns
+             "name" and "group_id".
+
+         """
 
         kwargs = self.__kwargs(url_post_fix="parameters", kwargs=locals())
         result = get_parameters(**kwargs)
@@ -59,7 +70,18 @@ class Api:
         return result
 
     def get_filters(self, filter_id=None):
-        """Get filters as dictionary, or sub-filters if a filter_id is specified."""
+        """
+         Get FEWS qualifiers as a pandas DataFrame
+
+         Args:
+             E.g. http://localhost:8080/FewsWebServices/rest/fewspiservice/v1/qualifiers
+             filter_id (str): the FEWS id of the filter to pass as request parameter
+
+         Returns:
+             df (pandas.DataFrame): Pandas dataframe with index "id" and columns
+             "name" and "group_id".
+
+         """
 
         kwargs = self.__kwargs(url_post_fix="filters", kwargs=locals())
         result = get_filters(**kwargs)
@@ -67,7 +89,19 @@ class Api:
         return result
 
     def get_locations(self, filter_id=None, attributes=[]):
-        """Get location en return as a GeoDataFrame."""
+        """
+        Get FEWS qualifiers as a pandas DataFrame
+
+        Args:
+            E.g. http://localhost:8080/FewsWebServices/rest/fewspiservice/v1/qualifiers
+            filter_id (str): the FEWS id of the filter to pass as request parameter
+            attributes (list): if not emtpy, the location attributes to include as columns in the pandas DataFrame.
+
+        Returns:
+            df (pandas.DataFrame): Pandas dataframe with index "id" and columns
+            "name" and "group_id".
+
+        """
 
         kwargs = self.__kwargs(url_post_fix="locations", kwargs=locals())
         result = get_locations(**kwargs)
@@ -76,13 +110,13 @@ class Api:
 
     def get_qualifiers(self) -> pd.DataFrame:
         """
-        Get FEWS qualifiers as Pandas DataFrame
+         Get FEWS qualifiers as Pandas DataFrame
 
-        Returns:
-            result (pandas.DataFrame): Pandas DataFrame with index "id" and
-            columns "name" and "group_id".
+         Returns:
+             df (pandas.DataFrame): Pandas dataframe with index "id" and columns
+             "name" and "group_id".
 
-        """
+         """
         url = f"{self.url}qualifiers"
         result = get_qualifiers(url, verify=self.ssl_verify, logger=self.logger)
         return result
@@ -100,7 +134,26 @@ class Api:
         show_statistics=False,
         parallel=False,
     ):
+        """
+         Get FEWS qualifiers as a pandas DataFrame
 
+         Args:
+             filter_id (str): the FEWS id of the filter to pass as request parameter
+             location_ids (list): list with FEWS location ids to extract timeseries from. Defaults to None.
+             parameter_ids (list): list with FEWS parameter ids to extract timeseries from. Defaults to None.
+             qualifier_ids (list): list with FEWS qualifier ids to extract timeseries from. Defaults to None.
+             start_time (datetime.datetime): datetime-object with start datetime to use in request. Defaults to None.
+             end_time (datetime.datetime): datetime-object with end datetime to use in request. Defaults to None.
+             thinning (int): integer value for thinning parameter to use in request. Defaults to None.
+             only_headers (bool): if True, only headers will be returned. Defaults to False.
+             show_statistics (bool): if True, time series statistics will be included in header. Defaults to False.
+             parallel (bool): if True, timeseries are requested by the asynchronous wrapper. Defaults to False
+
+         Returns:
+             df (pandas.DataFrame): Pandas dataframe with index "id" and columns
+             "name" and "group_id".
+
+         """
         kwargs = self.__kwargs(url_post_fix="timeseries", kwargs=locals())
         if parallel:
             kwargs.pop("only_headers")

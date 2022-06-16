@@ -2,7 +2,7 @@ import requests
 from xml.etree import ElementTree
 import pandas as pd
 import logging
-from .utils.timer import Timer
+from ..utils.timer import Timer
 
 NS = "{http://www.wldelft.nl/fews/PI}"
 LOGGER = logging.getLogger(__name__)
@@ -46,7 +46,7 @@ def get_qualifiers(url: str, verify: bool = False, logger=LOGGER) -> pd.DataFram
         verify (bool, optional): passed to requests.get verify parameter.
         Defaults to False.
         logger (logging.Logger, optional): Logger to pass logging to. By
-        default a logger will ge created.
+        default, a new logger will ge created.
 
     Returns:
         df (pandas.DataFrame): Pandas dataframe with index "id" and columns
