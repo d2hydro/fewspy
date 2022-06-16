@@ -1,11 +1,25 @@
 site_name: fewspy documentation
+site_url: https://d2hydro.github.io/fewspy
 theme:
   name: "material"
   language: en
+  logo: icons/logo/globe_only.png
+  favicon: icons/logo/globe_only.png
+  highlightjs: true
+  palette: 
+    primary: cyan
+
 plugins:
   - search
   - mkdocstrings
+  
+extra:
+  social:
+    - icon: fontawesome/brands/github-alt
+      link: https://github.com/d2hydro/fewspy
 nav:
     - Home: index.md
+    - Installation: manuals/installation.md
+    - Contribute: manuals/contribute.md
     - Code Reference:
         - Api: reference/api.md
