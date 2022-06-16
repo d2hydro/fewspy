@@ -15,18 +15,18 @@ LOGGER = logging.getLogger(__name__)
 def __result_async_to_time_series_set(async_result):
     time_series_set = TimeSeriesSet()
     time_series_set_gen = (i for i in async_result if "timeSeries" if type(i) == dict)
-    time_series_set_gen = (i for i in async_result if "timeSeries" in i.keys())
+    time_series_set_list = [i for i in async_result if "timeSeries" in i.keys()]
 
-    version = next((i for i in time_series_set_gen if "version" in i.keys()), None)
+    version = next((i for i in time_series_set_list if "version" in i.keys()), None)
     if version is not None:
         time_zone = next(
-            (i for i in time_series_set_gen if "timeZone" in i.keys()), None
+            (i for i in time_series_set_list if "timeZone" in i.keys()), None
         )
         if time_zone is not None:
             time_series = {
                 "timeSeries": [
                     i["timeSeries"][0]
-                    for i in time_series_set_gen
+                    for i in time_series_set_list
                     if "timeSeries" in i.keys()
                 ]
             }

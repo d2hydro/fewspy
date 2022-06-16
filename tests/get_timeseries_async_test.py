@@ -40,7 +40,7 @@ def test_empty():
 
 
 def test_length():
-    assert len(time_series_set) == 9
+    assert len(time_series_set) == 11
 
 
 def test_parameter_ids():

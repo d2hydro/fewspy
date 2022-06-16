@@ -9,6 +9,10 @@ dependencies:
   - black
   - jupyter
   - pandas
+  - mkdocs
+  - mkdocstrings
+  - mkdocstrings-python
+  - mkdocs-material
   - geopandas
   - requests
   - pytest

@@ -1,0 +1,11 @@
+site_name: fewspy documentation
+theme:
+  name: "material"
+  language: en
+plugins:
+  - search
+  - mkdocstrings
+nav:
+    - Home: index.md
+    - Code Reference:
+        - Api: reference/api.md
