@@ -8,7 +8,9 @@
       
       
       
-      <link rel="icon" href="../../assets/images/favicon.png">
+        <link rel="canonical" href="https://d2hydro.github.io/fewspy/reference/api/">
+      
+      <link rel="icon" href="../../icons/logo/favicon.png">
       <meta name="generator" content="mkdocs-1.3.0, mkdocs-material-8.3.4">
     
     
@@ -21,6 +23,10 @@
       
         
         <link rel="stylesheet" href="../../assets/stylesheets/palette.cbb835fc.min.css">
+        
+          
+          
+          <meta name="theme-color" content="#2094f3">
         
       
       
@@ -52,7 +58,7 @@
     
     
     
-    <body dir="ltr" data-md-color-scheme="" data-md-color-primary="none" data-md-color-accent="none">
+    <body dir="ltr" data-md-color-scheme="" data-md-color-primary="blue" data-md-color-accent="">
   
     
     
@@ -78,8 +84,7 @@
   <nav class="md-header__inner md-grid" aria-label="Header">
     <a href="../.." title="fewspy documentation" class="md-header__button md-logo" aria-label="fewspy documentation" data-md-component="logo">
       
-  
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+  <img src="../../icons/logo/globe_only.png" alt="logo">
 
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -164,8 +169,7 @@
   <label class="md-nav__title" for="__drawer">
     <a href="../.." title="fewspy documentation" class="md-nav__button md-logo" aria-label="fewspy documentation" data-md-component="logo">
       
-  
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+  <img src="../../icons/logo/globe_only.png" alt="logo">
 
     </a>
     fewspy documentation
@@ -194,6 +198,36 @@
 
   
   
+  
+    <li class="md-nav__item">
+      <a href="../../manuals/installation/" class="md-nav__link">
+        Installation
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../manuals/contribute/" class="md-nav__link">
+        Contribute
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
     
   
   
@@ -201,18 +235,18 @@
     <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2" type="checkbox" id="__nav_2" checked>
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4" type="checkbox" id="__nav_4" checked>
       
       
       
       
-        <label class="md-nav__link" for="__nav_2">
+        <label class="md-nav__link" for="__nav_4">
           Code Reference
           <span class="md-nav__icon md-icon"></span>
         </label>
       
       <nav class="md-nav" aria-label="Code Reference" data-md-level="1">
-        <label class="md-nav__title" for="__nav_2">
+        <label class="md-nav__title" for="__nav_4">
           <span class="md-nav__icon md-icon"></span>
           Code Reference
         </label>
@@ -279,8 +313,22 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#src.fewspy.api.Api.get_parameters" class="md-nav__link">
+    get_parameters()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#src.fewspy.api.Api.get_qualifiers" class="md-nav__link">
     get_qualifiers()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#src.fewspy.api.Api.get_time_series" class="md-nav__link">
+    get_time_series()
   </a>
   
 </li>
@@ -289,6 +337,20 @@
   
 </nav>
       
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../wrappers/" class="md-nav__link">
+        Wrappers
+      </a>
     </li>
   
 
@@ -348,8 +410,22 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#src.fewspy.api.Api.get_parameters" class="md-nav__link">
+    get_parameters()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#src.fewspy.api.Api.get_qualifiers" class="md-nav__link">
     get_qualifiers()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#src.fewspy.api.Api.get_time_series" class="md-nav__link">
+    get_time_series()
   </a>
   
 </li>
@@ -378,15 +454,13 @@
   <div class="doc doc-contents first">
 
   
-      <p>FEWS PI-REST api it needs an server url and a logger.</p>
-<p>All variables related to PI-REST variables are defined camelCase. All others are
-snake_case.</p>
+      <p>Python API for the Deltares FEWS PI REST Web Service.</p>
+<p>For more info on how-to work with the FEWS REST Web Service, visit the Deltares Website: https://publicwiki.deltares.nl/display/FEWSDOC/FEWS+PI+REST+Web+Service</p>
 
 
         <details class="quote">
           <summary>Source code in <code>src\fewspy\api.py</code></summary>
-          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 25</span>
-<span class="normal"> 26</span>
+          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 26</span>
 <span class="normal"> 27</span>
 <span class="normal"> 28</span>
 <span class="normal"> 29</span>
@@ -472,12 +546,64 @@ snake_case.</p>
 <span class="normal">109</span>
 <span class="normal">110</span>
 <span class="normal">111</span>
-<span class="normal">112</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">Api</span><span class="p">:</span>
+<span class="normal">112</span>
+<span class="normal">113</span>
+<span class="normal">114</span>
+<span class="normal">115</span>
+<span class="normal">116</span>
+<span class="normal">117</span>
+<span class="normal">118</span>
+<span class="normal">119</span>
+<span class="normal">120</span>
+<span class="normal">121</span>
+<span class="normal">122</span>
+<span class="normal">123</span>
+<span class="normal">124</span>
+<span class="normal">125</span>
+<span class="normal">126</span>
+<span class="normal">127</span>
+<span class="normal">128</span>
+<span class="normal">129</span>
+<span class="normal">130</span>
+<span class="normal">131</span>
+<span class="normal">132</span>
+<span class="normal">133</span>
+<span class="normal">134</span>
+<span class="normal">135</span>
+<span class="normal">136</span>
+<span class="normal">137</span>
+<span class="normal">138</span>
+<span class="normal">139</span>
+<span class="normal">140</span>
+<span class="normal">141</span>
+<span class="normal">142</span>
+<span class="normal">143</span>
+<span class="normal">144</span>
+<span class="normal">145</span>
+<span class="normal">146</span>
+<span class="normal">147</span>
+<span class="normal">148</span>
+<span class="normal">149</span>
+<span class="normal">150</span>
+<span class="normal">151</span>
+<span class="normal">152</span>
+<span class="normal">153</span>
+<span class="normal">154</span>
+<span class="normal">155</span>
+<span class="normal">156</span>
+<span class="normal">157</span>
+<span class="normal">158</span>
+<span class="normal">159</span>
+<span class="normal">160</span>
+<span class="normal">161</span>
+<span class="normal">162</span>
+<span class="normal">163</span>
+<span class="normal">164</span>
+<span class="normal">165</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">Api</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    FEWS PI-REST api it needs an server url and a logger.</span>
+<span class="sd">    Python API for the Deltares FEWS PI REST Web Service.</span>
 
-<span class="sd">    All variables related to PI-REST variables are defined camelCase. All others are</span>
-<span class="sd">    snake_case.</span>
+<span class="sd">    For more info on how-to work with the FEWS REST Web Service, visit the Deltares Website: https://publicwiki.deltares.nl/display/FEWSDOC/FEWS+PI+REST+Web+Service</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">LOGGER</span><span class="p">,</span> <span class="n">ssl_verify</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
@@ -502,6 +628,17 @@ snake_case.</p>
         <span class="k">return</span> <span class="n">kwargs</span>
 
     <span class="k">def</span> <span class="nf">get_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filter_id</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">         Get FEWS qualifiers as a pandas DataFrame</span>
+
+<span class="sd">         Args:</span>
+<span class="sd">             filter_id (str): the FEWS id of the filter to pass as request parameter</span>
+
+<span class="sd">         Returns:</span>
+<span class="sd">             df (pandas.DataFrame): Pandas dataframe with index &quot;id&quot; and columns</span>
+<span class="sd">             &quot;name&quot; and &quot;group_id&quot;.</span>
+
+<span class="sd">         &quot;&quot;&quot;</span>
 
         <span class="n">kwargs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__kwargs</span><span class="p">(</span><span class="n">url_post_fix</span><span class="o">=</span><span class="s2">&quot;parameters&quot;</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="nb">locals</span><span class="p">())</span>
         <span class="n">result</span> <span class="o">=</span> <span class="n">get_parameters</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -509,7 +646,18 @@ snake_case.</p>
         <span class="k">return</span> <span class="n">result</span>
 
     <span class="k">def</span> <span class="nf">get_filters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filter_id</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Get filters as dictionary, or sub-filters if a filter_id is specified.&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">         Get FEWS qualifiers as a pandas DataFrame</span>
+
+<span class="sd">         Args:</span>
+<span class="sd">             E.g. http://localhost:8080/FewsWebServices/rest/fewspiservice/v1/qualifiers</span>
+<span class="sd">             filter_id (str): the FEWS id of the filter to pass as request parameter</span>
+
+<span class="sd">         Returns:</span>
+<span class="sd">             df (pandas.DataFrame): Pandas dataframe with index &quot;id&quot; and columns</span>
+<span class="sd">             &quot;name&quot; and &quot;group_id&quot;.</span>
+
+<span class="sd">         &quot;&quot;&quot;</span>
 
         <span class="n">kwargs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__kwargs</span><span class="p">(</span><span class="n">url_post_fix</span><span class="o">=</span><span class="s2">&quot;filters&quot;</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="nb">locals</span><span class="p">())</span>
         <span class="n">result</span> <span class="o">=</span> <span class="n">get_filters</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -517,7 +665,19 @@ snake_case.</p>
         <span class="k">return</span> <span class="n">result</span>
 
     <span class="k">def</span> <span class="nf">get_locations</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filter_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">attributes</span><span class="o">=</span><span class="p">[]):</span>
-        <span class="sd">&quot;&quot;&quot;Get location en return as a GeoDataFrame.&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get FEWS qualifiers as a pandas DataFrame</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            E.g. http://localhost:8080/FewsWebServices/rest/fewspiservice/v1/qualifiers</span>
+<span class="sd">            filter_id (str): the FEWS id of the filter to pass as request parameter</span>
+<span class="sd">            attributes (list): if not emtpy, the location attributes to include as columns in the pandas DataFrame.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            df (pandas.DataFrame): Pandas dataframe with index &quot;id&quot; and columns</span>
+<span class="sd">            &quot;name&quot; and &quot;group_id&quot;.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">kwargs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__kwargs</span><span class="p">(</span><span class="n">url_post_fix</span><span class="o">=</span><span class="s2">&quot;locations&quot;</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="nb">locals</span><span class="p">())</span>
         <span class="n">result</span> <span class="o">=</span> <span class="n">get_locations</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -526,13 +686,13 @@ snake_case.</p>
 
     <span class="k">def</span> <span class="nf">get_qualifiers</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Get FEWS qualifiers as Pandas DataFrame</span>
+<span class="sd">         Get FEWS qualifiers as Pandas DataFrame</span>
 
-<span class="sd">        Returns:</span>
-<span class="sd">            result (pandas.DataFrame): Pandas DataFrame with index &quot;id&quot; and</span>
-<span class="sd">            columns &quot;name&quot; and &quot;group_id&quot;.</span>
+<span class="sd">         Returns:</span>
+<span class="sd">             df (pandas.DataFrame): Pandas dataframe with index &quot;id&quot; and columns</span>
+<span class="sd">             &quot;name&quot; and &quot;group_id&quot;.</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">         &quot;&quot;&quot;</span>
         <span class="n">url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="si">}</span><span class="s2">qualifiers&quot;</span>
         <span class="n">result</span> <span class="o">=</span> <span class="n">get_qualifiers</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">verify</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ssl_verify</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">result</span>
@@ -550,7 +710,26 @@ snake_case.</p>
         <span class="n">show_statistics</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">parallel</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">         Get FEWS qualifiers as a pandas DataFrame</span>
 
+<span class="sd">         Args:</span>
+<span class="sd">             filter_id (str): the FEWS id of the filter to pass as request parameter</span>
+<span class="sd">             location_ids (list): list with FEWS location ids to extract timeseries from. Defaults to None.</span>
+<span class="sd">             parameter_ids (list): list with FEWS parameter ids to extract timeseries from. Defaults to None.</span>
+<span class="sd">             qualifier_ids (list): list with FEWS qualifier ids to extract timeseries from. Defaults to None.</span>
+<span class="sd">             start_time (datetime.datetime): datetime-object with start datetime to use in request. Defaults to None.</span>
+<span class="sd">             end_time (datetime.datetime): datetime-object with end datetime to use in request. Defaults to None.</span>
+<span class="sd">             thinning (int): integer value for thinning parameter to use in request. Defaults to None.</span>
+<span class="sd">             only_headers (bool): if True, only headers will be returned. Defaults to False.</span>
+<span class="sd">             show_statistics (bool): if True, time series statistics will be included in header. Defaults to False.</span>
+<span class="sd">             parallel (bool): if True, timeseries are requested by the asynchronous wrapper. Defaults to False</span>
+
+<span class="sd">         Returns:</span>
+<span class="sd">             df (pandas.DataFrame): Pandas dataframe with index &quot;id&quot; and columns</span>
+<span class="sd">             &quot;name&quot; and &quot;group_id&quot;.</span>
+
+<span class="sd">         &quot;&quot;&quot;</span>
         <span class="n">kwargs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__kwargs</span><span class="p">(</span><span class="n">url_post_fix</span><span class="o">=</span><span class="s2">&quot;timeseries&quot;</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="nb">locals</span><span class="p">())</span>
         <span class="k">if</span> <span class="n">parallel</span><span class="p">:</span>
             <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;only_headers&quot;</span><span class="p">)</span>
@@ -587,18 +766,97 @@ snake_case.</p>
 
   <div class="doc doc-contents ">
   
-      <p>Get filters as dictionary, or sub-filters if a filter_id is specified.</p>
+      <p>Get FEWS qualifiers as a pandas DataFrame</p>
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>E.g.</code></td>
+          <td>
+                <code>http</code>
+          </td>
+          <td><p>//localhost:8080/FewsWebServices/rest/fewspiservice/v1/qualifiers</p></td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>filter_id</code></td>
+          <td>
+                <code>str</code>
+          </td>
+          <td><p>the FEWS id of the filter to pass as request parameter</p></td>
+          <td>
+                <code>None</code>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+  <p><strong>Returns:</strong></p>
+  <table>
+    <thead>
+      <tr>
+<th>Name</th>        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+<td><code>df</code></td>          <td>
+                <code>pandas.<span title="pandas.DataFrame">DataFrame</span></code>
+          </td>
+          <td><p>Pandas dataframe with index "id" and columns</p></td>
+        </tr>
+        <tr>
+<td></td>          <td>
+          </td>
+          <td><p>"name" and "group_id".</p></td>
+        </tr>
+    </tbody>
+  </table>
 
       <details class="quote">
         <summary>Source code in <code>src\fewspy\api.py</code></summary>
-        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">61</span>
-<span class="normal">62</span>
-<span class="normal">63</span>
-<span class="normal">64</span>
-<span class="normal">65</span>
-<span class="normal">66</span>
-<span class="normal">67</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_filters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filter_id</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Get filters as dictionary, or sub-filters if a filter_id is specified.&quot;&quot;&quot;</span>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">72</span>
+<span class="normal">73</span>
+<span class="normal">74</span>
+<span class="normal">75</span>
+<span class="normal">76</span>
+<span class="normal">77</span>
+<span class="normal">78</span>
+<span class="normal">79</span>
+<span class="normal">80</span>
+<span class="normal">81</span>
+<span class="normal">82</span>
+<span class="normal">83</span>
+<span class="normal">84</span>
+<span class="normal">85</span>
+<span class="normal">86</span>
+<span class="normal">87</span>
+<span class="normal">88</span>
+<span class="normal">89</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_filters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filter_id</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">     Get FEWS qualifiers as a pandas DataFrame</span>
+
+<span class="sd">     Args:</span>
+<span class="sd">         E.g. http://localhost:8080/FewsWebServices/rest/fewspiservice/v1/qualifiers</span>
+<span class="sd">         filter_id (str): the FEWS id of the filter to pass as request parameter</span>
+
+<span class="sd">     Returns:</span>
+<span class="sd">         df (pandas.DataFrame): Pandas dataframe with index &quot;id&quot; and columns</span>
+<span class="sd">         &quot;name&quot; and &quot;group_id&quot;.</span>
+
+<span class="sd">     &quot;&quot;&quot;</span>
 
     <span class="n">kwargs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__kwargs</span><span class="p">(</span><span class="n">url_post_fix</span><span class="o">=</span><span class="s2">&quot;filters&quot;</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="nb">locals</span><span class="p">())</span>
     <span class="n">result</span> <span class="o">=</span> <span class="n">get_filters</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -622,21 +880,214 @@ snake_case.</p>
 
   <div class="doc doc-contents ">
   
-      <p>Get location en return as a GeoDataFrame.</p>
+      <p>Get FEWS qualifiers as a pandas DataFrame</p>
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>E.g.</code></td>
+          <td>
+                <code>http</code>
+          </td>
+          <td><p>//localhost:8080/FewsWebServices/rest/fewspiservice/v1/qualifiers</p></td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>filter_id</code></td>
+          <td>
+                <code>str</code>
+          </td>
+          <td><p>the FEWS id of the filter to pass as request parameter</p></td>
+          <td>
+                <code>None</code>
+          </td>
+        </tr>
+        <tr>
+          <td><code>attributes</code></td>
+          <td>
+                <code>list</code>
+          </td>
+          <td><p>if not emtpy, the location attributes to include as columns in the pandas DataFrame.</p></td>
+          <td>
+                <code>[]</code>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+  <p><strong>Returns:</strong></p>
+  <table>
+    <thead>
+      <tr>
+<th>Name</th>        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+<td><code>df</code></td>          <td>
+                <code>pandas.<span title="pandas.DataFrame">DataFrame</span></code>
+          </td>
+          <td><p>Pandas dataframe with index "id" and columns</p></td>
+        </tr>
+        <tr>
+<td></td>          <td>
+          </td>
+          <td><p>"name" and "group_id".</p></td>
+        </tr>
+    </tbody>
+  </table>
 
       <details class="quote">
         <summary>Source code in <code>src\fewspy\api.py</code></summary>
-        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">69</span>
-<span class="normal">70</span>
-<span class="normal">71</span>
-<span class="normal">72</span>
-<span class="normal">73</span>
-<span class="normal">74</span>
-<span class="normal">75</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_locations</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filter_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">attributes</span><span class="o">=</span><span class="p">[]):</span>
-    <span class="sd">&quot;&quot;&quot;Get location en return as a GeoDataFrame.&quot;&quot;&quot;</span>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 91</span>
+<span class="normal"> 92</span>
+<span class="normal"> 93</span>
+<span class="normal"> 94</span>
+<span class="normal"> 95</span>
+<span class="normal"> 96</span>
+<span class="normal"> 97</span>
+<span class="normal"> 98</span>
+<span class="normal"> 99</span>
+<span class="normal">100</span>
+<span class="normal">101</span>
+<span class="normal">102</span>
+<span class="normal">103</span>
+<span class="normal">104</span>
+<span class="normal">105</span>
+<span class="normal">106</span>
+<span class="normal">107</span>
+<span class="normal">108</span>
+<span class="normal">109</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_locations</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filter_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">attributes</span><span class="o">=</span><span class="p">[]):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get FEWS qualifiers as a pandas DataFrame</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        E.g. http://localhost:8080/FewsWebServices/rest/fewspiservice/v1/qualifiers</span>
+<span class="sd">        filter_id (str): the FEWS id of the filter to pass as request parameter</span>
+<span class="sd">        attributes (list): if not emtpy, the location attributes to include as columns in the pandas DataFrame.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        df (pandas.DataFrame): Pandas dataframe with index &quot;id&quot; and columns</span>
+<span class="sd">        &quot;name&quot; and &quot;group_id&quot;.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">kwargs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__kwargs</span><span class="p">(</span><span class="n">url_post_fix</span><span class="o">=</span><span class="s2">&quot;locations&quot;</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="nb">locals</span><span class="p">())</span>
     <span class="n">result</span> <span class="o">=</span> <span class="n">get_locations</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">result</span>
+</code></pre></div></td></tr></table></div>
+      </details>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+
+<h2 id="src.fewspy.api.Api.get_parameters" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">get_parameters</span><span class="p">(</span><span class="n">filter_id</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+
+</h2>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Get FEWS qualifiers as a pandas DataFrame</p>
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>filter_id</code></td>
+          <td>
+                <code>str</code>
+          </td>
+          <td><p>the FEWS id of the filter to pass as request parameter</p></td>
+          <td>
+                <code>None</code>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+  <p><strong>Returns:</strong></p>
+  <table>
+    <thead>
+      <tr>
+<th>Name</th>        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+<td><code>df</code></td>          <td>
+                <code>pandas.<span title="pandas.DataFrame">DataFrame</span></code>
+          </td>
+          <td><p>Pandas dataframe with index "id" and columns</p></td>
+        </tr>
+        <tr>
+<td></td>          <td>
+          </td>
+          <td><p>"name" and "group_id".</p></td>
+        </tr>
+    </tbody>
+  </table>
+
+      <details class="quote">
+        <summary>Source code in <code>src\fewspy\api.py</code></summary>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">54</span>
+<span class="normal">55</span>
+<span class="normal">56</span>
+<span class="normal">57</span>
+<span class="normal">58</span>
+<span class="normal">59</span>
+<span class="normal">60</span>
+<span class="normal">61</span>
+<span class="normal">62</span>
+<span class="normal">63</span>
+<span class="normal">64</span>
+<span class="normal">65</span>
+<span class="normal">66</span>
+<span class="normal">67</span>
+<span class="normal">68</span>
+<span class="normal">69</span>
+<span class="normal">70</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filter_id</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">     Get FEWS qualifiers as a pandas DataFrame</span>
+
+<span class="sd">     Args:</span>
+<span class="sd">         filter_id (str): the FEWS id of the filter to pass as request parameter</span>
+
+<span class="sd">     Returns:</span>
+<span class="sd">         df (pandas.DataFrame): Pandas dataframe with index &quot;id&quot; and columns</span>
+<span class="sd">         &quot;name&quot; and &quot;group_id&quot;.</span>
+
+<span class="sd">     &quot;&quot;&quot;</span>
+
+    <span class="n">kwargs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__kwargs</span><span class="p">(</span><span class="n">url_post_fix</span><span class="o">=</span><span class="s2">&quot;parameters&quot;</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="nb">locals</span><span class="p">())</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">get_parameters</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">result</span>
 </code></pre></div></td></tr></table></div>
@@ -669,44 +1120,286 @@ snake_case.</p>
     </thead>
     <tbody>
         <tr>
-<td><code>result</code></td>          <td>
+<td><code>df</code></td>          <td>
                 <code>pandas.<span title="pandas.DataFrame">DataFrame</span></code>
           </td>
-          <td><p>Pandas DataFrame with index "id" and</p></td>
+          <td><p>Pandas dataframe with index "id" and columns</p></td>
         </tr>
         <tr>
 <td></td>          <td>
                 <code><span title="pandas">pd</span>.<span title="pandas.DataFrame">DataFrame</span></code>
           </td>
-          <td><p>columns "name" and "group_id".</p></td>
+          <td><p>"name" and "group_id".</p></td>
         </tr>
     </tbody>
   </table>
 
       <details class="quote">
         <summary>Source code in <code>src\fewspy\api.py</code></summary>
-        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">77</span>
-<span class="normal">78</span>
-<span class="normal">79</span>
-<span class="normal">80</span>
-<span class="normal">81</span>
-<span class="normal">82</span>
-<span class="normal">83</span>
-<span class="normal">84</span>
-<span class="normal">85</span>
-<span class="normal">86</span>
-<span class="normal">87</span>
-<span class="normal">88</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_qualifiers</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">111</span>
+<span class="normal">112</span>
+<span class="normal">113</span>
+<span class="normal">114</span>
+<span class="normal">115</span>
+<span class="normal">116</span>
+<span class="normal">117</span>
+<span class="normal">118</span>
+<span class="normal">119</span>
+<span class="normal">120</span>
+<span class="normal">121</span>
+<span class="normal">122</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_qualifiers</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Get FEWS qualifiers as Pandas DataFrame</span>
+<span class="sd">     Get FEWS qualifiers as Pandas DataFrame</span>
 
-<span class="sd">    Returns:</span>
-<span class="sd">        result (pandas.DataFrame): Pandas DataFrame with index &quot;id&quot; and</span>
-<span class="sd">        columns &quot;name&quot; and &quot;group_id&quot;.</span>
+<span class="sd">     Returns:</span>
+<span class="sd">         df (pandas.DataFrame): Pandas dataframe with index &quot;id&quot; and columns</span>
+<span class="sd">         &quot;name&quot; and &quot;group_id&quot;.</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">     &quot;&quot;&quot;</span>
     <span class="n">url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="si">}</span><span class="s2">qualifiers&quot;</span>
     <span class="n">result</span> <span class="o">=</span> <span class="n">get_qualifiers</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">verify</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ssl_verify</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">result</span>
+</code></pre></div></td></tr></table></div>
+      </details>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+
+<h2 id="src.fewspy.api.Api.get_time_series" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">get_time_series</span><span class="p">(</span><span class="n">filter_id</span><span class="p">,</span> <span class="n">location_ids</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">start_time</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">end_time</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">parameter_ids</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">qualifier_ids</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">thinning</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">only_headers</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">show_statistics</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">parallel</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
+
+</h2>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Get FEWS qualifiers as a pandas DataFrame</p>
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>filter_id</code></td>
+          <td>
+                <code>str</code>
+          </td>
+          <td><p>the FEWS id of the filter to pass as request parameter</p></td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>location_ids</code></td>
+          <td>
+                <code>list</code>
+          </td>
+          <td><p>list with FEWS location ids to extract timeseries from. Defaults to None.</p></td>
+          <td>
+                <code>None</code>
+          </td>
+        </tr>
+        <tr>
+          <td><code>parameter_ids</code></td>
+          <td>
+                <code>list</code>
+          </td>
+          <td><p>list with FEWS parameter ids to extract timeseries from. Defaults to None.</p></td>
+          <td>
+                <code>None</code>
+          </td>
+        </tr>
+        <tr>
+          <td><code>qualifier_ids</code></td>
+          <td>
+                <code>list</code>
+          </td>
+          <td><p>list with FEWS qualifier ids to extract timeseries from. Defaults to None.</p></td>
+          <td>
+                <code>None</code>
+          </td>
+        </tr>
+        <tr>
+          <td><code>start_time</code></td>
+          <td>
+                <code>datetime.<span title="datetime.datetime">datetime</span></code>
+          </td>
+          <td><p>datetime-object with start datetime to use in request. Defaults to None.</p></td>
+          <td>
+                <code>None</code>
+          </td>
+        </tr>
+        <tr>
+          <td><code>end_time</code></td>
+          <td>
+                <code>datetime.<span title="datetime.datetime">datetime</span></code>
+          </td>
+          <td><p>datetime-object with end datetime to use in request. Defaults to None.</p></td>
+          <td>
+                <code>None</code>
+          </td>
+        </tr>
+        <tr>
+          <td><code>thinning</code></td>
+          <td>
+                <code>int</code>
+          </td>
+          <td><p>integer value for thinning parameter to use in request. Defaults to None.</p></td>
+          <td>
+                <code>None</code>
+          </td>
+        </tr>
+        <tr>
+          <td><code>only_headers</code></td>
+          <td>
+                <code>bool</code>
+          </td>
+          <td><p>if True, only headers will be returned. Defaults to False.</p></td>
+          <td>
+                <code>False</code>
+          </td>
+        </tr>
+        <tr>
+          <td><code>show_statistics</code></td>
+          <td>
+                <code>bool</code>
+          </td>
+          <td><p>if True, time series statistics will be included in header. Defaults to False.</p></td>
+          <td>
+                <code>False</code>
+          </td>
+        </tr>
+        <tr>
+          <td><code>parallel</code></td>
+          <td>
+                <code>bool</code>
+          </td>
+          <td><p>if True, timeseries are requested by the asynchronous wrapper. Defaults to False</p></td>
+          <td>
+                <code>False</code>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+  <p><strong>Returns:</strong></p>
+  <table>
+    <thead>
+      <tr>
+<th>Name</th>        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+<td><code>df</code></td>          <td>
+                <code>pandas.<span title="pandas.DataFrame">DataFrame</span></code>
+          </td>
+          <td><p>Pandas dataframe with index "id" and columns</p></td>
+        </tr>
+        <tr>
+<td></td>          <td>
+          </td>
+          <td><p>"name" and "group_id".</p></td>
+        </tr>
+    </tbody>
+  </table>
+
+      <details class="quote">
+        <summary>Source code in <code>src\fewspy\api.py</code></summary>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">124</span>
+<span class="normal">125</span>
+<span class="normal">126</span>
+<span class="normal">127</span>
+<span class="normal">128</span>
+<span class="normal">129</span>
+<span class="normal">130</span>
+<span class="normal">131</span>
+<span class="normal">132</span>
+<span class="normal">133</span>
+<span class="normal">134</span>
+<span class="normal">135</span>
+<span class="normal">136</span>
+<span class="normal">137</span>
+<span class="normal">138</span>
+<span class="normal">139</span>
+<span class="normal">140</span>
+<span class="normal">141</span>
+<span class="normal">142</span>
+<span class="normal">143</span>
+<span class="normal">144</span>
+<span class="normal">145</span>
+<span class="normal">146</span>
+<span class="normal">147</span>
+<span class="normal">148</span>
+<span class="normal">149</span>
+<span class="normal">150</span>
+<span class="normal">151</span>
+<span class="normal">152</span>
+<span class="normal">153</span>
+<span class="normal">154</span>
+<span class="normal">155</span>
+<span class="normal">156</span>
+<span class="normal">157</span>
+<span class="normal">158</span>
+<span class="normal">159</span>
+<span class="normal">160</span>
+<span class="normal">161</span>
+<span class="normal">162</span>
+<span class="normal">163</span>
+<span class="normal">164</span>
+<span class="normal">165</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_time_series</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span>
+    <span class="n">filter_id</span><span class="p">,</span>
+    <span class="n">location_ids</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">start_time</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">end_time</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">parameter_ids</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">qualifier_ids</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">thinning</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">only_headers</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">show_statistics</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">parallel</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">     Get FEWS qualifiers as a pandas DataFrame</span>
+
+<span class="sd">     Args:</span>
+<span class="sd">         filter_id (str): the FEWS id of the filter to pass as request parameter</span>
+<span class="sd">         location_ids (list): list with FEWS location ids to extract timeseries from. Defaults to None.</span>
+<span class="sd">         parameter_ids (list): list with FEWS parameter ids to extract timeseries from. Defaults to None.</span>
+<span class="sd">         qualifier_ids (list): list with FEWS qualifier ids to extract timeseries from. Defaults to None.</span>
+<span class="sd">         start_time (datetime.datetime): datetime-object with start datetime to use in request. Defaults to None.</span>
+<span class="sd">         end_time (datetime.datetime): datetime-object with end datetime to use in request. Defaults to None.</span>
+<span class="sd">         thinning (int): integer value for thinning parameter to use in request. Defaults to None.</span>
+<span class="sd">         only_headers (bool): if True, only headers will be returned. Defaults to False.</span>
+<span class="sd">         show_statistics (bool): if True, time series statistics will be included in header. Defaults to False.</span>
+<span class="sd">         parallel (bool): if True, timeseries are requested by the asynchronous wrapper. Defaults to False</span>
+
+<span class="sd">     Returns:</span>
+<span class="sd">         df (pandas.DataFrame): Pandas dataframe with index &quot;id&quot; and columns</span>
+<span class="sd">         &quot;name&quot; and &quot;group_id&quot;.</span>
+
+<span class="sd">     &quot;&quot;&quot;</span>
+    <span class="n">kwargs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__kwargs</span><span class="p">(</span><span class="n">url_post_fix</span><span class="o">=</span><span class="s2">&quot;timeseries&quot;</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="nb">locals</span><span class="p">())</span>
+    <span class="k">if</span> <span class="n">parallel</span><span class="p">:</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;only_headers&quot;</span><span class="p">)</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;show_statistics&quot;</span><span class="p">)</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">get_time_series_async</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">get_time_series</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
     <span class="k">return</span> <span class="n">result</span>
 </code></pre></div></td></tr></table></div>
       </details>
@@ -736,7 +1429,7 @@ snake_case.</p>
     <nav class="md-footer__inner md-grid" aria-label="Footer" >
       
         
-        <a href="../.." class="md-footer__link md-footer__link--prev" aria-label="Previous: Home" rel="prev">
+        <a href="../../manuals/contribute/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Contribute" rel="prev">
           <div class="md-footer__button md-icon">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
           </div>
@@ -745,11 +1438,26 @@ snake_case.</p>
               <span class="md-footer__direction">
                 Previous
               </span>
-              Home
+              Contribute
             </div>
           </div>
         </a>
       
+      
+        
+        <a href="../wrappers/" class="md-footer__link md-footer__link--next" aria-label="Next: Wrappers" rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              Wrappers
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4Z"/></svg>
+          </div>
+        </a>
       
     </nav>
   
@@ -761,6 +1469,19 @@ snake_case.</p>
     Made with
     <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
       Material for MkDocs
+    </a>
+  
+</div>
+      
+        <div class="md-social">
+  
+    
+    
+      
+      
+    
+    <a href="https://github.com/d2hydro/fewspy" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 512"><!--! Font Awesome Free 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M186.1 328.7c0 20.9-10.9 55.1-36.7 55.1s-36.7-34.2-36.7-55.1 10.9-55.1 36.7-55.1 36.7 34.2 36.7 55.1zM480 278.2c0 31.9-3.2 65.7-17.5 95-37.9 76.6-142.1 74.8-216.7 74.8-75.8 0-186.2 2.7-225.6-74.8-14.6-29-20.2-63.1-20.2-95 0-41.9 13.9-81.5 41.5-113.6-5.2-15.8-7.7-32.4-7.7-48.8 0-21.5 4.9-32.3 14.6-51.8 45.3 0 74.3 9 108.8 36 29-6.9 58.8-10 88.7-10 27 0 54.2 2.9 80.4 9.2 34-26.7 63-35.2 107.8-35.2 9.8 19.5 14.6 30.3 14.6 51.8 0 16.4-2.6 32.7-7.7 48.2 27.5 32.4 39 72.3 39 114.2zm-64.3 50.5c0-43.9-26.7-82.6-73.5-82.6-18.9 0-37 3.4-56 6-14.9 2.3-29.8 3.2-45.1 3.2-15.2 0-30.1-.9-45.1-3.2-18.7-2.6-37-6-56-6-46.8 0-73.5 38.7-73.5 82.6 0 87.8 80.4 101.3 150.4 101.3h48.2c70.3 0 150.6-13.4 150.6-101.3zm-82.6-55.1c-25.8 0-36.7 34.2-36.7 55.1s10.9 55.1 36.7 55.1 36.7-34.2 36.7-55.1-10.9-55.1-36.7-55.1z"/></svg>
     </a>
   
 </div>
