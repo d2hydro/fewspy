@@ -1,3 +1,2 @@
 from .api import Api
-
-__version__ = "v0.5.0"
+__version__ = "0.5.1"

@@ -11,3 +11,5 @@ dependencies:
   - geopandas
   - requests
   - mkdocs
+  - pip:
+    - fewspy
