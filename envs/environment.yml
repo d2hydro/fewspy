@@ -6,10 +6,8 @@ channels:
 
 dependencies:
   - aiohttp
-  - jupyter
+  - requests
   - pandas
   - geopandas
-  - requests
-  - mkdocs
   - pip:
     - fewspy
