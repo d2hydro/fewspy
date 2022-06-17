@@ -1,43 +1,33 @@
-# fewspy
-A Python API for the Deltares FEWS PI REST Web Service
+# Fewspy
+
+A Python API for the [Deltares FEWS PI REST Web Service](https://publicwiki.deltares.nl/display/FEWSDOC/FEWS+PI+REST+Web+Service).
+
+Fewspy is build for speed; time-series requests are handled asynchronous, giving the results you need much faster.
+
+---
+
+**Source Code**: [https://github.com/d2hydro/fewspy](https://github.com/d2hydro/fewspy)
+
+---
 
 ## Installation
-1. Make sure you have git [Git](https://gitforwindows.org/) installed.
-2. Make sure you have a copy of [Anaconda](https://www.anaconda.com/) or [Miniconda](https://veranostech.github.io/docs-korean-conda-docs/docs/build/html/miniconda.html) installed.
-3. Clone the **fewspy**, e.g. via GIT:
-```
-git clone https://github.com/d2hydro/fewspy.git
-```
-Developers continue to [Install for development](#install-for-development).
 
-For regular use continue below
-### Install for Regular use
-4. Make sure you have all requirements in [environment.yml](envs/environment.yml)  installed in a Anaconda environment:
+Fewspy can be installed with pip in any environment with the following Python-packages properly installed:
+
+* requests
+* aiohttp
+* pandas
+* geopandas
+
+In that activated environment you can add fewspy via pip by:
+```
+pip install fewspy
+```
+We recommend to build your environment using [Anaconda](https://www.anaconda.com/). You can build an environment ánd install fewspy by conda in one go using this <a href="https://github.com/d2hydro/fewspy/blob/main/envs/environment.yml" target="_blank">environment.yml</a> from the command-line:
 ```
 conda env create -f environment.yml
 ```
-5. Activate the environment in the Command Prompt (or Anaconda Prompt) by:
-```
-conda activate fewspy
-```
-6. Now navigate to the clone on your disk and install **fewspy** (so with **-e**):
-```
-cd path\to\fewspy
-pip install .
-```
-<h3 id="install-for-development">Install for development</h3>
 
-4. Make sure you have the fewspy development environment installed, using the [environment_dev.yml](envs/environment_dev.yml). By e.g. Anaconda:
-```
-conda env create -f environment_dev.yml
-```
-5. Activate the environment in the Command Prompt (or Anaconda Prompt) by:
-```
-conda activate fewspy
-```
-6. Now `cd` to the clone on your disk and install **fewspy** in dev-mode (so with **-e**):
+## About
 
-```
-cd path\to\fewspy
-pip install -e .
-```
+Fewspy is developed and maintained by [D2Hydro](https://d2hydro.nl/) and freely available under an Open Source <a href="https://github.com/d2hydro/fewspy/blob/main/LICENSE" target="_blank">MIT license</a>.
