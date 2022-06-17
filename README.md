@@ -6,7 +6,7 @@ Fewspy is build for speed; time-series requests are handled asynchronous, giving
 
 ---
 
-**Documentation**: [https://d2hydro.github.io/fewspy/](https://d2hydro.github.io/fewspy/)
+**Documentation**: [https://d2hydro.github.io/fewspy](https://d2hydro.github.io/fewspy)
 
 **Source Code**: [https://github.com/d2hydro/fewspy](https://github.com/d2hydro/fewspy)
 
