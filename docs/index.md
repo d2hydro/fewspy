@@ -29,7 +29,6 @@ We recommend to build your environment using [Anaconda](https://www.anaconda.com
 ```
 conda env create -f environment.yml
 ```
-
 ## About
 
 Fewspy is developed and maintained by [D2Hydro](https://d2hydro.nl/) and freely available under an Open Source <a href="https://github.com/d2hydro/fewspy/blob/main/LICENSE" target="_blank">MIT license</a>.
