@@ -7,6 +7,7 @@ https://publicwiki.deltares.nl/display/FEWSDOC/FEWS+PI+REST+Web+Service
 
 import pandas as pd
 from .utils.timer import Timer
+from .utils.url import validate_url
 import logging
 import urllib3
 
@@ -30,12 +31,17 @@ class Api:
     For more info on how-to work with the FEWS REST Web Service, visit the Deltares Website: https://publicwiki.deltares.nl/display/FEWSDOC/FEWS+PI+REST+Web+Service
     """
 
-    def __init__(self, url, logger=LOGGER, ssl_verify=False):
+    def __init__(self, url, logger=LOGGER, ssl_verify=None):
         self.document_format = "PI_JSON"
-        self.url = url
         self.logger = logger
         self.timer = Timer(logger)
-        self.ssl_verify = ssl_verify
+        self.url, verify = validate_url(url)
+
+        # set ssl_verify
+        if ssl_verify is None:
+            self.ssl_verify = verify
+        else:
+            self.ssl_verify = ssl_verify
 
     def __kwargs(self, url_post_fix: str, kwargs: dict) -> dict:
         kwargs = {
@@ -84,6 +90,7 @@ class Api:
          """
 
         kwargs = self.__kwargs(url_post_fix="filters", kwargs=locals())
+        print(kwargs["url"])
         result = get_filters(**kwargs)
 
         return result
