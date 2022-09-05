@@ -5,9 +5,13 @@ from ..utils.timer import Timer
 from ..utils.transformations import parameters_to_fews
 from typing import List, Union
 from ..time_series import TimeSeriesSet
+from aiohttp import ClientSession
+
 from datetime import datetime
 import aiohttp
 import asyncio
+import nest_asyncio
+nest_asyncio.apply()
 
 LOGGER = logging.getLogger(__name__)
 
@@ -74,39 +78,42 @@ def get_time_series_async(
     parameters = parameters_to_fews(locals())
 
     def _get_loop():
-        try:
+        try:        
             loop = asyncio.get_event_loop()
         except RuntimeError:
+            
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
         finally:
             loop.set_debug(True)
             return loop
 
-    async def get_timeseries_async(location_id, parameter_id, session):
+    async def get_timeseries_async(location_id, parameter_id,qualifier_id, session):
         """Get timerseries using FEWS (asynchronously)"""
         parameters["locationIds"] = [location_id]
         parameters["parameterIds"] = [parameter_id]
+        parameters["qualifierIds"] = [qualifier_id]
+        if (parameters["qualifierIds"]==[['']]):
+            parameters["qualifierIds"] = [1]
         try:
             response = await session.request(
                 method="GET", url=url, params=parameters, verify_ssl=verify
             )
-            # print(response.url)
+            print(response.url)
             response.raise_for_status()
         except Exception as err:
-            # print(f"An error ocurred: {err}")
+            print(f"An error ocurred: {err}")
             response = None
         response_json = await response.json()
         return response_json
 
-    async def run_program(location_id, parameter_id, session):
+    async def run_program(location_id, parameter_id,qualifier_id, session):
 
         """Wrapper for running program in an asynchronous manner"""
-        try:
-            response = await get_timeseries_async(location_id, parameter_id, session)
-            # print(f"{len(response.get('timeSeries'))}")
+        try:       
+            response = await get_timeseries_async(location_id, parameter_id, qualifier_id, session)
         except Exception as err:
-            # print(f"Exception occured: {err}")
+            print(f"Exception occured: {err}")
             response = None
             pass
         return response
@@ -115,16 +122,17 @@ def get_time_series_async(
         async with aiohttp.ClientSession(loop=loop) as session:
             print("fetching async")
             fetch_all = [
-                run_program(location_id, parameter_id, session)
+                run_program(location_id, parameter_id,qualifier_id, session)
                 for location_id in location_ids
                 for parameter_id in parameter_ids
+                for qualifier_id in qualifier_ids
             ]
             result_async = await asyncio.gather(*fetch_all)
             return result_async
 
     if __name__ == "fewspy.wrappers.get_time_series_async":
-        print("name=", __name__)
         loop = _get_loop()
         result_async = loop.run_until_complete(asynciee())
-    time_series_set = __result_async_to_time_series_set(result_async)
+        time_series_set = __result_async_to_time_series_set(result_async)
+        print("async done")
     return time_series_set
