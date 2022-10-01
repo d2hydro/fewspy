@@ -75,7 +75,7 @@ def get_time_series(
         time_series_set = TimeSeriesSet.from_pi_time_series(pi_time_series)
         timer.report(report_string.format(status="parsed"))
     else:
-        logger.error(f"FEWS Server responds {response.text}")
+        logger.error(f"FEWS WebService request {response.url} responds {response.text}")
         time_series_set = TimeSeriesSet()
 
     return time_series_set

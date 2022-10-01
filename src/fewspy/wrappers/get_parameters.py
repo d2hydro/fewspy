@@ -57,6 +57,7 @@ def get_parameters(
             df = pd.DataFrame(response.json()["timeSeriesParameters"])
             df.columns = [camel_to_snake_case(i) for i in df.columns]
             df["uses_datum"] = df["uses_datum"] == "true"
+            timer.report("Parameters parsed")
     else:
         logger.error(f"FEWS Server responds {response.text}")
 

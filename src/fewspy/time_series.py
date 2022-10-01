@@ -77,7 +77,7 @@ class Events(pd.DataFrame):
     """FEWS-PI events in pandas DataFrame"""
 
     @classmethod
-    def from_pi_events(cls, pi_events: list, missing_value: float):
+    def from_pi_events(cls, pi_events: list, missing_value: float, tz_offset: float = None):
         """
         Parse Events from FEWS PI events dict.
 
@@ -92,7 +92,10 @@ class Events(pd.DataFrame):
         df = cls(pi_events)
 
         # set datetime
-        df["datetime"] = pd.to_datetime(df["date"]) + pd.to_timedelta(df["time"])
+        if tz_offset is not None:
+            df["datetime"] = pd.to_datetime(df["date"]) + pd.to_timedelta(df["time"]) - pd.Timedelta(hours=tz_offset)
+        else:
+            df["datetime"] = pd.to_datetime(df["date"]) + pd.to_timedelta(df["time"])
 
         # set value to numeric and remove missings
         df["value"] = pd.to_numeric(df["value"])
@@ -122,13 +125,13 @@ class TimeSeries:
     events: Events = pd.DataFrame(columns=EVENT_COLUMNS).set_index("datetime")
 
     @classmethod
-    def from_pi_time_series(cls, pi_time_series: dict):
+    def from_pi_time_series(cls, pi_time_series: dict, time_zone: float = None):
         # print(pi_time_series)
         header = Header.from_pi_header(pi_time_series["header"])
         kwargs = dict(header=header)
         if "events" in pi_time_series.keys():
             kwargs["events"] = Events.from_pi_events(
-                pi_time_series["events"], header.miss_val
+                pi_time_series["events"], header.miss_val, time_zone
             )
         return cls(**kwargs)
 
@@ -149,10 +152,11 @@ class TimeSeriesSet:
         if "version" in pi_time_series_set.keys():
             kwargs["version"] = pi_time_series_set["version"]
         if "timeZone" in pi_time_series_set.keys():
-            kwargs["time_zone"] = float(pi_time_series_set["timeZone"])
+            time_zone = float(pi_time_series_set["timeZone"])
+            kwargs["time_zone"] = time_zone
         if "timeSeries" in pi_time_series_set.keys():
             kwargs["time_series"] = [
-                TimeSeries.from_pi_time_series(i)
+                TimeSeries.from_pi_time_series(i, time_zone)
                 for i in pi_time_series_set["timeSeries"]
             ]
             if len(kwargs["time_series"]) > 0:

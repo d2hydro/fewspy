@@ -31,7 +31,7 @@ class Api:
     For more info on how-to work with the FEWS REST Web Service, visit the Deltares Website: https://publicwiki.deltares.nl/display/FEWSDOC/FEWS+PI+REST+Web+Service
     """
 
-    def __init__(self, url, logger=LOGGER, ssl_verify=None):
+    def __init__(self, url, logger=None, ssl_verify=None):
         self.document_format = "PI_JSON"
         self.logger = logger
         self.timer = Timer(logger)
@@ -42,6 +42,12 @@ class Api:
             self.ssl_verify = verify
         else:
             self.ssl_verify = ssl_verify
+
+        # set logger
+        if logger is None:
+            self.logger = LOGGER
+        else:
+            self.logger = logger
 
     def __kwargs(self, url_post_fix: str, kwargs: dict) -> dict:
         kwargs = {
@@ -90,7 +96,6 @@ class Api:
          """
 
         kwargs = self.__kwargs(url_post_fix="filters", kwargs=locals())
-        print(kwargs["url"])
         result = get_filters(**kwargs)
 
         return result

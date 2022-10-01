@@ -59,8 +59,6 @@ def get_qualifiers(url: str, verify: bool = False, logger=LOGGER) -> pd.DataFram
     response = requests.get(url, verify=False)
     timer.report("Qualifiers request")
 
-    logger.debug(response.url)
-
     # parse the response
     if response.status_code == 200:
         tree = ElementTree.fromstring(response.content)
