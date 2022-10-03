@@ -77,7 +77,9 @@ class Events(pd.DataFrame):
     """FEWS-PI events in pandas DataFrame"""
 
     @classmethod
-    def from_pi_events(cls, pi_events: list, missing_value: float, tz_offset: float = None):
+    def from_pi_events(
+        cls, pi_events: list, missing_value: float, tz_offset: float = None
+    ):
         """
         Parse Events from FEWS PI events dict.
 
@@ -93,7 +95,11 @@ class Events(pd.DataFrame):
 
         # set datetime
         if tz_offset is not None:
-            df["datetime"] = pd.to_datetime(df["date"]) + pd.to_timedelta(df["time"]) - pd.Timedelta(hours=tz_offset)
+            df["datetime"] = (
+                pd.to_datetime(df["date"])
+                + pd.to_timedelta(df["time"])
+                - pd.Timedelta(hours=tz_offset)
+            )
         else:
             df["datetime"] = pd.to_datetime(df["date"]) + pd.to_timedelta(df["time"])
 

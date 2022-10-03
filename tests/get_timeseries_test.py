@@ -17,7 +17,7 @@ def test_time_zone():
 
 
 def test_version():
-    assert timeseriesset.version == "1.28"
+    assert timeseriesset.version == "1.31"
 
 
 def test_empty():
@@ -42,4 +42,4 @@ def test_location_ids():
 
 
 def test_qualifier_ids():
-    assert timeseriesset.qualifier_ids == ["validatie"]
+    assert timeseriesset.qualifier_ids == ["productie"]

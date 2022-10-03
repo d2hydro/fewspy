@@ -1,70 +1,70 @@
 [
- {
-  "id": "webservices",
-  "name": "WebServices",
-  "child": [
-   {
-    "id": "WDB",
-    "name": "WAM Dashboard",
-    "child": [
-     {
-      "id": "WDB_OW",
-      "name": "Oppervlaktewater",
-      "child": [
-       {
-        "id": "WDB_OW_KGM",
-        "name": "Gemaal"
-       },
-       {
-        "id": "WDB_OW_KST",
-        "name": "Stuw"
-       },
-       {
-        "id": "WDB_OW_INL",
-        "name": "Inlaat"
-       },
-       {
-        "id": "WDB_OW_KSL",
-        "name": "Sluis"
-       },
-       {
-        "id": "WDB_OW_MPN",
-        "name": "Meetpunt"
-       }
-      ]
-     },
-     {
-      "id": "WDB_GW",
-      "name": "Grondwater",
-      "child": [
-       {
-        "id": "WDB_GW_GMW",
-        "name": "Peilbuis"
-       }
-      ]
-     },
-     {
-      "id": "WDB_FC",
-      "name": "Fysisch/Chemisch",
-      "child": [
-       {
-        "id": "WDB_FC_MPN",
-        "name": "Meetpunt"
-       }
-      ]
-     },
-     {
-      "id": "WDB_ML",
-      "name": "Meteorologie",
-      "child": [
-       {
-        "id": "WDB_ML_KNMI",
-        "name": "KNMI"
-       }
-      ]
-     }
-    ]
-   }
-  ]
- }
+    {
+        "id": "webservices",
+        "name": "WebServices",
+        "child": [
+            {
+                "id": "WDB",
+                "name": "WAM Dashboard",
+                "child": [
+                    {
+                        "id": "WDB_OW",
+                        "name": "Oppervlaktewater",
+                        "child": [
+                            {
+                                "id": "WDB_OW_KGM",
+                                "name": "Gemaal"
+                            },
+                            {
+                                "id": "WDB_OW_KST",
+                                "name": "Stuw"
+                            },
+                            {
+                                "id": "WDB_OW_INL",
+                                "name": "Inlaat"
+                            },
+                            {
+                                "id": "WDB_OW_KSL",
+                                "name": "Sluis"
+                            },
+                            {
+                                "id": "WDB_OW_MPN",
+                                "name": "Meetpunt (hydrologisch)"
+                            }
+                        ]
+                    },
+                    {
+                        "id": "WDB_GW",
+                        "name": "Grondwater",
+                        "child": [
+                            {
+                                "id": "WDB_GW_GMW",
+                                "name": "Peilbuis"
+                            }
+                        ]
+                    },
+                    {
+                        "id": "WDB_FC",
+                        "name": "Fysisch-Chemisch",
+                        "child": [
+                            {
+                                "id": "FC_LAB_INT_MPN",
+                                "name": "Alle meetpunten"
+                            }
+                        ]
+                    },
+                    {
+                        "id": "WDB_ML",
+                        "name": "Meteorologie",
+                        "child": [
+                            {
+                                "id": "WDB_ML_KNMI",
+                                "name": "KNMI"
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
 ]

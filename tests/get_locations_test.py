@@ -4,11 +4,13 @@ from config import api
 
 ATTRIBUTES = ["MPN_IDENT", "MPN_BRON"]
 DATA_PATH = Path(__file__).parent / "data"
-
-locations_reference = gpd.read_file(DATA_PATH / "locations.gpkg").set_index(
-    "location_id"
-)
+REFERENCE_GPKG = DATA_PATH / "locations.gpkg"
+locations_reference = gpd.read_file(REFERENCE_GPKG).set_index("location_id")
 locations = api.get_locations(attributes=ATTRIBUTES)
+
+
+def write_reference_set():
+    locations.to_file(REFERENCE_GPKG, driver="GPKG")
 
 
 def test_to_reference_set():

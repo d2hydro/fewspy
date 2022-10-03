@@ -1,6 +1,5 @@
 import requests
 import logging
-from typing import List
 from ..utils.timer import Timer
 from ..utils.transformations import parameters_to_fews
 
@@ -13,7 +12,7 @@ def get_timezone_id(
     document_format: str = "PI_JSON",
     verify: bool = False,
     logger=LOGGER,
-) -> List[dict]:
+) -> str:
     """
     Get FEWS timezone id
 
@@ -28,7 +27,7 @@ def get_timezone_id(
         default, a logger will ge created.
 
     Returns:
-        something undefined
+        str: timezone string, e.g. GMT+01:00 expressing a GMT + 1 hour offset
 
     """
 
@@ -40,8 +39,7 @@ def get_timezone_id(
 
     # parse the response
     if response.status_code == 200:
-        if "filters" in response.json().keys():
-            result = response.json()
+        result = response.text
         timer.report("Timezone parsed")
     else:
         logger.error(f"FEWS Server responds {response.text}")

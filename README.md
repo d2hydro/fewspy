@@ -18,6 +18,7 @@ Fewspy can be installed with pip in any environment with the following Python-pa
 
 * requests
 * aiohttp
+* nest-asyncio
 * pandas
 * geopandas
 

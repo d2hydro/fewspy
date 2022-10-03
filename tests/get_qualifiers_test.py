@@ -4,10 +4,19 @@ from config import api
 
 
 DATA_PATH = Path(__file__).parent / "data"
+QUALIFIERS_CSV = DATA_PATH / "qualifiers.csv"
+qualifiers_reference = pd.read_csv(QUALIFIERS_CSV).set_index("id")
+qualifiers_reference.sort_index(inplace=True)
 
-qualifiers_reference = pd.read_csv(DATA_PATH / "qualifiers.csv").set_index("id")
+
 qualifiers = api.get_qualifiers()
+qualifiers.sort_index(inplace=True)
+
+
+def write_reference_set():
+    qualifiers.to_csv(QUALIFIERS_CSV)
 
 
 def test_to_refrence_set():
-    assert qualifiers.sort_index().equals(qualifiers_reference.sort_index())
+    all(qualifiers.index == qualifiers_reference.index)
+    assert all(qualifiers.index == qualifiers_reference.index)

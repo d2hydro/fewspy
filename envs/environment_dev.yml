@@ -6,6 +6,7 @@ channels:
 
 dependencies:
   - aiohttp
+  - nest-asyncio
   - black
   - jupyter
   - pandas

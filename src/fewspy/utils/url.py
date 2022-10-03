@@ -5,7 +5,7 @@ class URLNotFoundError(Exception):
     pass
 
 
-def validate_url(url: str, test_postfix: str = "filters") -> str:
+def validate_url(url: str, test_postfix: str = "timezoneid") -> str:
     """
 
     Args:

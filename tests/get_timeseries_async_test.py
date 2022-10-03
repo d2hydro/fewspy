@@ -2,20 +2,9 @@ from datetime import datetime
 from config import api
 
 
-LOCATION_IDS = [
-    "NL34.HL.KGM154.LWZ1",
-    "NL34.HL.KGM154.HWZ1",
-    "NL34.HL.KGM154.KWK",
-    "NL34.HL.KGM156.PMP2",
-    "NL34.HL.KGM156.HWZ1",
-    "NL34.HL.KGM155.HWZ1",
-    "NL34.HL.KGM156.KSL1",
-    "NL34.HL.KGM156.LWZ1",
-    "NL34.HL.KGM156.PMP1",
-    "NL34.HL.KGM154.PMP1",
-    "NL34.HL.KGM155.LWZ1",
-]
+LOCATION_IDS = ["NL34.HL.KGM156.HWZ1", "NL34.HL.KGM156.LWZ1"]
 PARAMETER_IDS = ["Q [m3/s] [NVT] [OW]", "WATHTE [m] [NAP] [OW]"]
+QUALIFIER_IDS = ["productie"]
 
 time_series_set = api.get_time_series(
     filter_id="WDB_OW_KGM",
@@ -23,6 +12,7 @@ time_series_set = api.get_time_series(
     start_time=datetime(2022, 5, 1),
     end_time=datetime(2022, 5, 5),
     parameter_ids=PARAMETER_IDS,
+    qualifier_ids=QUALIFIER_IDS,
     parallel=True,
 )
 
@@ -32,7 +22,7 @@ def test_time_zone():
 
 
 def test_version():
-    assert time_series_set.version == "1.28"
+    assert time_series_set.version == "1.31"
 
 
 def test_empty():
@@ -40,7 +30,7 @@ def test_empty():
 
 
 def test_length():
-    assert len(time_series_set) == 11
+    assert len(time_series_set) == 2
 
 
 def test_parameter_ids():
@@ -52,4 +42,4 @@ def test_location_ids():
 
 
 def test_qualifier_ids():
-    assert time_series_set.qualifier_ids == ["validatie"]
+    assert time_series_set.qualifier_ids == ["productie"]

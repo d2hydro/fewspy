@@ -6,6 +6,7 @@ channels:
 
 dependencies:
   - aiohttp
+  - nest-asyncio
   - requests
   - pandas
   - geopandas
