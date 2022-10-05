@@ -1,6 +1,8 @@
 name: tests
 
-on: [push]
+on:
+  release:
+    types: [created]
 
 jobs:
   build-windows:
