@@ -20,4 +20,4 @@ dependencies:
   - pytest-cov
   - pytest-black
   - pytest-flakes
- 
+  - twine
