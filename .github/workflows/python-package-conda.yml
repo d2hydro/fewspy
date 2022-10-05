@@ -1,0 +1,27 @@
+name: tests
+
+on: [push]
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - uses: conda-incubator/setup-miniconda@v2
+      with:
+        python-version: 3.9
+        miniconda-version: "latest"
+        channels: conda-forge,defaults
+        channel-priority: true
+        activate-environment: test
+        environment-file: envs\environment_test.yml
+    - name: Test
+      shell: pwsh
+      run: |
+        conda info
+        conda list
+        pip install -e .
+        pytest --cov-report term-missing --cov=src --cov-report=xml tests\
+    - name: Upload coverage
+      uses: codecov/codecov-action@v2

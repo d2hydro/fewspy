@@ -1,0 +1,19 @@
+name: test
+
+channels:
+  - conda-forge
+  - defaults
+
+dependencies:
+  - aiohttp
+  - nest-asyncio
+  - requests
+  - pandas
+  - geopandas
+  - bokeh
+  - pip
+  - pydantic
+  - pytest
+  - pytest-cov
+  - pytest-black
+  - pytest-flakes

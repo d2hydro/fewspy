@@ -3,6 +3,11 @@
 A Python API for the [Deltares FEWS PI REST Web Service](https://publicwiki.deltares.nl/display/FEWSDOC/FEWS+PI+REST+Web+Service).
 
 Fewspy is build for speed; time-series requests are handled asynchronous, giving the results you need much faster.
+[![test](https://github.com/d2hydro/fewspy/actions/workflows/python-package-conda.yml/badge.svg)](https://github.com/d2hydro/fewspy/actions/workflows/python-package-conda.yml)
+[![Coverage](https://img.shields.io/codecov/c/github/d2hydro/fewspy)](https://codecov.io/github/d2hydro/fewspy)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![Release: latest](https://img.shields.io/github/v/release/d2hydro/fewspy)](https://pypi.org/project/fewspy)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ---
 
