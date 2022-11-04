@@ -8,14 +8,16 @@ Fewspy can be installed with pip in any environment with the following Python-pa
 * pandas
 * geopandas
 
-In that activated environment you can add fewspy via pip by:
+In that  environment you can add fewspy via pip by:
 ```
 pip install fewspy
 ```
-We recommend to build your environment using [Anaconda](https://www.anaconda.com/). You can build an environment ánd install fewspy by conda in one go using this <a href="https://github.com/d2hydro/fewspy/blob/main/envs/environment.yml" target="_blank">environment.yml</a> from the command-line:
+If you don't have such an environment, we recommend to build your environment using [Anaconda](https://www.anaconda.com/). You can build an environment ánd install fewspy by conda in one go using this <a href="https://github.com/d2hydro/fewspy/blob/main/envs/environment.yml" target="_blank">environment.yml</a> from the command-line:
 ```
 conda env create -f environment.yml
 ```
+An eloborated installation instruction can be found on: [installation tutorial](../tutorials/installation_tutorial.md)
+
 <h2 id="installation-for-development">Installation for development</h2>
 For development we recommend the following approach:
 
@@ -45,3 +47,6 @@ For development we recommend the following approach:
     cd path\to\fewspy
     pip install -e .
     ```
+	
+	
+	010 7036559

@@ -24,3 +24,6 @@ nav:
     - Code Reference:
         - Api: reference/api.md
         - Wrappers: reference/wrappers.md
+    - Tutorials:
+        - Installation tutorial: tutorials/installation_tutorial.md
+ 
