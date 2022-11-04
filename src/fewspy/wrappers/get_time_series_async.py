@@ -19,7 +19,7 @@ LOGGER = logging.getLogger(__name__)
 
 def __result_async_to_time_series_set(async_result):
     time_series_set = TimeSeriesSet()
-    time_series_set_gen = (i for i in async_result if "timeSeries" if type(i) == dict)
+    time_series_set_gen = (i for i in async_result if "timeSeries" if type(i) == dict) 
     time_series_set_list = [i for i in async_result if "timeSeries" in i.keys()]
 
     version = next((i for i in time_series_set_list if "version" in i.keys()), None)
@@ -94,12 +94,11 @@ def get_time_series_async(
         parameters["locationIds"] = [location_id]
         parameters["parameterIds"] = [parameter_id]
         if qualifier_id is not None:
-            parameters["qualifierIds"] = [qualifier_id]
+            parameters["qualifierIds"] = qualifier_id
         try:
             response = await session.request(
                 method="GET", url=url, params=parameters, verify_ssl=verify
             )
-            print(response.url)
             response.raise_for_status()
         except Exception as err:
             print(f"An error ocurred: {err}")
@@ -110,7 +109,6 @@ def get_time_series_async(
     async def run_program(location_id, parameter_id, qualifier_id, session):
 
         """Wrapper for running program in an asynchronous manner"""
-        print("run")
         try:
             response = await get_timeseries_async(
                 location_id, parameter_id, qualifier_id, session
