@@ -1,7 +1,7 @@
 import pandas as pd
 from typing import List
 from datetime import datetime
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from .utils.conversions import camel_to_snake_case, dict_to_datetime
 from .utils.transformations import flatten_list
 
@@ -146,7 +146,7 @@ class TimeSeries:
 class TimeSeriesSet:
     version: str = None
     time_zone: float = None
-    time_series: List[TimeSeries] = list
+    time_series: List[TimeSeries] = field(default_factory=list)
     empty: bool = True
 
     def __len__(self):
