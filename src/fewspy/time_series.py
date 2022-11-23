@@ -147,7 +147,6 @@ class TimeSeriesSet:
     version: str = None
     time_zone: float = None
     time_series: List[TimeSeries] = field(default_factory=list)
-    empty: bool = True
 
     def __len__(self):
         return len(self.time_series)
@@ -165,13 +164,15 @@ class TimeSeriesSet:
                 TimeSeries.from_pi_time_series(i, time_zone)
                 for i in pi_time_series_set["timeSeries"]
             ]
-            if len(kwargs["time_series"]) > 0:
-                kwargs["empty"] = False
         return cls(**kwargs)
 
     def add(self, time_series_set):
         # add time_series_set to the time_series_set
         return self
+
+    @property
+    def empty(self):
+        return all([i.events.empty for i in self.time_series])
 
     @property
     def parameter_ids(self):
