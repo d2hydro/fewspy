@@ -30,6 +30,7 @@ def get_time_series(
     end_time: datetime = None,
     thinning: int = None,
     only_headers: bool = False,
+    omit_missing: bool = True,
     show_statistics: bool = False,
     document_format: str = "PI_JSON",
     verify: bool = False,
@@ -49,6 +50,7 @@ def get_time_series(
         end_time (datetime.datetime): datetime-object with end datetime to use in request. Defaults to None.
         thinning (int): integer value for thinning parameter to use in request. Defaults to None.
         only_headers (bool): if True, only headers will be returned. Defaults to False.
+        omit_missing (bool): if True, no missings values will be returned. Defaults to True.
         show_statistics (bool): if True, time series statistics will be included in header. Defaults to False.
         document_format (str): request document format to return. Defaults to PI_JSON.
         verify (bool, optional): passed to requests.get verify parameter.

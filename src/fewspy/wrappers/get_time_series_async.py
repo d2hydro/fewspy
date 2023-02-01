@@ -19,7 +19,7 @@ LOGGER = logging.getLogger(__name__)
 
 def __result_async_to_time_series_set(async_result):
     time_series_set = TimeSeriesSet()
-    time_series_set_gen = (i for i in async_result if "timeSeries" if type(i) == dict) 
+    time_series_set_gen = (i for i in async_result if "timeSeries" if type(i) == dict)
     time_series_set_list = [i for i in async_result if "timeSeries" in i.keys()]
 
     version = next((i for i in time_series_set_list if "version" in i.keys()), None)
@@ -50,6 +50,7 @@ def get_time_series_async(
     end_time: datetime = None,
     thinning: int = None,
     document_format: str = "PI_JSON",
+    omit_missing: bool = True,
     verify: bool = False,
     logger=LOGGER,
 ) -> pd.DataFrame:
@@ -66,6 +67,7 @@ def get_time_series_async(
         end_time (datetime.datetime): datetime-object with end datetime to use in request. Defaults to None.
         thinning (int): integer value for thinning parameter to use in request. Defaults to None.
         document_format (str): request document format to return. Defaults to PI_JSON.
+        omit_missing (bool): if True, no missings values will be returned. Defaults to True
         verify (bool, optional): passed to requests.get verify parameter.
         Defaults to False.
         logger (logging.Logger, optional): Logger to pass logging to. By

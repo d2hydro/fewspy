@@ -78,7 +78,7 @@ class Events(pd.DataFrame):
 
     @classmethod
     def from_pi_events(
-        cls, pi_events: list, missing_value: float, tz_offset: float = None
+        cls, pi_events: list, missing_value: float = None, tz_offset: float = None
     ):
         """
         Parse Events from FEWS PI events dict.
@@ -95,17 +95,11 @@ class Events(pd.DataFrame):
 
         # set datetime
         if tz_offset is not None:
-            df["datetime"] = (
-                pd.to_datetime(df["date"])
-                + pd.to_timedelta(df["time"])
-                - pd.Timedelta(hours=tz_offset)
-            )
+            df["datetime"] = pd.to_datetime(
+                df["date"] + " " + df["time"]
+            ) - pd.Timedelta(hours=tz_offset)
         else:
-            df["datetime"] = pd.to_datetime(df["date"]) + pd.to_timedelta(df["time"])
-
-        # set value to numeric and remove missings
-        df["value"] = pd.to_numeric(df["value"])
-        df = df.loc[df["value"] != missing_value]
+            df["datetime"] = pd.to_datetime(df["date"] + " " + df["time"])
 
         # drop columns and add missing columns
         drop_cols = [i for i in df.columns if i not in EVENT_COLUMNS]
@@ -114,8 +108,12 @@ class Events(pd.DataFrame):
             if i not in df.columns:
                 df[i] = pd.NA
 
-        # set flag to numeric
-        df["flag"] = pd.to_numeric(df["flag"])
+        # set numeric types
+        df = df.astype(dtype={"value": "float32", "flag": "uint8"})
+
+        # remove missings (if specified)
+        if missing_value is not None:
+            df = df.loc[df["value"] != missing_value]
 
         # set datetime to index
         df.set_index("datetime", inplace=True)
@@ -132,12 +130,11 @@ class TimeSeries:
 
     @classmethod
     def from_pi_time_series(cls, pi_time_series: dict, time_zone: float = None):
-        # print(pi_time_series)
         header = Header.from_pi_header(pi_time_series["header"])
         kwargs = dict(header=header)
         if "events" in pi_time_series.keys():
             kwargs["events"] = Events.from_pi_events(
-                pi_time_series["events"], header.miss_val, time_zone
+                pi_time_series["events"], None, time_zone
             )
         return cls(**kwargs)
 

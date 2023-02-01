@@ -18,7 +18,7 @@ from .wrappers import (
     get_locations,
     get_filters,
     get_parameters,
-    get_timezone_id
+    get_timezone_id,
 )
 
 LOGGER = logging.getLogger(__name__)
@@ -157,6 +157,7 @@ class Api:
         qualifier_ids=None,
         thinning=None,
         only_headers=False,
+        omit_missing=True,
         show_statistics=False,
         parallel=False,
     ):
@@ -172,6 +173,7 @@ class Api:
             end_time (datetime.datetime): datetime-object with end datetime to use in request. Defaults to None.
             thinning (int): integer value for thinning parameter to use in request. Defaults to None.
             only_headers (bool): if True, only headers will be returned. Defaults to False.
+            omit_missing (bool): if True, no missings values will be returned. Defaults to True.
             show_statistics (bool): if True, time series statistics will be included in header. Defaults to False.
             parallel (bool): if True, timeseries are requested by the asynchronous wrapper. Defaults to False
 
