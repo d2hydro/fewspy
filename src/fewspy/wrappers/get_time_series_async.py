@@ -84,7 +84,6 @@ def get_time_series_async(
         try:
             loop = asyncio.get_event_loop()
         except RuntimeError:
-
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
         finally:
@@ -109,7 +108,6 @@ def get_time_series_async(
         return response_json
 
     async def run_program(location_id, parameter_id, qualifier_id, session):
-
         """Wrapper for running program in an asynchronous manner"""
         try:
             response = await get_timeseries_async(

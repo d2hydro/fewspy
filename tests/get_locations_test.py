@@ -9,7 +9,7 @@ locations_reference = gpd.read_file(REFERENCE_GPKG).set_index("location_id")
 locations = api.get_locations(attributes=ATTRIBUTES)
 
 
-def write_reference_set():
+def _write_reference_set():
     locations.to_file(REFERENCE_GPKG, driver="GPKG")
 
 
