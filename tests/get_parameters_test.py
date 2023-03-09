@@ -8,7 +8,7 @@ parameters_reference = pd.read_csv(PARAMETERS_CSV).set_index("id")
 parameters = api.get_parameters()
 
 
-def write_reference_set():
+def _write_reference_set():
     parameters.to_csv(PARAMETERS_CSV)
 
 
