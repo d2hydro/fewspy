@@ -20,7 +20,7 @@ LOGGER = logging.getLogger(__name__)
 def __result_async_to_time_series_set(async_result):
     time_series_set = TimeSeriesSet()
     time_series_set_gen = (i for i in async_result if "timeSeries" if type(i) == dict)
-    time_series_set_list = [i for i in async_result if "timeSeries" in i.keys()]
+    time_series_set_list = [i for i in time_series_set_gen if "timeSeries" in i.keys()]
 
     version = next((i for i in time_series_set_list if "version" in i.keys()), None)
     if version is not None:
@@ -78,7 +78,7 @@ def get_time_series_async(
         "name" and "group_id".
 
     """
-    parameters = parameters_to_fews(locals())
+    parameters = parameters_to_fews(locals(), bool_to_string=True)
 
     def _get_loop():
         try:
@@ -102,7 +102,9 @@ def get_time_series_async(
             )
             response.raise_for_status()
         except Exception as err:
-            print(f"An error ocurred: {err}")
+            logger.error(
+                f"An error ocurred: {err} while executing url {url} with parameters {parameters}"
+                )
             response = None
         response_json = await response.json()
         return response_json
@@ -114,7 +116,9 @@ def get_time_series_async(
                 location_id, parameter_id, qualifier_id, session
             )
         except Exception as err:
-            print(f"Exception occured: {err}")
+            logger.error(
+                f"Exception occured: {err}"
+                )
             response = None
             pass
         return response
@@ -140,5 +144,4 @@ def get_time_series_async(
         loop = _get_loop()
         result_async = loop.run_until_complete(asynciee())
         time_series_set = __result_async_to_time_series_set(result_async)
-        print("async done")
     return time_series_set

@@ -134,7 +134,7 @@ class TimeSeries:
         kwargs = dict(header=header)
         if "events" in pi_time_series.keys():
             kwargs["events"] = Events.from_pi_events(
-                pi_time_series["events"], None, time_zone
+                pi_time_series["events"], header.miss_val, time_zone
             )
         return cls(**kwargs)
 
