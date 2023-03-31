@@ -12,6 +12,7 @@ theme:
 plugins:
   - search
   - mkdocstrings
+  - mkdocs-jupyter
   
 extra:
   social:
@@ -20,10 +21,11 @@ extra:
 nav:
     - Home: index.md
     - Installation: manuals/installation.md
+    - Get started: manuals/get_started.ipynb
     - Contribute: manuals/contribute.md
     - Code Reference:
         - Api: reference/api.md
         - Wrappers: reference/wrappers.md
     - Tutorials:
-        - Installation tutorial: tutorials/installation_tutorial.md
+        - Installation: tutorials/installation_tutorial.md
  
