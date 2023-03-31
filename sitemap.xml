@@ -2,32 +2,37 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://d2hydro.github.io/fewspy/</loc>
-         <lastmod>2023-03-09</lastmod>
+         <lastmod>2023-03-31</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://d2hydro.github.io/fewspy/manuals/contribute/</loc>
-         <lastmod>2023-03-09</lastmod>
+         <lastmod>2023-03-31</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://d2hydro.github.io/fewspy/manuals/get_started/</loc>
+         <lastmod>2023-03-31</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://d2hydro.github.io/fewspy/manuals/installation/</loc>
-         <lastmod>2023-03-09</lastmod>
+         <lastmod>2023-03-31</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://d2hydro.github.io/fewspy/reference/api/</loc>
-         <lastmod>2023-03-09</lastmod>
+         <lastmod>2023-03-31</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://d2hydro.github.io/fewspy/reference/wrappers/</loc>
-         <lastmod>2023-03-09</lastmod>
+         <lastmod>2023-03-31</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://d2hydro.github.io/fewspy/tutorials/installation_tutorial/</loc>
-         <lastmod>2023-03-09</lastmod>
+         <lastmod>2023-03-31</lastmod>
          <changefreq>daily</changefreq>
     </url>
 </urlset>
