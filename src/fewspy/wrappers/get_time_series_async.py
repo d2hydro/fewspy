@@ -104,7 +104,7 @@ def get_time_series_async(
         except Exception as err:
             logger.error(
                 f"An error ocurred: {err} while executing url {url} with parameters {parameters}"
-                )
+            )
             response = None
         response_json = await response.json()
         return response_json
@@ -116,9 +116,7 @@ def get_time_series_async(
                 location_id, parameter_id, qualifier_id, session
             )
         except Exception as err:
-            logger.error(
-                f"Exception occured: {err}"
-                )
+            logger.error(f"Exception occured: {err}")
             response = None
             pass
         return response
