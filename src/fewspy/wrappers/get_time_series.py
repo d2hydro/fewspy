@@ -74,6 +74,7 @@ def get_time_series(
     # parse the response
     if response.ok:
         pi_time_series = response.json()
+        logger.debug(response.url)
         time_series_set = TimeSeriesSet.from_pi_time_series(pi_time_series)
         timer.report(report_string.format(status="parsed"))
         if time_series_set.empty:
