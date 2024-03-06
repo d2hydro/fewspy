@@ -22,6 +22,7 @@ def get_locations(
     attributes: list = [],
     verify: bool = False,
     logger=LOGGER,
+    remove_duplicates: bool = False
 ) -> pd.DataFrame:
     """
     Get FEWS qualifiers as a pandas DataFrame
@@ -53,6 +54,12 @@ def get_locations(
         # convert to gdf and snake_case
         gdf = gpd.GeoDataFrame(response.json()["locations"])
         gdf.columns = [camel_to_snake_case(i) for i in gdf.columns]
+
+        # remove duplicates
+        if remove_duplicates:
+            gdf.drop_duplicates(subset="location_id", inplace=True, ignore_index=True)
+
+        # set index
         gdf.set_index("location_id", inplace=True)
 
         # handle geometry and crs

@@ -102,7 +102,7 @@ class Api:
 
         return result
 
-    def get_locations(self, filter_id=None, attributes=[]):
+    def get_locations(self, filter_id=None, attributes=[], remove_duplicates=False):
         """
         Get FEWS qualifiers as a pandas DataFrame
 
@@ -110,6 +110,7 @@ class Api:
             E.g. http://localhost:8080/FewsWebServices/rest/fewspiservice/v1/qualifiers
             filter_id (str): the FEWS id of the filter to pass as request parameter
             attributes (list): if not emtpy, the location attributes to include as columns in the pandas DataFrame.
+            remove_duplicates (bool): if True, duplicated location_ids are removed. Default = False
 
         Returns:
             df (pandas.DataFrame): Pandas dataframe with index "id" and columns
