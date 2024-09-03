@@ -1,5 +1,40 @@
 [build-system]
-requires = ["setuptools>=45", "setuptools_scm[toml]>=6.2", "wheel"]
+requires = ["setuptools>=61"]
 build-backend = "setuptools.build_meta"
 
-[tool.setuptools_scm]
+[project]
+name = "fewspy"
+description = "A Python API for the Deltares FEWS PI REST Web Service"
+readme = "README.md"
+authors = [
+    { name = "Daniel Tollenaar", email = "daniel@d2hydro.nl" },
+]
+license = { text = "MIT" }
+
+dependencies = [
+   "aiohttp",
+   "nest-asyncio",
+   "pandas",
+   "geopandas",
+   "requests"
+]
+dynamic = ["version"]
+
+[project.optional-dependencies]
+tests = ["pytest"]
+
+[tool.flake8]
+max-line-length = 120
+max-complexity = 10
+
+[tool.setuptools]
+zip-safe = true
+
+[tool.setuptools.dynamic]
+version = { attr = "fewspy.__version__" }
+
+[tool.setuptools.packages.find]
+include = ["fewspy"]
+
+[project.urls]
+Source = "https://github.com/d2hydro/fewspy"
