@@ -14,10 +14,11 @@
         <link rel="prev" href="../api/">
       
       
-        <link rel="next" href="../../tutorials/installation_tutorial/">
+        <link rel="next" href="../timeseries/">
+      
       
       <link rel="icon" href="../../icons/logo/favicon.png">
-      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.1.5">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.39">
     
     
       
@@ -25,14 +26,17 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.7a7fce14.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.8c3ca2c6.min.css">
       
         
-        <link rel="stylesheet" href="../../assets/stylesheets/palette.a0c5b2b5.min.css">
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
       
       
 
+
     
+    
+      
     
     
       
@@ -46,7 +50,7 @@
     
       <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
     
-    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -61,9 +65,8 @@
     
     
     
-    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="blue" data-md-color-accent="">
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="blue" data-md-color-accent="indigo">
   
-    
     
     <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
@@ -93,7 +96,8 @@
 
     </a>
     <label class="md-header__button md-icon" for="__drawer">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
     </label>
     <div class="md-header__title" data-md-component="header-title">
       <div class="md-header__ellipsis">
@@ -112,10 +116,14 @@
       </div>
     </div>
     
+      
+    
+    
     
     
       <label class="md-header__button md-icon" for="__search">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
       </label>
       <div class="md-search" data-md-component="search" role="dialog">
   <label class="md-search__overlay" for="__search"></label>
@@ -123,19 +131,22 @@
     <form class="md-search__form" name="search">
       <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
       <label class="md-search__icon md-icon" for="__search">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
       </label>
       <nav class="md-search__options" aria-label="Search">
         
         <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
         </button>
       </nav>
       
     </form>
     <div class="md-search__output">
-      <div class="md-search__scrollwrap" data-md-scrollfix>
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
         <div class="md-search-result" data-md-component="search-result">
           <div class="md-search-result__meta">
             Initializing search
@@ -170,6 +181,7 @@
                     
 
 
+
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
     <a href="../.." title="fewspy documentation" class="md-nav__button md-logo" aria-label="fewspy documentation" data-md-component="logo">
@@ -184,14 +196,19 @@
     
       
       
-      
-
+  
   
   
   
     <li class="md-nav__item">
       <a href="../.." class="md-nav__link">
-        Home
+        
+  
+  <span class="md-ellipsis">
+    Home
+  </span>
+  
+
       </a>
     </li>
   
@@ -199,14 +216,19 @@
     
       
       
-      
-
+  
   
   
   
     <li class="md-nav__item">
       <a href="../../manuals/installation/" class="md-nav__link">
-        Installation
+        
+  
+  <span class="md-ellipsis">
+    Installation
+  </span>
+  
+
       </a>
     </li>
   
@@ -214,14 +236,19 @@
     
       
       
-      
-
+  
   
   
   
     <li class="md-nav__item">
       <a href="../../manuals/get_started/" class="md-nav__link">
-        Getting started
+        
+  
+  <span class="md-ellipsis">
+    Getting started
+  </span>
+  
+
       </a>
     </li>
   
@@ -229,14 +256,19 @@
     
       
       
-      
-
+  
   
   
   
     <li class="md-nav__item">
       <a href="../../manuals/contribute/" class="md-nav__link">
-        Contribute
+        
+  
+  <span class="md-ellipsis">
+    Contribute
+  </span>
+  
+
       </a>
     </li>
   
@@ -244,54 +276,68 @@
     
       
       
-      
-
   
   
     
   
   
+  
+    
+    
+    
     
     <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
-      
-      
-      
-      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
-      
-      
-      
-        <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
-          Code Reference
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
-        <label class="md-nav__title" for="__nav_5">
-          <span class="md-nav__icon md-icon"></span>
-          Code Reference
-        </label>
-        <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
+        
           
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Code Reference
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            Code Reference
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
             
               
+                
+  
   
   
   
     <li class="md-nav__item">
       <a href="../api/" class="md-nav__link">
-        Api
+        
+  
+  <span class="md-ellipsis">
+    Api
+  </span>
+  
+
       </a>
     </li>
   
 
-            
-          
+              
             
               
+                
   
   
     
+  
   
   
     <li class="md-nav__item md-nav__item--active">
@@ -303,12 +349,24 @@
       
       
         <label class="md-nav__link md-nav__link--active" for="__toc">
-          Wrappers
+          
+  
+  <span class="md-ellipsis">
+    Wrappers
+  </span>
+  
+
           <span class="md-nav__icon md-icon"></span>
         </label>
       
       <a href="./" class="md-nav__link md-nav__link--active">
-        Wrappers
+        
+  
+  <span class="md-ellipsis">
+    Wrappers
+  </span>
+  
+
       </a>
       
         
@@ -328,84 +386,108 @@
       
         <li class="md-nav__item">
   <a href="#src.fewspy.wrappers.get_filters" class="md-nav__link">
-    src.fewspy.wrappers.get_filters
+    <span class="md-ellipsis">
+      get_filters
+    </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
   <a href="#src.fewspy.wrappers.get_filters.get_filters" class="md-nav__link">
-    get_filters()
+    <span class="md-ellipsis">
+      get_filters
+    </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
   <a href="#src.fewspy.wrappers.get_locations" class="md-nav__link">
-    src.fewspy.wrappers.get_locations
+    <span class="md-ellipsis">
+      get_locations
+    </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
   <a href="#src.fewspy.wrappers.get_locations.get_locations" class="md-nav__link">
-    get_locations()
+    <span class="md-ellipsis">
+      get_locations
+    </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
   <a href="#src.fewspy.wrappers.get_parameters" class="md-nav__link">
-    src.fewspy.wrappers.get_parameters
+    <span class="md-ellipsis">
+      get_parameters
+    </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
   <a href="#src.fewspy.wrappers.get_parameters.get_parameters" class="md-nav__link">
-    get_parameters()
+    <span class="md-ellipsis">
+      get_parameters
+    </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
   <a href="#src.fewspy.wrappers.get_qualifiers" class="md-nav__link">
-    src.fewspy.wrappers.get_qualifiers
+    <span class="md-ellipsis">
+      get_qualifiers
+    </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
   <a href="#src.fewspy.wrappers.get_qualifiers.get_qualifiers" class="md-nav__link">
-    get_qualifiers()
+    <span class="md-ellipsis">
+      get_qualifiers
+    </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
   <a href="#src.fewspy.wrappers.get_time_series" class="md-nav__link">
-    src.fewspy.wrappers.get_time_series
+    <span class="md-ellipsis">
+      get_time_series
+    </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
   <a href="#src.fewspy.wrappers.get_time_series.get_time_series" class="md-nav__link">
-    get_time_series()
+    <span class="md-ellipsis">
+      get_time_series
+    </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
   <a href="#src.fewspy.wrappers.get_time_series_async" class="md-nav__link">
-    src.fewspy.wrappers.get_time_series_async
+    <span class="md-ellipsis">
+      get_time_series_async
+    </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
   <a href="#src.fewspy.wrappers.get_time_series_async.get_time_series_async" class="md-nav__link">
-    get_time_series_async()
+    <span class="md-ellipsis">
+      get_time_series_async
+    </span>
   </a>
   
 </li>
@@ -417,59 +499,95 @@
     </li>
   
 
+              
             
-          
-        </ul>
-      </nav>
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../timeseries/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    TimeSeries
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
     </li>
   
 
     
       
       
-      
-
+  
   
   
   
     
+    
+    
+    
     <li class="md-nav__item md-nav__item--nested">
       
-      
-      
-      
-      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
-      
-      
-      
-        <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
-          Tutorials
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
-        <label class="md-nav__title" for="__nav_6">
-          <span class="md-nav__icon md-icon"></span>
-          Tutorials
-        </label>
-        <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
           
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Tutorials
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            Tutorials
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
             
               
+                
+  
   
   
   
     <li class="md-nav__item">
       <a href="../../tutorials/installation_tutorial/" class="md-nav__link">
-        Installation
+        
+  
+  <span class="md-ellipsis">
+    Installation
+  </span>
+  
+
       </a>
     </li>
   
 
+              
             
-          
-        </ul>
-      </nav>
+          </ul>
+        </nav>
+      
     </li>
   
 
@@ -502,84 +620,108 @@
       
         <li class="md-nav__item">
   <a href="#src.fewspy.wrappers.get_filters" class="md-nav__link">
-    src.fewspy.wrappers.get_filters
+    <span class="md-ellipsis">
+      get_filters
+    </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
   <a href="#src.fewspy.wrappers.get_filters.get_filters" class="md-nav__link">
-    get_filters()
+    <span class="md-ellipsis">
+      get_filters
+    </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
   <a href="#src.fewspy.wrappers.get_locations" class="md-nav__link">
-    src.fewspy.wrappers.get_locations
+    <span class="md-ellipsis">
+      get_locations
+    </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
   <a href="#src.fewspy.wrappers.get_locations.get_locations" class="md-nav__link">
-    get_locations()
+    <span class="md-ellipsis">
+      get_locations
+    </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
   <a href="#src.fewspy.wrappers.get_parameters" class="md-nav__link">
-    src.fewspy.wrappers.get_parameters
+    <span class="md-ellipsis">
+      get_parameters
+    </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
   <a href="#src.fewspy.wrappers.get_parameters.get_parameters" class="md-nav__link">
-    get_parameters()
+    <span class="md-ellipsis">
+      get_parameters
+    </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
   <a href="#src.fewspy.wrappers.get_qualifiers" class="md-nav__link">
-    src.fewspy.wrappers.get_qualifiers
+    <span class="md-ellipsis">
+      get_qualifiers
+    </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
   <a href="#src.fewspy.wrappers.get_qualifiers.get_qualifiers" class="md-nav__link">
-    get_qualifiers()
+    <span class="md-ellipsis">
+      get_qualifiers
+    </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
   <a href="#src.fewspy.wrappers.get_time_series" class="md-nav__link">
-    src.fewspy.wrappers.get_time_series
+    <span class="md-ellipsis">
+      get_time_series
+    </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
   <a href="#src.fewspy.wrappers.get_time_series.get_time_series" class="md-nav__link">
-    get_time_series()
+    <span class="md-ellipsis">
+      get_time_series
+    </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
   <a href="#src.fewspy.wrappers.get_time_series_async" class="md-nav__link">
-    src.fewspy.wrappers.get_time_series_async
+    <span class="md-ellipsis">
+      get_time_series_async
+    </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
   <a href="#src.fewspy.wrappers.get_time_series_async.get_time_series_async" class="md-nav__link">
-    get_time_series_async()
+    <span class="md-ellipsis">
+      get_time_series_async
+    </span>
   </a>
   
 </li>
@@ -605,10 +747,11 @@
 <div class="doc doc-object doc-module">
 
 
-<a id="src.fewspy.wrappers.get_filters"></a>
-  <div class="doc doc-contents first">
 
-  
+<a id="src.fewspy.wrappers.get_filters"></a>
+    <div class="doc doc-contents first">
+
+
 
   <div class="doc doc-children">
 
@@ -623,118 +766,151 @@
 <div class="doc doc-object doc-function">
 
 
-
 <h2 id="src.fewspy.wrappers.get_filters.get_filters" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">get_filters</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">filter_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">document_format</span><span class="o">=</span><span class="s1">&#39;PI_JSON&#39;</span><span class="p">,</span> <span class="n">verify</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">LOGGER</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">get_filters</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">filter_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">document_format</span><span class="o">=</span><span class="s1">&#39;PI_JSON&#39;</span><span class="p">,</span> <span class="n">verify</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">LOGGER</span><span class="p">)</span></code>
 
 </h2>
 
 
-  <div class="doc doc-contents ">
-  
-      <p>Get FEWS qualifiers as a pandas DataFrame</p>
+    <div class="doc doc-contents ">
 
-  <p><strong>Parameters:</strong></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-          <td><code>url</code></td>
-          <td>
-                <code>str</code>
-          </td>
-          <td><p>url Delft-FEWS PI REST WebService.</p></td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-        <tr>
-          <td><code>E.g.</code></td>
-          <td>
-                <code>http</code>
-          </td>
-          <td><p>//localhost:8080/FewsWebServices/rest/fewspiservice/v1/filters</p></td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-        <tr>
-          <td><code>filter_id</code></td>
-          <td>
-                <code>str</code>
-          </td>
-          <td><p>the FEWS id of the filter to pass as request parameter</p></td>
-          <td>
-                <code>None</code>
-          </td>
-        </tr>
-        <tr>
-          <td><code>document_format</code></td>
-          <td>
-                <code>str</code>
-          </td>
-          <td><p>request document format to return. Defaults to PI_JSON.</p></td>
-          <td>
-                <code>&#39;PI_JSON&#39;</code>
-          </td>
-        </tr>
-        <tr>
-          <td><code>verify</code></td>
-          <td>
-                <code>bool</code>
-          </td>
-          <td><p>passed to requests.get verify parameter.</p></td>
-          <td>
-                <code>False</code>
-          </td>
-        </tr>
-        <tr>
-          <td><code>logger</code></td>
-          <td>
-                <code>logging.<span title="logging.Logger">Logger</span></code>
-          </td>
-          <td><p>Logger to pass logging to. By</p></td>
-          <td>
-                <code>LOGGER</code>
-          </td>
-        </tr>
-    </tbody>
-  </table>
+        <p>Get FEWS qualifiers as a pandas DataFrame</p>
 
-  <p><strong>Returns:</strong></p>
-  <table>
-    <thead>
-      <tr>
-<th>Name</th>        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-<td><code>df</code></td>          <td>
-                <code>pandas.<span title="pandas.DataFrame">DataFrame</span></code>
-          </td>
-          <td><p>Pandas dataframe with index "id" and columns</p></td>
-        </tr>
-        <tr>
-<td></td>          <td>
-                <code><span title="typing.List">List</span>[dict]</code>
-          </td>
-          <td><p>"name" and "group_id".</p></td>
-        </tr>
-    </tbody>
-  </table>
 
-      <details class="quote">
-        <summary>Source code in <code>src\fewspy\wrappers\get_filters.py</code></summary>
-        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">10</span>
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>url</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>url Delft-FEWS PI REST WebService.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>E.g.</code></td>
+            <td>
+                  <code>http</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>//localhost:8080/FewsWebServices/rest/fewspiservice/v1/filters</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>filter_id</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>the FEWS id of the filter to pass as request parameter</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>document_format</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>request document format to return. Defaults to PI_JSON.</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;PI_JSON&#39;</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>verify</code></td>
+            <td>
+                  <code>bool</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>passed to requests.get verify parameter.</p>
+              </div>
+            </td>
+            <td>
+                  <code>False</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>logger</code></td>
+            <td>
+                  <code><span title="logging.Logger">Logger</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Logger to pass logging to. By</p>
+              </div>
+            </td>
+            <td>
+                  <code><span title="src.fewspy.wrappers.get_filters.LOGGER">LOGGER</span></code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td><code>df</code></td>            <td>
+                  <code><span title="pandas.DataFrame">DataFrame</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Pandas dataframe with index "id" and columns</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+<td></td>            <td>
+                  <code><span title="typing.List">List</span>[dict]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>"name" and "group_id".</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+            <details class="quote">
+              <summary>Source code in <code>src\fewspy\wrappers\get_filters.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">10</span>
 <span class="normal">11</span>
 <span class="normal">12</span>
 <span class="normal">13</span>
@@ -818,8 +994,8 @@
 
     <span class="k">return</span> <span class="n">result</span>
 </code></pre></div></td></tr></table></div>
-      </details>
-  </div>
+            </details>
+    </div>
 
 </div>
 
@@ -827,17 +1003,18 @@
 
   </div>
 
-  </div>
+    </div>
 
 </div>
 
 <div class="doc doc-object doc-module">
 
 
-<a id="src.fewspy.wrappers.get_locations"></a>
-  <div class="doc doc-contents first">
 
-  
+<a id="src.fewspy.wrappers.get_locations"></a>
+    <div class="doc doc-contents first">
+
+
 
   <div class="doc doc-children">
 
@@ -852,128 +1029,165 @@
 <div class="doc doc-object doc-function">
 
 
-
 <h2 id="src.fewspy.wrappers.get_locations.get_locations" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">get_locations</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">filter_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">document_format</span><span class="o">=</span><span class="s1">&#39;PI_JSON&#39;</span><span class="p">,</span> <span class="n">attributes</span><span class="o">=</span><span class="p">[],</span> <span class="n">verify</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">LOGGER</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">get_locations</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">filter_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">document_format</span><span class="o">=</span><span class="s1">&#39;PI_JSON&#39;</span><span class="p">,</span> <span class="n">attributes</span><span class="o">=</span><span class="p">[],</span> <span class="n">verify</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">LOGGER</span><span class="p">,</span> <span class="n">remove_duplicates</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
 
 </h2>
 
 
-  <div class="doc doc-contents ">
-  
-      <p>Get FEWS qualifiers as a pandas DataFrame</p>
+    <div class="doc doc-contents ">
 
-  <p><strong>Parameters:</strong></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-          <td><code>url</code></td>
-          <td>
-                <code>str</code>
-          </td>
-          <td><p>url Delft-FEWS PI REST WebService.</p></td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-        <tr>
-          <td><code>E.g.</code></td>
-          <td>
-                <code>http</code>
-          </td>
-          <td><p>//localhost:8080/FewsWebServices/rest/fewspiservice/v1/qualifiers</p></td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-        <tr>
-          <td><code>filter_id</code></td>
-          <td>
-                <code>str</code>
-          </td>
-          <td><p>the FEWS id of the filter to pass as request parameter</p></td>
-          <td>
-                <code>None</code>
-          </td>
-        </tr>
-        <tr>
-          <td><code>document_format</code></td>
-          <td>
-                <code>str</code>
-          </td>
-          <td><p>request document format to return. Defaults to PI_JSON.</p></td>
-          <td>
-                <code>&#39;PI_JSON&#39;</code>
-          </td>
-        </tr>
-        <tr>
-          <td><code>attributes</code></td>
-          <td>
-                <code>list</code>
-          </td>
-          <td><p>if not emtpy, the location attributes to include as columns in the pandas DataFrame.</p></td>
-          <td>
-                <code>[]</code>
-          </td>
-        </tr>
-        <tr>
-          <td><code>verify</code></td>
-          <td>
-                <code>bool</code>
-          </td>
-          <td><p>passed to requests.get verify parameter.</p></td>
-          <td>
-                <code>False</code>
-          </td>
-        </tr>
-        <tr>
-          <td><code>logger</code></td>
-          <td>
-                <code>logging.<span title="logging.Logger">Logger</span></code>
-          </td>
-          <td><p>Logger to pass logging to. By default, a logger will ge created.</p></td>
-          <td>
-                <code>LOGGER</code>
-          </td>
-        </tr>
-    </tbody>
-  </table>
+        <p>Get FEWS qualifiers as a pandas DataFrame</p>
 
-  <p><strong>Returns:</strong></p>
-  <table>
-    <thead>
-      <tr>
-<th>Name</th>        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-<td><code>df</code></td>          <td>
-                <code>pandas.<span title="pandas.DataFrame">DataFrame</span></code>
-          </td>
-          <td><p>Pandas dataframe with index "id" and columns</p></td>
-        </tr>
-        <tr>
-<td></td>          <td>
-                <code><span title="pandas">pd</span>.<span title="pandas.DataFrame">DataFrame</span></code>
-          </td>
-          <td><p>"name" and "group_id".</p></td>
-        </tr>
-    </tbody>
-  </table>
 
-      <details class="quote">
-        <summary>Source code in <code>src\fewspy\wrappers\get_locations.py</code></summary>
-        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">18</span>
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>url</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>url Delft-FEWS PI REST WebService.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>E.g.</code></td>
+            <td>
+                  <code>http</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>//localhost:8080/FewsWebServices/rest/fewspiservice/v1/qualifiers</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>filter_id</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>the FEWS id of the filter to pass as request parameter</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>document_format</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>request document format to return. Defaults to PI_JSON.</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;PI_JSON&#39;</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>attributes</code></td>
+            <td>
+                  <code>list</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>if not emtpy, the location attributes to include as columns in the pandas DataFrame.</p>
+              </div>
+            </td>
+            <td>
+                  <code>[]</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>verify</code></td>
+            <td>
+                  <code>bool</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>passed to requests.get verify parameter.</p>
+              </div>
+            </td>
+            <td>
+                  <code>False</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>logger</code></td>
+            <td>
+                  <code><span title="logging.Logger">Logger</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Logger to pass logging to. By default, a logger will ge created.</p>
+              </div>
+            </td>
+            <td>
+                  <code><span title="src.fewspy.wrappers.get_locations.LOGGER">LOGGER</span></code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td><code>df</code></td>            <td>
+                  <code><span title="pandas.DataFrame">DataFrame</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Pandas dataframe with index "id" and columns</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+<td></td>            <td>
+                  <code><span title="pandas.DataFrame">DataFrame</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>"name" and "group_id".</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+            <details class="quote">
+              <summary>Source code in <code>src\fewspy\wrappers\get_locations.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">18</span>
 <span class="normal">19</span>
 <span class="normal">20</span>
 <span class="normal">21</span>
@@ -1030,13 +1244,21 @@
 <span class="normal">72</span>
 <span class="normal">73</span>
 <span class="normal">74</span>
-<span class="normal">75</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_locations</span><span class="p">(</span>
+<span class="normal">75</span>
+<span class="normal">76</span>
+<span class="normal">77</span>
+<span class="normal">78</span>
+<span class="normal">79</span>
+<span class="normal">80</span>
+<span class="normal">81</span>
+<span class="normal">82</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_locations</span><span class="p">(</span>
     <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">filter_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">document_format</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;PI_JSON&quot;</span><span class="p">,</span>
     <span class="n">attributes</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="p">[],</span>
     <span class="n">verify</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">logger</span><span class="o">=</span><span class="n">LOGGER</span><span class="p">,</span>
+    <span class="n">remove_duplicates</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Get FEWS qualifiers as a pandas DataFrame</span>
@@ -1068,6 +1290,12 @@
         <span class="c1"># convert to gdf and snake_case</span>
         <span class="n">gdf</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="s2">&quot;locations&quot;</span><span class="p">])</span>
         <span class="n">gdf</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">camel_to_snake_case</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">gdf</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
+
+        <span class="c1"># remove duplicates</span>
+        <span class="k">if</span> <span class="n">remove_duplicates</span><span class="p">:</span>
+            <span class="n">gdf</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">(</span><span class="n">subset</span><span class="o">=</span><span class="s2">&quot;location_id&quot;</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="c1"># set index</span>
         <span class="n">gdf</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">&quot;location_id&quot;</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
         <span class="c1"># handle geometry and crs</span>
@@ -1089,8 +1317,8 @@
 
     <span class="k">return</span> <span class="n">gdf</span>
 </code></pre></div></td></tr></table></div>
-      </details>
-  </div>
+            </details>
+    </div>
 
 </div>
 
@@ -1098,17 +1326,18 @@
 
   </div>
 
-  </div>
+    </div>
 
 </div>
 
 <div class="doc doc-object doc-module">
 
 
-<a id="src.fewspy.wrappers.get_parameters"></a>
-  <div class="doc doc-contents first">
 
-  
+<a id="src.fewspy.wrappers.get_parameters"></a>
+    <div class="doc doc-contents first">
+
+
 
   <div class="doc doc-children">
 
@@ -1123,118 +1352,151 @@
 <div class="doc doc-object doc-function">
 
 
-
 <h2 id="src.fewspy.wrappers.get_parameters.get_parameters" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">get_parameters</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">filter_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">document_format</span><span class="o">=</span><span class="s1">&#39;PI_JSON&#39;</span><span class="p">,</span> <span class="n">verify</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">LOGGER</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">get_parameters</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">filter_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">document_format</span><span class="o">=</span><span class="s1">&#39;PI_JSON&#39;</span><span class="p">,</span> <span class="n">verify</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">LOGGER</span><span class="p">)</span></code>
 
 </h2>
 
 
-  <div class="doc doc-contents ">
-  
-      <p>Get FEWS qualifiers as a pandas DataFrame</p>
+    <div class="doc doc-contents ">
 
-  <p><strong>Parameters:</strong></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-          <td><code>url</code></td>
-          <td>
-                <code>str</code>
-          </td>
-          <td><p>url Delft-FEWS PI REST WebService.</p></td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-        <tr>
-          <td><code>E.g.</code></td>
-          <td>
-                <code>http</code>
-          </td>
-          <td><p>//localhost:8080/FewsWebServices/rest/fewspiservice/v1/qualifiers</p></td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-        <tr>
-          <td><code>filter_id</code></td>
-          <td>
-                <code>str</code>
-          </td>
-          <td><p>the FEWS id of the filter to pass as request parameter</p></td>
-          <td>
-                <code>None</code>
-          </td>
-        </tr>
-        <tr>
-          <td><code>document_format</code></td>
-          <td>
-                <code>str</code>
-          </td>
-          <td><p>request document format to return. Defaults to PI_JSON.</p></td>
-          <td>
-                <code>&#39;PI_JSON&#39;</code>
-          </td>
-        </tr>
-        <tr>
-          <td><code>verify</code></td>
-          <td>
-                <code>bool</code>
-          </td>
-          <td><p>passed to requests.get verify parameter.</p></td>
-          <td>
-                <code>False</code>
-          </td>
-        </tr>
-        <tr>
-          <td><code>logger</code></td>
-          <td>
-                <code>logging.<span title="logging.Logger">Logger</span></code>
-          </td>
-          <td><p>Logger to pass logging to. By</p></td>
-          <td>
-                <code>LOGGER</code>
-          </td>
-        </tr>
-    </tbody>
-  </table>
+        <p>Get FEWS qualifiers as a pandas DataFrame</p>
 
-  <p><strong>Returns:</strong></p>
-  <table>
-    <thead>
-      <tr>
-<th>Name</th>        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-<td><code>df</code></td>          <td>
-                <code>pandas.<span title="pandas.DataFrame">DataFrame</span></code>
-          </td>
-          <td><p>Pandas dataframe with index "id" and columns</p></td>
-        </tr>
-        <tr>
-<td></td>          <td>
-                <code><span title="typing.List">List</span>[dict]</code>
-          </td>
-          <td><p>"name" and "group_id".</p></td>
-        </tr>
-    </tbody>
-  </table>
 
-      <details class="quote">
-        <summary>Source code in <code>src\fewspy\wrappers\get_parameters.py</code></summary>
-        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">21</span>
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>url</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>url Delft-FEWS PI REST WebService.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>E.g.</code></td>
+            <td>
+                  <code>http</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>//localhost:8080/FewsWebServices/rest/fewspiservice/v1/qualifiers</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>filter_id</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>the FEWS id of the filter to pass as request parameter</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>document_format</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>request document format to return. Defaults to PI_JSON.</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;PI_JSON&#39;</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>verify</code></td>
+            <td>
+                  <code>bool</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>passed to requests.get verify parameter.</p>
+              </div>
+            </td>
+            <td>
+                  <code>False</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>logger</code></td>
+            <td>
+                  <code><span title="logging.Logger">Logger</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Logger to pass logging to. By</p>
+              </div>
+            </td>
+            <td>
+                  <code><span title="src.fewspy.wrappers.get_parameters.LOGGER">LOGGER</span></code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td><code>df</code></td>            <td>
+                  <code><span title="pandas.DataFrame">DataFrame</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Pandas dataframe with index "id" and columns</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+<td></td>            <td>
+                  <code><span title="typing.List">List</span>[dict]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>"name" and "group_id".</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+            <details class="quote">
+              <summary>Source code in <code>src\fewspy\wrappers\get_parameters.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">21</span>
 <span class="normal">22</span>
 <span class="normal">23</span>
 <span class="normal">24</span>
@@ -1326,8 +1588,8 @@
 
     <span class="k">return</span> <span class="n">df</span>
 </code></pre></div></td></tr></table></div>
-      </details>
-  </div>
+            </details>
+    </div>
 
 </div>
 
@@ -1335,17 +1597,18 @@
 
   </div>
 
-  </div>
+    </div>
 
 </div>
 
 <div class="doc doc-object doc-module">
 
 
-<a id="src.fewspy.wrappers.get_qualifiers"></a>
-  <div class="doc doc-contents first">
 
-  
+<a id="src.fewspy.wrappers.get_qualifiers"></a>
+    <div class="doc doc-contents first">
+
+
 
   <div class="doc doc-children">
 
@@ -1360,98 +1623,123 @@
 <div class="doc doc-object doc-function">
 
 
-
 <h2 id="src.fewspy.wrappers.get_qualifiers.get_qualifiers" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">get_qualifiers</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">verify</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">LOGGER</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">get_qualifiers</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">verify</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">LOGGER</span><span class="p">)</span></code>
 
 </h2>
 
 
-  <div class="doc doc-contents ">
-  
-      <p>Get FEWS qualifiers as Pandas DataFrame</p>
+    <div class="doc doc-contents ">
 
-  <p><strong>Parameters:</strong></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-          <td><code>url</code></td>
-          <td>
-                <code>str</code>
-          </td>
-          <td><p>url Delft-FEWS PI REST WebService.</p></td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-        <tr>
-          <td><code>E.g.</code></td>
-          <td>
-                <code>http</code>
-          </td>
-          <td><p>//localhost:8080/FewsWebServices/rest/fewspiservice/v1/qualifiers</p></td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-        <tr>
-          <td><code>verify</code></td>
-          <td>
-                <code>bool</code>
-          </td>
-          <td><p>passed to requests.get verify parameter.</p></td>
-          <td>
-                <code>False</code>
-          </td>
-        </tr>
-        <tr>
-          <td><code>logger</code></td>
-          <td>
-                <code>logging.<span title="logging.Logger">Logger</span></code>
-          </td>
-          <td><p>Logger to pass logging to. By</p></td>
-          <td>
-                <code>LOGGER</code>
-          </td>
-        </tr>
-    </tbody>
-  </table>
+        <p>Get FEWS qualifiers as Pandas DataFrame</p>
 
-  <p><strong>Returns:</strong></p>
-  <table>
-    <thead>
-      <tr>
-<th>Name</th>        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-<td><code>df</code></td>          <td>
-                <code>pandas.<span title="pandas.DataFrame">DataFrame</span></code>
-          </td>
-          <td><p>Pandas dataframe with index "id" and columns</p></td>
-        </tr>
-        <tr>
-<td></td>          <td>
-                <code><span title="pandas">pd</span>.<span title="pandas.DataFrame">DataFrame</span></code>
-          </td>
-          <td><p>"name" and "group_id".</p></td>
-        </tr>
-    </tbody>
-  </table>
 
-      <details class="quote">
-        <summary>Source code in <code>src\fewspy\wrappers\get_qualifiers.py</code></summary>
-        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">39</span>
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>url</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>url Delft-FEWS PI REST WebService.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>E.g.</code></td>
+            <td>
+                  <code>http</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>//localhost:8080/FewsWebServices/rest/fewspiservice/v1/qualifiers</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>verify</code></td>
+            <td>
+                  <code>bool</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>passed to requests.get verify parameter.</p>
+              </div>
+            </td>
+            <td>
+                  <code>False</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>logger</code></td>
+            <td>
+                  <code><span title="logging.Logger">Logger</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Logger to pass logging to. By</p>
+              </div>
+            </td>
+            <td>
+                  <code><span title="src.fewspy.wrappers.get_qualifiers.LOGGER">LOGGER</span></code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td><code>df</code></td>            <td>
+                  <code><span title="pandas.DataFrame">DataFrame</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Pandas dataframe with index "id" and columns</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+<td></td>            <td>
+                  <code><span title="pandas.DataFrame">DataFrame</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>"name" and "group_id".</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+            <details class="quote">
+              <summary>Source code in <code>src\fewspy\wrappers\get_qualifiers.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">39</span>
 <span class="normal">40</span>
 <span class="normal">41</span>
 <span class="normal">42</span>
@@ -1523,8 +1811,8 @@
 
     <span class="k">return</span> <span class="n">df</span>
 </code></pre></div></td></tr></table></div>
-      </details>
-  </div>
+            </details>
+    </div>
 
 </div>
 
@@ -1532,17 +1820,18 @@
 
   </div>
 
-  </div>
+    </div>
 
 </div>
 
 <div class="doc doc-object doc-module">
 
 
-<a id="src.fewspy.wrappers.get_time_series"></a>
-  <div class="doc doc-contents first">
 
-  
+<a id="src.fewspy.wrappers.get_time_series"></a>
+    <div class="doc doc-contents first">
+
+
 
   <div class="doc doc-children">
 
@@ -1557,208 +1846,277 @@
 <div class="doc doc-object doc-function">
 
 
-
 <h2 id="src.fewspy.wrappers.get_time_series.get_time_series" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">get_time_series</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">filter_id</span><span class="p">,</span> <span class="n">location_ids</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">parameter_ids</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">qualifier_ids</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">start_time</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">end_time</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">thinning</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">only_headers</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">omit_missing</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">show_statistics</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">document_format</span><span class="o">=</span><span class="s1">&#39;PI_JSON&#39;</span><span class="p">,</span> <span class="n">verify</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">LOGGER</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">get_time_series</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">filter_id</span><span class="p">,</span> <span class="n">location_ids</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">parameter_ids</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">qualifier_ids</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">start_time</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">end_time</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">thinning</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">only_headers</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">omit_missing</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">show_statistics</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">document_format</span><span class="o">=</span><span class="s1">&#39;PI_JSON&#39;</span><span class="p">,</span> <span class="n">verify</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">LOGGER</span><span class="p">)</span></code>
 
 </h2>
 
 
-  <div class="doc doc-contents ">
-  
-      <p>Get FEWS qualifiers as a pandas DataFrame</p>
+    <div class="doc doc-contents ">
 
-  <p><strong>Parameters:</strong></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-          <td><code>url</code></td>
-          <td>
-                <code>str</code>
-          </td>
-          <td><p>url Delft-FEWS PI REST WebService.</p></td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-        <tr>
-          <td><code>E.g.</code></td>
-          <td>
-                <code>http</code>
-          </td>
-          <td><p>//localhost:8080/FewsWebServices/rest/fewspiservice/v1/qualifiers</p></td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-        <tr>
-          <td><code>filter_id</code></td>
-          <td>
-                <code>str</code>
-          </td>
-          <td><p>the FEWS id of the filter to pass as request parameter</p></td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-        <tr>
-          <td><code>location_ids</code></td>
-          <td>
-                <code>list</code>
-          </td>
-          <td><p>list with FEWS location ids to extract timeseries from. Defaults to None.</p></td>
-          <td>
-                <code>None</code>
-          </td>
-        </tr>
-        <tr>
-          <td><code>parameter_ids</code></td>
-          <td>
-                <code>list</code>
-          </td>
-          <td><p>list with FEWS parameter ids to extract timeseries from. Defaults to None.</p></td>
-          <td>
-                <code>None</code>
-          </td>
-        </tr>
-        <tr>
-          <td><code>qualifier_ids</code></td>
-          <td>
-                <code>list</code>
-          </td>
-          <td><p>list with FEWS qualifier ids to extract timeseries from. Defaults to None.</p></td>
-          <td>
-                <code>None</code>
-          </td>
-        </tr>
-        <tr>
-          <td><code>start_time</code></td>
-          <td>
-                <code><span title="datetime.datetime">datetime</span>.<span title="datetime.datetime.datetime">datetime</span></code>
-          </td>
-          <td><p>datetime-object with start datetime to use in request. Defaults to None.</p></td>
-          <td>
-                <code>None</code>
-          </td>
-        </tr>
-        <tr>
-          <td><code>end_time</code></td>
-          <td>
-                <code><span title="datetime.datetime">datetime</span>.<span title="datetime.datetime.datetime">datetime</span></code>
-          </td>
-          <td><p>datetime-object with end datetime to use in request. Defaults to None.</p></td>
-          <td>
-                <code>None</code>
-          </td>
-        </tr>
-        <tr>
-          <td><code>thinning</code></td>
-          <td>
-                <code>int</code>
-          </td>
-          <td><p>integer value for thinning parameter to use in request. Defaults to None.</p></td>
-          <td>
-                <code>None</code>
-          </td>
-        </tr>
-        <tr>
-          <td><code>only_headers</code></td>
-          <td>
-                <code>bool</code>
-          </td>
-          <td><p>if True, only headers will be returned. Defaults to False.</p></td>
-          <td>
-                <code>False</code>
-          </td>
-        </tr>
-        <tr>
-          <td><code>omit_missing</code></td>
-          <td>
-                <code>bool</code>
-          </td>
-          <td><p>if True, no missings values will be returned. Defaults to True.</p></td>
-          <td>
-                <code>True</code>
-          </td>
-        </tr>
-        <tr>
-          <td><code>show_statistics</code></td>
-          <td>
-                <code>bool</code>
-          </td>
-          <td><p>if True, time series statistics will be included in header. Defaults to False.</p></td>
-          <td>
-                <code>False</code>
-          </td>
-        </tr>
-        <tr>
-          <td><code>document_format</code></td>
-          <td>
-                <code>str</code>
-          </td>
-          <td><p>request document format to return. Defaults to PI_JSON.</p></td>
-          <td>
-                <code>&#39;PI_JSON&#39;</code>
-          </td>
-        </tr>
-        <tr>
-          <td><code>verify</code></td>
-          <td>
-                <code>bool</code>
-          </td>
-          <td><p>passed to requests.get verify parameter.</p></td>
-          <td>
-                <code>False</code>
-          </td>
-        </tr>
-        <tr>
-          <td><code>logger</code></td>
-          <td>
-                <code>logging.<span title="logging.Logger">Logger</span></code>
-          </td>
-          <td><p>Logger to pass logging to. By</p></td>
-          <td>
-                <code>LOGGER</code>
-          </td>
-        </tr>
-    </tbody>
-  </table>
+        <p>Get FEWS qualifiers as a pandas DataFrame</p>
 
-  <p><strong>Returns:</strong></p>
-  <table>
-    <thead>
-      <tr>
-<th>Name</th>        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-<td><code>df</code></td>          <td>
-                <code>pandas.<span title="pandas.DataFrame">DataFrame</span></code>
-          </td>
-          <td><p>Pandas dataframe with index "id" and columns</p></td>
-        </tr>
-        <tr>
-<td></td>          <td>
-                <code><span title="pandas">pd</span>.<span title="pandas.DataFrame">DataFrame</span></code>
-          </td>
-          <td><p>"name" and "group_id".</p></td>
-        </tr>
-    </tbody>
-  </table>
 
-      <details class="quote">
-        <summary>Source code in <code>src\fewspy\wrappers\get_time_series.py</code></summary>
-        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">23</span>
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>url</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>url Delft-FEWS PI REST WebService.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>E.g.</code></td>
+            <td>
+                  <code>http</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>//localhost:8080/FewsWebServices/rest/fewspiservice/v1/qualifiers</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>filter_id</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>the FEWS id of the filter to pass as request parameter</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>location_ids</code></td>
+            <td>
+                  <code>list</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>list with FEWS location ids to extract timeseries from. Defaults to None.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>parameter_ids</code></td>
+            <td>
+                  <code>list</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>list with FEWS parameter ids to extract timeseries from. Defaults to None.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>qualifier_ids</code></td>
+            <td>
+                  <code>list</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>list with FEWS qualifier ids to extract timeseries from. Defaults to None.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>start_time</code></td>
+            <td>
+                  <code><span title="datetime.datetime.datetime">datetime</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>datetime-object with start datetime to use in request. Defaults to None.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>end_time</code></td>
+            <td>
+                  <code><span title="datetime.datetime.datetime">datetime</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>datetime-object with end datetime to use in request. Defaults to None.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>thinning</code></td>
+            <td>
+                  <code>int</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>integer value for thinning parameter to use in request. Defaults to None.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>only_headers</code></td>
+            <td>
+                  <code>bool</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>if True, only headers will be returned. Defaults to False.</p>
+              </div>
+            </td>
+            <td>
+                  <code>False</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>omit_missing</code></td>
+            <td>
+                  <code>bool</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>if True, no missings values will be returned. Defaults to True.</p>
+              </div>
+            </td>
+            <td>
+                  <code>True</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>show_statistics</code></td>
+            <td>
+                  <code>bool</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>if True, time series statistics will be included in header. Defaults to False.</p>
+              </div>
+            </td>
+            <td>
+                  <code>False</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>document_format</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>request document format to return. Defaults to PI_JSON.</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;PI_JSON&#39;</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>verify</code></td>
+            <td>
+                  <code>bool</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>passed to requests.get verify parameter.</p>
+              </div>
+            </td>
+            <td>
+                  <code>False</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>logger</code></td>
+            <td>
+                  <code><span title="logging.Logger">Logger</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Logger to pass logging to. By</p>
+              </div>
+            </td>
+            <td>
+                  <code><span title="src.fewspy.wrappers.get_time_series.LOGGER">LOGGER</span></code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td><code>df</code></td>            <td>
+                  <code><span title="pandas.DataFrame">DataFrame</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Pandas dataframe with index "id" and columns</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+<td></td>            <td>
+                  <code><span title="pandas.DataFrame">DataFrame</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>"name" and "group_id".</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+            <details class="quote">
+              <summary>Source code in <code>src\fewspy\wrappers\get_time_series.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">23</span>
 <span class="normal">24</span>
 <span class="normal">25</span>
 <span class="normal">26</span>
@@ -1886,8 +2244,8 @@
 
     <span class="k">return</span> <span class="n">time_series_set</span>
 </code></pre></div></td></tr></table></div>
-      </details>
-  </div>
+            </details>
+    </div>
 
 </div>
 
@@ -1895,17 +2253,18 @@
 
   </div>
 
-  </div>
+    </div>
 
 </div>
 
 <div class="doc doc-object doc-module">
 
 
-<a id="src.fewspy.wrappers.get_time_series_async"></a>
-  <div class="doc doc-contents first">
 
-  
+<a id="src.fewspy.wrappers.get_time_series_async"></a>
+    <div class="doc doc-contents first">
+
+
 
   <div class="doc doc-children">
 
@@ -1920,187 +2279,248 @@
 <div class="doc doc-object doc-function">
 
 
-
 <h2 id="src.fewspy.wrappers.get_time_series_async.get_time_series_async" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">get_time_series_async</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">filter_id</span><span class="p">,</span> <span class="n">location_ids</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">parameter_ids</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">qualifier_ids</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">start_time</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">end_time</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">thinning</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">document_format</span><span class="o">=</span><span class="s1">&#39;PI_JSON&#39;</span><span class="p">,</span> <span class="n">omit_missing</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">verify</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">LOGGER</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">get_time_series_async</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">filter_id</span><span class="p">,</span> <span class="n">location_ids</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">parameter_ids</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">qualifier_ids</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">start_time</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">end_time</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">thinning</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">document_format</span><span class="o">=</span><span class="s1">&#39;PI_JSON&#39;</span><span class="p">,</span> <span class="n">omit_missing</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">verify</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">LOGGER</span><span class="p">)</span></code>
 
 </h2>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
 
-  <p><strong>Parameters:</strong></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-          <td><code>url</code></td>
-          <td>
-                <code>str</code>
-          </td>
-          <td><p>url Delft-FEWS PI REST WebService.</p></td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-        <tr>
-          <td><code>E.g.</code></td>
-          <td>
-                <code>http</code>
-          </td>
-          <td><p>//localhost:8080/FewsWebServices/rest/fewspiservice/v1/qualifiers</p></td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-        <tr>
-          <td><code>filter_id</code></td>
-          <td>
-                <code>str</code>
-          </td>
-          <td><p>the FEWS id of the filter to pass as request parameter</p></td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-        <tr>
-          <td><code>location_ids</code></td>
-          <td>
-                <code>list</code>
-          </td>
-          <td><p>list with FEWS location ids to extract timeseries from. Defaults to None.</p></td>
-          <td>
-                <code>None</code>
-          </td>
-        </tr>
-        <tr>
-          <td><code>parameter_ids</code></td>
-          <td>
-                <code>list</code>
-          </td>
-          <td><p>list with FEWS parameter ids to extract timeseries from. Defaults to None.</p></td>
-          <td>
-                <code>None</code>
-          </td>
-        </tr>
-        <tr>
-          <td><code>qualifier_ids</code></td>
-          <td>
-                <code>list</code>
-          </td>
-          <td><p>list with FEWS qualifier ids to extract timeseries from. Defaults to None.</p></td>
-          <td>
-                <code>None</code>
-          </td>
-        </tr>
-        <tr>
-          <td><code>start_time</code></td>
-          <td>
-                <code><span title="datetime.datetime">datetime</span>.<span title="datetime.datetime.datetime">datetime</span></code>
-          </td>
-          <td><p>datetime-object with start datetime to use in request. Defaults to None.</p></td>
-          <td>
-                <code>None</code>
-          </td>
-        </tr>
-        <tr>
-          <td><code>end_time</code></td>
-          <td>
-                <code><span title="datetime.datetime">datetime</span>.<span title="datetime.datetime.datetime">datetime</span></code>
-          </td>
-          <td><p>datetime-object with end datetime to use in request. Defaults to None.</p></td>
-          <td>
-                <code>None</code>
-          </td>
-        </tr>
-        <tr>
-          <td><code>thinning</code></td>
-          <td>
-                <code>int</code>
-          </td>
-          <td><p>integer value for thinning parameter to use in request. Defaults to None.</p></td>
-          <td>
-                <code>None</code>
-          </td>
-        </tr>
-        <tr>
-          <td><code>document_format</code></td>
-          <td>
-                <code>str</code>
-          </td>
-          <td><p>request document format to return. Defaults to PI_JSON.</p></td>
-          <td>
-                <code>&#39;PI_JSON&#39;</code>
-          </td>
-        </tr>
-        <tr>
-          <td><code>omit_missing</code></td>
-          <td>
-                <code>bool</code>
-          </td>
-          <td><p>if True, no missings values will be returned. Defaults to True</p></td>
-          <td>
-                <code>True</code>
-          </td>
-        </tr>
-        <tr>
-          <td><code>verify</code></td>
-          <td>
-                <code>bool</code>
-          </td>
-          <td><p>passed to requests.get verify parameter.</p></td>
-          <td>
-                <code>False</code>
-          </td>
-        </tr>
-        <tr>
-          <td><code>logger</code></td>
-          <td>
-                <code>logging.<span title="logging.Logger">Logger</span></code>
-          </td>
-          <td><p>Logger to pass logging to. By</p></td>
-          <td>
-                <code>LOGGER</code>
-          </td>
-        </tr>
-    </tbody>
-  </table>
 
-  <p><strong>Returns:</strong></p>
-  <table>
-    <thead>
-      <tr>
-<th>Name</th>        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-<td><code>df</code></td>          <td>
-                <code>pandas.<span title="pandas.DataFrame">DataFrame</span></code>
-          </td>
-          <td><p>Pandas dataframe with index "id" and columns</p></td>
-        </tr>
-        <tr>
-<td></td>          <td>
-                <code><span title="pandas">pd</span>.<span title="pandas.DataFrame">DataFrame</span></code>
-          </td>
-          <td><p>"name" and "group_id".</p></td>
-        </tr>
-    </tbody>
-  </table>
 
-      <details class="quote">
-        <summary>Source code in <code>src\fewspy\wrappers\get_time_series_async.py</code></summary>
-        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 43</span>
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>url</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>url Delft-FEWS PI REST WebService.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>E.g.</code></td>
+            <td>
+                  <code>http</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>//localhost:8080/FewsWebServices/rest/fewspiservice/v1/qualifiers</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>filter_id</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>the FEWS id of the filter to pass as request parameter</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>location_ids</code></td>
+            <td>
+                  <code>list</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>list with FEWS location ids to extract timeseries from. Defaults to None.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>parameter_ids</code></td>
+            <td>
+                  <code>list</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>list with FEWS parameter ids to extract timeseries from. Defaults to None.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>qualifier_ids</code></td>
+            <td>
+                  <code>list</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>list with FEWS qualifier ids to extract timeseries from. Defaults to None.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>start_time</code></td>
+            <td>
+                  <code><span title="datetime.datetime.datetime">datetime</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>datetime-object with start datetime to use in request. Defaults to None.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>end_time</code></td>
+            <td>
+                  <code><span title="datetime.datetime.datetime">datetime</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>datetime-object with end datetime to use in request. Defaults to None.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>thinning</code></td>
+            <td>
+                  <code>int</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>integer value for thinning parameter to use in request. Defaults to None.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>document_format</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>request document format to return. Defaults to PI_JSON.</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;PI_JSON&#39;</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>omit_missing</code></td>
+            <td>
+                  <code>bool</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>if True, no missings values will be returned. Defaults to True</p>
+              </div>
+            </td>
+            <td>
+                  <code>True</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>verify</code></td>
+            <td>
+                  <code>bool</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>passed to requests.get verify parameter.</p>
+              </div>
+            </td>
+            <td>
+                  <code>False</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>logger</code></td>
+            <td>
+                  <code><span title="logging.Logger">Logger</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Logger to pass logging to. By</p>
+              </div>
+            </td>
+            <td>
+                  <code><span title="src.fewspy.wrappers.get_time_series_async.LOGGER">LOGGER</span></code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td><code>df</code></td>            <td>
+                  <code><span title="pandas.DataFrame">DataFrame</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Pandas dataframe with index "id" and columns</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+<td></td>            <td>
+                  <code><span title="pandas.DataFrame">DataFrame</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>"name" and "group_id".</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+            <details class="quote">
+              <summary>Source code in <code>src\fewspy\wrappers\get_time_series_async.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 43</span>
 <span class="normal"> 44</span>
 <span class="normal"> 45</span>
 <span class="normal"> 46</span>
@@ -2202,9 +2622,7 @@
 <span class="normal">142</span>
 <span class="normal">143</span>
 <span class="normal">144</span>
-<span class="normal">145</span>
-<span class="normal">146</span>
-<span class="normal">147</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_time_series_async</span><span class="p">(</span>
+<span class="normal">145</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_time_series_async</span><span class="p">(</span>
     <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">filter_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">location_ids</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -2268,7 +2686,7 @@
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;An error ocurred: </span><span class="si">{</span><span class="n">err</span><span class="si">}</span><span class="s2"> while executing url </span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s2"> with parameters </span><span class="si">{</span><span class="n">parameters</span><span class="si">}</span><span class="s2">&quot;</span>
-                <span class="p">)</span>
+            <span class="p">)</span>
             <span class="n">response</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="n">response_json</span> <span class="o">=</span> <span class="k">await</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">response_json</span>
@@ -2280,9 +2698,7 @@
                 <span class="n">location_id</span><span class="p">,</span> <span class="n">parameter_id</span><span class="p">,</span> <span class="n">qualifier_id</span><span class="p">,</span> <span class="n">session</span>
             <span class="p">)</span>
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Exception occured: </span><span class="si">{</span><span class="n">err</span><span class="si">}</span><span class="s2">&quot;</span>
-                <span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Exception occured: </span><span class="si">{</span><span class="n">err</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="n">response</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="k">pass</span>
         <span class="k">return</span> <span class="n">response</span>
@@ -2310,8 +2726,8 @@
         <span class="n">time_series_set</span> <span class="o">=</span> <span class="n">__result_async_to_time_series_set</span><span class="p">(</span><span class="n">result_async</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">time_series_set</span>
 </code></pre></div></td></tr></table></div>
-      </details>
-  </div>
+            </details>
+    </div>
 
 </div>
 
@@ -2319,9 +2735,16 @@
 
   </div>
 
-  </div>
+    </div>
 
 </div>
+
+
+
+
+
+
+
 
 
 
@@ -2332,6 +2755,7 @@
             </div>
           
           
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
         </div>
         
       </main>
@@ -2360,7 +2784,7 @@
       
     
     <a href="https://github.com/d2hydro/fewspy" target="_blank" rel="noopener" title="github.com" class="md-social__link">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 512"><!--! Font Awesome Free 6.3.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M186.1 328.7c0 20.9-10.9 55.1-36.7 55.1s-36.7-34.2-36.7-55.1 10.9-55.1 36.7-55.1 36.7 34.2 36.7 55.1zM480 278.2c0 31.9-3.2 65.7-17.5 95-37.9 76.6-142.1 74.8-216.7 74.8-75.8 0-186.2 2.7-225.6-74.8-14.6-29-20.2-63.1-20.2-95 0-41.9 13.9-81.5 41.5-113.6-5.2-15.8-7.7-32.4-7.7-48.8 0-21.5 4.9-32.3 14.6-51.8 45.3 0 74.3 9 108.8 36 29-6.9 58.8-10 88.7-10 27 0 54.2 2.9 80.4 9.2 34-26.7 63-35.2 107.8-35.2 9.8 19.5 14.6 30.3 14.6 51.8 0 16.4-2.6 32.7-7.7 48.2 27.5 32.4 39 72.3 39 114.2zm-64.3 50.5c0-43.9-26.7-82.6-73.5-82.6-18.9 0-37 3.4-56 6-14.9 2.3-29.8 3.2-45.1 3.2-15.2 0-30.1-.9-45.1-3.2-18.7-2.6-37-6-56-6-46.8 0-73.5 38.7-73.5 82.6 0 87.8 80.4 101.3 150.4 101.3h48.2c70.3 0 150.6-13.4 150.6-101.3zm-82.6-55.1c-25.8 0-36.7 34.2-36.7 55.1s10.9 55.1 36.7 55.1 36.7-34.2 36.7-55.1-10.9-55.1-36.7-55.1z"/></svg>
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 512"><!--! Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M186.1 328.7c0 20.9-10.9 55.1-36.7 55.1s-36.7-34.2-36.7-55.1 10.9-55.1 36.7-55.1 36.7 34.2 36.7 55.1M480 278.2c0 31.9-3.2 65.7-17.5 95-37.9 76.6-142.1 74.8-216.7 74.8-75.8 0-186.2 2.7-225.6-74.8-14.6-29-20.2-63.1-20.2-95 0-41.9 13.9-81.5 41.5-113.6-5.2-15.8-7.7-32.4-7.7-48.8 0-21.5 4.9-32.3 14.6-51.8 45.3 0 74.3 9 108.8 36 29-6.9 58.8-10 88.7-10 27 0 54.2 2.9 80.4 9.2 34-26.7 63-35.2 107.8-35.2 9.8 19.5 14.6 30.3 14.6 51.8 0 16.4-2.6 32.7-7.7 48.2 27.5 32.4 39 72.3 39 114.2m-64.3 50.5c0-43.9-26.7-82.6-73.5-82.6-18.9 0-37 3.4-56 6-14.9 2.3-29.8 3.2-45.1 3.2-15.2 0-30.1-.9-45.1-3.2-18.7-2.6-37-6-56-6-46.8 0-73.5 38.7-73.5 82.6 0 87.8 80.4 101.3 150.4 101.3h48.2c70.3 0 150.6-13.4 150.6-101.3m-82.6-55.1c-25.8 0-36.7 34.2-36.7 55.1s10.9 55.1 36.7 55.1 36.7-34.2 36.7-55.1-10.9-55.1-36.7-55.1"/></svg>
     </a>
   
 </div>
@@ -2374,10 +2798,11 @@
       <div class="md-dialog__inner md-typeset"></div>
     </div>
     
-    <script id="__config" type="application/json">{"base": "../..", "features": [], "search": "../../assets/javascripts/workers/search.208ed371.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    <script id="__config" type="application/json">{"base": "../..", "features": [], "search": "../../assets/javascripts/workers/search.6ce7567c.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.407015b8.min.js"></script>
+      <script src="../../assets/javascripts/bundle.525ec568.min.js"></script>
       
     
   </body>
