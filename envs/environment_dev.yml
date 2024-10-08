@@ -9,10 +9,12 @@ dependencies:
   - nest-asyncio
   - black
   - jupyter
+  - lxml
   - pandas
   - mkdocs
   - mkdocstrings
   - mkdocstrings-python
+  - mkdocs-jupyter
   - mkdocs-material
   - geopandas
   - requests

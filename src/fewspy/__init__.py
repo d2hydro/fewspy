@@ -1,1 +1,3 @@
-from .api import Api
+from fewspy.api import Api
+
+__all__ = ["Api"]

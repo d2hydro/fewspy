@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<TimeSeries xmlns="http://www.wldelft.nl/fews/PI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.wldelft.nl/fews/PI http://fews.wldelft.nl/schemas/version1.0/pi-schemas/pi_timeseries.xsd"
+    version="1.22">
+    <timeZone>0.0</timeZone>
+    <series>
+        <header>
+            <type>instantaneous</type>
+            <moduleInstanceId>None</moduleInstanceId>
+            <locationId>union_8020 AE2</locationId>
+            <parameterId>H.meting</parameterId>
+            <timeStep unit="second" multiplier="900" />
+            <missVal>-999.0</missVal>
+        </header>
+        <event date="2021-06-22" time="06:00:00" value="-1.1059999465942383" flag="0" />
+        <event date="2021-06-22" time="06:15:00" value="-1.1009999513626099" flag="0" />
+        <event date="2021-06-22" time="06:30:00" value="-1.0959999561309814" flag="0" />
+        <event date="2021-06-22" time="06:45:00" value="-1.0889999866485596" flag="0" />
+        <event date="2021-06-22" time="07:00:00" value="-1.0859999656677246" flag="0" />
+    </series>
+    <series>
+        <header>
+            <type>instantaneous</type>
+            <moduleInstanceId>None</moduleInstanceId>
+            <locationId>union_Waddenzeedijk 1</locationId>
+            <parameterId>H.meting</parameterId>
+            <timeStep unit="second" multiplier="900" />
+            <missVal>-999.0</missVal>
+        </header>
+        <event date="2021-06-22" time="06:00:00" value="-0.37299999594688416" />
+        <event date="2021-06-22" time="06:15:00" value="-0.3720000088214874" />
+        <event date="2021-06-22" time="06:30:00" value="-0.3700000047683716" />
+        <event date="2021-06-22" time="06:45:00" value="-0.36899998784065247" />
+        <event date="2021-06-22" time="07:00:00" value="-0.3700000047683716" />
+    </series>
+    <series>
+        <header>
+            <type>instantaneous</type>
+            <moduleInstanceId>None</moduleInstanceId>
+            <locationId>union_GPG-E-6001</locationId>
+            <parameterId>H.meting</parameterId>
+            <timeStep unit="second" multiplier="900" />
+            <missVal>-999.0</missVal>
+        </header>
+        <event date="2021-06-22" time="06:00:00" value="-0.796999990940094" />
+        <event date="2021-06-22" time="06:15:00" value="-0.7960000038146973" />
+        <event date="2021-06-22" time="06:30:00" value="-0.7960000038146973" />
+        <event date="2021-06-22" time="06:45:00" value="-0.7960000038146973" />
+        <event date="2021-06-22" time="07:00:00" value="-0.796999990940094" />
+    </series>
+</TimeSeries>

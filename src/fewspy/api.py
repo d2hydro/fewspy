@@ -11,7 +11,7 @@ from .utils.url import validate_url
 import logging
 import urllib3
 
-from .wrappers import (
+from fewspy.wrappers import (
     get_time_series_async,
     get_qualifiers,
     get_time_series,

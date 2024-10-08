@@ -1,10 +1,10 @@
 import requests
 import pandas as pd
 import logging
-from ..utils.timer import Timer
-from ..utils.transformations import parameters_to_fews
+from fewspy.utils.timer import Timer
+from fewspy.utils.transformations import parameters_to_fews
 from typing import List, Union
-from ..time_series import TimeSeriesSet
+from fewspy.time_series import TimeSeriesSet
 from aiohttp import ClientSession
 
 from datetime import datetime
@@ -36,7 +36,7 @@ def __result_async_to_time_series_set(async_result):
                 ]
             }
             pi_time_series = {**version, **time_zone, **time_series}
-            time_series_set = TimeSeriesSet.from_pi_time_series(pi_time_series)
+            time_series_set = TimeSeriesSet.from_json(pi_time_series)
     return time_series_set
 
 
@@ -98,7 +98,7 @@ def get_time_series_async(
             parameters["qualifierIds"] = qualifier_id
         try:
             response = await session.request(
-                method="GET", url=url, params=parameters, verify_ssl=verify
+                method="GET", url=url, params=parameters, ssl=verify
             )
             response.raise_for_status()
         except Exception as err:
