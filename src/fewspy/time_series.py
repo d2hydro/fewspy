@@ -126,7 +126,7 @@ class TimeSeries:
     """FEWS-PI time series"""
 
     header: Header
-    events: Events = pd.DataFrame(columns=EVENT_COLUMNS).set_index("datetime")
+    events: Events = field(default_factory=pd.DataFrame(columns=EVENT_COLUMNS).set_index("datetime"))
 
     @classmethod
     def from_pi_time_series(cls, pi_time_series: dict, time_zone: float = None):
