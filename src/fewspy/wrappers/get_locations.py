@@ -52,7 +52,7 @@ def get_locations(
     # parse the response
     if response.status_code == 200:
         # convert to gdf and snake_case
-        gdf = gpd.GeoDataFrame(response.json()["locations"])
+        gdf = gpd.GeoDataFrame(response.json()["locations"], geometry=gpd.GeoSeries())
         gdf.columns = [camel_to_snake_case(i) for i in gdf.columns]
 
         # remove duplicates
