@@ -12,6 +12,7 @@ for handler in logging.root.handlers[:]:
     logging.root.removeHandler(handler)
 
 base_url = r"https://fews.hhnk.nl/FewsWebServices/rest/fewspiservice/v1"
+base_url = r"http://localhost:8080/FewsWebServices/rest/fewspiservice/v1"
 logging.basicConfig(level=logging.DEBUG, format="%(asctime)s - %(levelname)s - %(message)s")
 
 
@@ -19,7 +20,7 @@ logger = logging.getLogger(__name__)
 api = fewspy.Api(url=base_url, logger=logger)
 
 
-start_time = datetime(2024,12,1)
+start_time = datetime(2025,4,1)
 end_time = start_time + timedelta(days=21)
 location_ids = ["CMB_03751-21","CMB_6100-04"]
 parameter_ids = ["vullingsgraad"]
@@ -35,8 +36,7 @@ ts = api.get_time_series(
 
 
 # %%get JSON
-url = f"{base_url}/timeseries?filterId=VullingsgraadOutput&locationIds=CMB_03751-21&locationIds=CMB_6100-04&parameterIds=vullingsgraad&startTime=2024-12-01T00%3A00%3A00Z&endTime=2024-12-22T00%3A00%3A00Z&onlyHeaders=False&omitMissing=True&showStatistics=False&documentFormat=PI_JSON"
-
+url = f"{base_url}/timeseries?filterId=VullingsgraadOutput&locationIds=CMB_03751-21&locationIds=CMB_6100-04&parameterIds=vullingsgraad&startTime=2025-04-01T00%3A00%3A00Z&endTime=2025-04-22T00%3A00%3A00Z&onlyHeaders=False&omitMissing=True&showStatistics=False&documentFormat=PI_JSON"
 response = requests.get(url)
 response.raise_for_status()
 with open("sample.json", "w") as f:
@@ -55,7 +55,7 @@ def remove_whitespace_nodes(node):
             
 
 
-url = f"{base_url}/timeseries?filterId=VullingsgraadOutput&locationIds=CMB_03751-21&locationIds=CMB_6100-04&parameterIds=vullingsgraad&startTime=2024-12-01T00%3A00%3A00Z&endTime=2024-12-22T00%3A00%3A00Z&onlyHeaders=False&omitMissing=True&showStatistics=False"
+url = f"{base_url}/timeseries?filterId=VullingsgraadOutput&locationIds=CMB_03751-21&locationIds=CMB_6100-04&parameterIds=vullingsgraad&startTime=2025-04-01T00%3A00%3A00Z&endTime=2025-04-22T00%3A00%3A00Z&onlyHeaders=False&omitMissing=True&showStatistics=False"
 
 response = requests.get(url)
 response.raise_for_status()
@@ -65,9 +65,12 @@ with open("sample.xml", "w") as f:
     f.write(dom.toprettyxml(indent="  "))
 
 # %%get NetCDF
-url = f"{base_url}/timeseries?filterId=VullingsgraadOutput&locationIds=CMB_03751-21&locationIds=CMB_6100-04&parameterIds=vullingsgraad&startTime=2024-12-01T00%3A00%3A00Z&endTime=2024-12-22T00%3A00%3A00Z&onlyHeaders=False&omitMissing=True&showStatistics=False&documentFormat=PI_NETCDF"
+url = f"{base_url}/timeseries?filterId=VullingsgraadOutput&locationIds=CMB_03751-21&locationIds=CMB_6100-04&parameterIds=vullingsgraad&startTime=2025-04-01T00%3A00%3A00Z&endTime=2025-04-22T00%3A00%3A00Z&onlyHeaders=False&omitMissing=True&showStatistics=False&documentFormat=PI_NETCDF"
 
 response = requests.get(url)
 response.raise_for_status()
+
+with open("sample.zip", "wb") as f:
+    f.write(response.content)
 
 # %%
