@@ -1,0 +1,26 @@
+[project]
+name = "fewspy"
+version = "0.6.3"
+description = "A Python API for the Deltares FEWS PI REST Web Service"
+channels = ["conda-forge"]
+platforms = ["win-64"]
+readme = "README.md"
+license = "MIT"
+license-file = "LICENSE"
+
+[tasks]
+tests = "pytest tests"
+
+[dependencies]
+aiohttp = "*"
+geopandas = "*"
+ipykernel = "*"
+lxml = "*"
+nest-asyncio = "*"
+pandas = "*"
+pyarrow = "*"
+pytest = "*"
+netcdf4 = "*"
+
+[pypi-dependencies]
+fewspy = { path = ".", editable = true }

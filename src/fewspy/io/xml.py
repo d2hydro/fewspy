@@ -1,7 +1,10 @@
-
 from lxml import objectify
 from pathlib import Path
 from fewspy.utils.conversions import snake_to_camel_case
+from fewspy.time_series import TimeSeriesSet
+
+ns = {"pi": "http://www.wldelft.nl/fews/PI"}
+
 
 def read_xml(xml_path: Path) -> dict:
     """Parse PI XML file to fewspy TimeSeriesSet
@@ -12,14 +15,20 @@ def read_xml(xml_path: Path) -> dict:
     Returns:
         TimeSeriesSet: fewspy time series set
     """
-    
+
     xml_data = objectify.parse(xml_path)  # Parse XML data
     root = xml_data.getroot()  # Root element
 
-    time_series_set = {"timeSeries": []}
+    version = root.attrib.get("version")
+    time_zone_element = root.find("pi:timeZone", namespaces=ns)
+    time_zone = float(time_zone_element.text) if time_zone_element is not None else None
+
+    time_series_set = {"version": version, "time_zone": time_zone, "timeSeries": []}
 
     # Get children, filter out timezone.
-    rootchildren = [child for child in root.getchildren() if child.tag.endswith("series")]
+    rootchildren = [
+        child for child in root.getchildren() if child.tag.endswith("series")
+    ]
 
     # Loop over children (individual timeseries in the xml)
     for child in rootchildren:
@@ -29,7 +38,9 @@ def read_xml(xml_path: Path) -> dict:
 
         for subchild in subchildren:
             # Write header to dict
-            if subchild.tag.endswith("header"):  # gewoonlijk eerste subchild is de header
+            if subchild.tag.endswith(
+                "header"
+            ):  # gewoonlijk eerste subchild is de header
                 header_childs = subchild.getchildren()
                 metadata = {}
                 for item in header_childs:
@@ -45,7 +56,7 @@ def read_xml(xml_path: Path) -> dict:
                             metadata[key][item_key] = item_value
             # Get event data
             else:
-                data += [{k:v for k,v in zip(subchild.keys(), subchild.values())}]
+                data += [{k: v for k, v in zip(subchild.keys(), subchild.values())}]
 
         # add to time_series_set
         if "start_date" not in metadata:
@@ -55,4 +66,4 @@ def read_xml(xml_path: Path) -> dict:
 
         time_series_set["timeSeries"] += [{"header": metadata, "events": data}]
 
-    return time_series_set
+    return TimeSeriesSet.from_dict(time_series_set)

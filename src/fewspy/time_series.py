@@ -1,11 +1,9 @@
 import pandas as pd
 from typing import List
 from datetime import datetime
-from pathlib import Path
 from dataclasses import dataclass, field
 from .utils.conversions import camel_to_snake_case, dict_to_datetime
 from .utils.transformations import flatten_list
-from fewspy.readers.xml import read_xml
 import warnings
 
 
@@ -36,7 +34,7 @@ class Header:
     """FEWS-PI header-style dataclass"""
 
     type: str
-    module_instance_id: str  | None
+    module_instance_id: str | None
     location_id: str
     parameter_id: str
     time_step: dict
@@ -54,12 +52,13 @@ class Header:
 
     @classmethod
     def from_pi_header(cls, pi_header: dict):
-        warnings.warn("from_pi_header is depricated, use from_json instead.",
-                  DeprecationWarning)
-        return cls.from_json(pi_header=pi_header)
-    
+        warnings.warn(
+            "from_pi_header is depricated, use from_dict instead.", DeprecationWarning
+        )
+        return cls.from_dict(pi_header=pi_header)
+
     @classmethod
-    def from_json(cls, pi_header: dict):
+    def from_dict(cls, pi_header: dict):
         """
         Parse Header from FEWS PI header dict.
 
@@ -87,17 +86,25 @@ class Header:
         args = (_convert_kv(k, v) for k, v in pi_header.items())
         return cls(**{i[0]: i[1] for i in args})
 
+
 class Events(pd.DataFrame):
     """FEWS-PI events in pandas DataFrame"""
 
     @classmethod
-    def from_pi_events(cls, pi_events: list, missing_value: float = None, tz_offset: float = None):
-        warnings.warn("from_pi_events is deprecated, use from_json instead.",
-                  DeprecationWarning)
-        return cls.from_json(pi_events= pi_events, missing_value= missing_value, tz_offset=tz_offset)
+    def from_pi_events(
+        cls, pi_events: list, missing_value: float = None, tz_offset: float = None
+    ):
+        warnings.warn(
+            "from_pi_events is deprecated, use from_dict instead.", DeprecationWarning
+        )
+        return cls.from_dict(
+            pi_events=pi_events, missing_value=missing_value, tz_offset=tz_offset
+        )
 
     @classmethod
-    def from_json(cls, pi_events: list, missing_value: float = None, tz_offset: float = None):
+    def from_dict(
+        cls, pi_events: list, missing_value: float = None, tz_offset: float = None
+    ):
         """
         Parse Events from FEWS PI events dict.
 
@@ -140,21 +147,28 @@ class Events(pd.DataFrame):
 
         return df
 
+
 @dataclass
 class TimeSeries:
     """FEWS-PI time series"""
 
     header: Header
-    events: Events = field(default_factory=lambda: pd.DataFrame(columns=EVENT_COLUMNS).set_index("datetime"))
+    events: Events = field(
+        default_factory=lambda: pd.DataFrame(columns=EVENT_COLUMNS).set_index(
+            "datetime"
+        )
+    )
 
     @classmethod
     def from_pi_time_series(cls, pi_time_series: dict, time_zone: float = None):
-        warnings.warn("from_pi_time_series is deprecated, use from_json instead.",
-                  DeprecationWarning)
-        return cls.from_json(pi_time_series=pi_time_series, time_zone=time_zone)
+        warnings.warn(
+            "from_pi_time_series is deprecated, use from_dict instead.",
+            DeprecationWarning,
+        )
+        return cls.from_dict(pi_time_series=pi_time_series, time_zone=time_zone)
 
     @classmethod
-    def from_json(cls, pi_time_series: dict, time_zone: float = None):
+    def from_dict(cls, pi_time_series: dict, time_zone: float = None):
         """Parse TimeSeries from FEWS PI timeseries dict.
 
         Args:
@@ -164,10 +178,10 @@ class TimeSeries:
         Returns:
             fewspy.TimeSeries: time series in FEWS PI format
         """
-        header = Header.from_json(pi_time_series["header"])
+        header = Header.from_dict(pi_time_series["header"])
         kwargs = dict(header=header)
         if "events" in pi_time_series.keys():
-            kwargs["events"] = Events.from_json(
+            kwargs["events"] = Events.from_dict(
                 pi_time_series["events"], header.miss_val, time_zone
             )
         return cls(**kwargs)
@@ -176,6 +190,7 @@ class TimeSeries:
 @dataclass
 class TimeSeriesSet:
     """FEWS-PI time series set"""
+
     version: str = None
     time_zone: float = None
     time_series: List[TimeSeries] = field(default_factory=list)
@@ -185,12 +200,14 @@ class TimeSeriesSet:
 
     @classmethod
     def from_pi_time_series(cls, pi_time_series_set):
-        warnings.warn("from_pi_time_series is deprecated, use from_json instead.",
-                  DeprecationWarning)
-        return cls.from_json(pi_time_series_set)
+        warnings.warn(
+            "from_pi_time_series is deprecated, use from_dict instead.",
+            DeprecationWarning,
+        )
+        return cls.from_dict(pi_time_series_set)
 
     @classmethod
-    def from_json(cls, pi_time_series_set: dict):
+    def from_dict(cls, pi_time_series_set: dict):
         """Parse TimeSeries from FEWS PI time series set dict.
 
         Args:
@@ -209,15 +226,10 @@ class TimeSeriesSet:
             time_zone = None
         if "timeSeries" in pi_time_series_set.keys():
             kwargs["time_series"] = [
-                TimeSeries.from_json(i, time_zone)
+                TimeSeries.from_dict(i, time_zone)
                 for i in pi_time_series_set["timeSeries"]
             ]
         return cls(**kwargs)
-    
-    @classmethod
-    def read_xml(cls, xml_file: Path):
-        pi_time_series_set = read_xml(xml_file)
-        return cls.from_json(pi_time_series_set)
 
     def add(self, time_series_set):
         # add time_series to the time_series_set
