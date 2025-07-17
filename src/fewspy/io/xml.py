@@ -13,7 +13,7 @@ def read_xml(xml_path: Path) -> dict:
         xml_path (Path): Path to xml-file
 
     Returns:
-        TimeSeriesSet: fewspy time series set
+        TimeSeriesSet: timeseries
     """
 
     xml_data = objectify.parse(xml_path)  # Parse XML data

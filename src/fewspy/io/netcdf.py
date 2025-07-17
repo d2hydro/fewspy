@@ -37,11 +37,30 @@ def _parse_locations(stations_var):
     ]
 
 
+def _get_parameter_id(ds):
+    parameter_ids = [
+        var_name
+        for var_name, var in ds.variables.items()
+        if var.dimensions == ("time", "stations")
+    ]
+    return parameter_ids
+
+
 def read_netcdf(
     nc_file: Path,
     time_series_type: str | None = None,
     module_instance_id: str | None = None,
-):
+) -> TimeSeriesSet:
+    """Read the content of a NetCDF file into a fewspy TimeSeriesSet
+
+    Args:
+        nc_file (Path): path to the NetCDF file
+        time_series_type (str | None, optional): type for timeseries header. Defaults to None.
+        module_instance_id (str | None, optional): ModuleInstanceId for timeseries header. Defaults to None.
+
+    Returns:
+        TimeSeriesSet: timeseries
+    """
     # Read file
     ds = Dataset(nc_file, mode="r")
 
@@ -67,11 +86,7 @@ def read_netcdf(
     z = [None if i == z_fill else float(i) for i in ds.variables["z"][:].data]
 
     # Get Parameters
-    parameter_ids = [
-        var_name
-        for var_name, var in ds.variables.items()
-        if var.dimensions == ("time", "stations")
-    ]
+    parameter_ids = _get_parameter_id(ds)
 
     # Populate TimeSeries
     for parameter_id in parameter_ids:
