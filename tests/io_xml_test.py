@@ -154,7 +154,7 @@ def test_netcdf_ts():
     )
 
 
-def test_parquet_ts():
+def test_parquet_ts(tmp_path):
     """Check json time-series to xml-timeseries
 
 
@@ -169,7 +169,7 @@ def test_parquet_ts():
     """
 
     # make sure parquet-file does not exist
-    parquet_file = data_dir.joinpath("io", "sample.parquet")
+    parquet_file = tmp_path.joinpath("io", "sample.parquet")
     parquet_file.unlink(missing_ok=True)
     assert not parquet_file.exists()
 
