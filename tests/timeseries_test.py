@@ -7,7 +7,7 @@ DATA_PATH = Path(__file__).parent / "data"
 with open(DATA_PATH / "pi_time_series.json") as src:
     pi_time_series = json.load(src)
 
-timeseriesset = TimeSeriesSet.from_pi_time_series(pi_time_series)
+timeseriesset = TimeSeriesSet.from_dict(pi_time_series)
 
 
 def test_time_zone():

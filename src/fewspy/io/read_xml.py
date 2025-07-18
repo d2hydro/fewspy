@@ -1,3 +1,4 @@
+# %%
 from lxml import objectify
 from pathlib import Path
 from fewspy.utils.conversions import snake_to_camel_case
@@ -23,7 +24,7 @@ def read_xml(xml_path: Path) -> dict:
     time_zone_element = root.find("pi:timeZone", namespaces=ns)
     time_zone = float(time_zone_element.text) if time_zone_element is not None else None
 
-    time_series_set = {"version": version, "time_zone": time_zone, "timeSeries": []}
+    time_series_set = {"version": version, "timeZone": time_zone, "timeSeries": []}
 
     # Get children, filter out timezone.
     rootchildren = [

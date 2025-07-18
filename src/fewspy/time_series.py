@@ -2,9 +2,11 @@ import pandas as pd
 from typing import List
 from datetime import datetime
 from dataclasses import dataclass, field
-from .utils.conversions import camel_to_snake_case, dict_to_datetime
-from .utils.transformations import flatten_list
+from fewspy.utils.conversions import camel_to_snake_case, dict_to_datetime
+from fewspy.utils.transformations import flatten_list
+from fewspy.io.header_file import get_header_file
 import warnings
+from pathlib import Path
 
 
 DATETIME_KEYS = ["start_date", "end_date"]
@@ -25,8 +27,10 @@ def reliables(df: pd.DataFrame, threshold: int = 6) -> pd.DataFrame:
         pd.DataFrame: Pandas DataFrame with reliable data only
 
     """
-
-    return df.loc[df["flag"] < threshold]
+    if "flag" not in df.columns:
+        return df
+    else:
+        return df.loc[df["flag"] < threshold]
 
 
 @dataclass
@@ -74,17 +78,27 @@ class Header:
             k = camel_to_snake_case(k)
             if k in DATETIME_KEYS:
                 v = dict_to_datetime(v)
-            if k in FLOAT_KEYS:
+            elif k in FLOAT_KEYS:
                 v = float(v)
-            if k in STRING_KEYS:
+            elif k in STRING_KEYS:
                 if v == "None":
                     v = None
                 else:
                     str(v)
+            elif k == "time_step":
+                if "multiplier" in v.keys():
+                    v["multiplier"] = float(v["multiplier"])
             return k, v
 
         args = (_convert_kv(k, v) for k, v in pi_header.items())
         return cls(**{i[0]: i[1] for i in args})
+
+    def to_row(self):
+        flat = self.__dict__.copy()
+        ts = flat.pop("time_step", {})
+        flat["time_step.unit"] = ts.get("unit")
+        flat["time_step.multiplier"] = ts.get("multiplier")
+        return flat
 
 
 class Events(pd.DataFrame):
@@ -136,7 +150,7 @@ class Events(pd.DataFrame):
         else:
             df.loc[:, ["flag"]] = df["flag"].astype("int")
 
-        df.loc[:, "value"] = pd.to_numeric(df["value"])
+        df["value"] = pd.to_numeric(df["value"], downcast="float")
 
         # remove missings (if specified)
         if missing_value is not None:
@@ -158,6 +172,9 @@ class TimeSeries:
             "datetime"
         )
     )
+
+    def __len__(self):
+        return len(self.events)
 
     @classmethod
     def from_pi_time_series(cls, pi_time_series: dict, time_zone: float = None):
@@ -254,3 +271,36 @@ class TimeSeriesSet:
         qualifiers = [i for i in qualifiers if i is not None]
 
         return list(set(flatten_list(qualifiers)))
+
+    def to_df(self) -> pd.DataFrame:
+        columns = pd.MultiIndex.from_tuples(
+            [(i.header.location_id, i.header.parameter_id) for i in self.time_series],
+            names=["location_id", "parameter_id"],
+        )
+        df = pd.concat([reliables(i.events)["value"] for i in self.time_series], axis=1)
+        df.columns = columns
+
+        return df
+
+    def to_parquet(self, parquet_file: Path, include_header: bool = False):
+        """Write fewspy.TimeSeriesSet to arrow parquet file
+
+        Args:
+            parquet_file (Path): parquet-file to store
+            include_header (bool, optional): if true all headers will be stored as a parquet-file next to the timeseries. Defaults to False.
+        """
+
+        # make dir-structure to file(s)
+        parquet_file.parent.mkdir(exist_ok=True, parents=True)
+        parquet_file.unlink(missing_ok=True)
+
+        # concat events to one dataframe and write to parquet
+        df = self.to_df()
+        df.to_parquet(parquet_file, engine="pyarrow")
+
+        # if include_header, write header_file
+        if include_header:
+            header_file = get_header_file(parquet_file)
+            header_file.unlink(missing_ok=True)
+            header_df = pd.DataFrame([i.header.to_row() for i in self.time_series])
+            header_df.to_parquet(header_file, engine="pyarrow")

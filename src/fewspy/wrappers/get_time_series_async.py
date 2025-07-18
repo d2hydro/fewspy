@@ -36,7 +36,7 @@ def __result_async_to_time_series_set(async_result):
                 ]
             }
             pi_time_series = {**version, **time_zone, **time_series}
-            time_series_set = TimeSeriesSet.from_json(pi_time_series)
+            time_series_set = TimeSeriesSet.from_dict(pi_time_series)
     return time_series_set
 
 

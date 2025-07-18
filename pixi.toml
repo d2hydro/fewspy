@@ -9,7 +9,7 @@ license = "MIT"
 license-file = "LICENSE"
 
 [tasks]
-tests = "pytest tests"
+tests = "pytest ./tests"
 
 [dependencies]
 aiohttp = "*"
@@ -20,6 +20,8 @@ nest-asyncio = "*"
 pandas = "*"
 pyarrow = "*"
 pytest = "*"
+pytest-black = "*"
+pytest-flakes = "*"
 netcdf4 = "*"
 
 [pypi-dependencies]

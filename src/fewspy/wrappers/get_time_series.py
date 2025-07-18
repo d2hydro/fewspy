@@ -75,7 +75,7 @@ def get_time_series(
     if response.ok:
         pi_time_series = response.json()
         logger.debug(response.url)
-        time_series_set = TimeSeriesSet.from_json(pi_time_series)
+        time_series_set = TimeSeriesSet.from_dict(pi_time_series)
         timer.report(report_string.format(status="parsed"))
         if time_series_set.empty:
             logger.debug(f"FEWS WebService request passing empty set: {response.url}")

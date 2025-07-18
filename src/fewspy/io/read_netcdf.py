@@ -21,7 +21,7 @@ def _get_time_step(time_index):
     first_delta = deltas.iloc[0]
     equidistant = (deltas == first_delta).all()
     if equidistant:
-        return {"unit": "second", "multiplier": f"{first_delta.total_seconds():.0f}"}
+        return {"unit": "second", "multiplier": first_delta.total_seconds()}
     else:
         return {"unit": "nonequidistant"}
 
@@ -114,9 +114,8 @@ def read_netcdf(
             )
 
             # define events
-            data = {"value": var[:, i].data}
+            data = {"value": pd.to_numeric(var[:, i].data, downcast="float")}
             events = pd.DataFrame(data=data, index=time_index)
-            events["flag"] = pd.NA
 
             # append to TimeSeriesSet
             time_series_set.time_series.append(TimeSeries(header=header, events=events))
