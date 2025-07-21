@@ -71,11 +71,7 @@ def read_netcdf_from_content(content) -> TimeSeriesSet:
 
             result = read_netcdf(Path(tmp_path))
         finally:
-            try:
-                os.remove(tmp_path)
-            except PermissionError as e:
-                print(f"⚠️ Kon tijdelijk bestand niet verwijderen: {e}")
-
+            os.remove(tmp_path)
         return result
 
 
