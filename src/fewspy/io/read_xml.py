@@ -3,21 +3,12 @@ from lxml import objectify
 from pathlib import Path
 from fewspy.utils.conversions import snake_to_camel_case
 from fewspy.time_series import TimeSeriesSet
+from io import BytesIO
 
 ns = {"pi": "http://www.wldelft.nl/fews/PI"}
 
 
-def read_xml(xml_path: Path) -> dict:
-    """Parse PI XML file to fewspy TimeSeriesSet
-
-    Args:
-        xml_path (Path): Path to xml-file
-
-    Returns:
-        TimeSeriesSet: timeseries
-    """
-
-    xml_data = objectify.parse(xml_path)  # Parse XML data
+def _parse_xml_data(xml_data) -> TimeSeriesSet:
     root = xml_data.getroot()  # Root element
 
     version = root.attrib.get("version")
@@ -68,3 +59,32 @@ def read_xml(xml_path: Path) -> dict:
         time_series_set["timeSeries"] += [{"header": metadata, "events": data}]
 
     return TimeSeriesSet.from_dict(time_series_set)
+
+
+def read_xml(xml_path: Path) -> TimeSeriesSet:
+    """Parse PI XML file to fewspy TimeSeriesSet
+
+    Args:
+        xml_path (Path): Path to xml-file
+
+    Returns:
+        TimeSeriesSet: timeseries
+    """
+
+    xml_data = objectify.parse(xml_path)  # Parse XML data
+    return _parse_xml_data(xml_data)
+
+
+
+def read_xml_from_string(xml_string: str) -> TimeSeriesSet:
+    """Parse PI XML file to fewspy TimeSeriesSet
+
+    Args:
+        xml_string (str): string with PI_XML data
+
+    Returns:
+        TimeSeriesSet: timeseries
+    """
+
+    xml_data = objectify.parse(BytesIO(xml_string.encode("utf-8")))
+    return _parse_xml_data(xml_data)

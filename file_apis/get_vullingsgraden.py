@@ -30,8 +30,8 @@ ts = api.get_time_series(
     location_ids=location_ids,
     parameter_ids=parameter_ids,
     start_time=start_time,
-    end_time=end_time
-
+    end_time=end_time,
+    document_format="PI_NETCDF"
     )
 
 

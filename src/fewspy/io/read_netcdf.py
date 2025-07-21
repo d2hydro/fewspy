@@ -2,6 +2,10 @@ from netCDF4 import Dataset, num2date
 from pathlib import Path
 import pandas as pd
 from fewspy.time_series import TimeSeriesSet, TimeSeries, Header
+import zipfile
+from io import  BytesIO
+import tempfile
+import os
 
 
 type = "instantaneous"
@@ -46,6 +50,40 @@ def _get_parameter_id(ds):
     return parameter_ids
 
 
+
+def read_netcdf_from_content(content) -> TimeSeriesSet:
+    """Read zipped NetCDF content as TimeSeriesSet 
+
+    Parameters
+    ----------
+    content : Bytes
+        Zipped NetCDF content
+
+    Returns
+    -------
+    TimeSeriesSet
+        timeseries
+
+    Raises
+    ------
+    ValueError
+        In case no netcdf-file is present in content
+    """
+    with zipfile.ZipFile(BytesIO(content)) as zf:
+        nc_file_name  = next((name for name in zf.namelist() if name.endswith(".nc")), None)
+        if nc_file_name is None:
+            raise ValueError(f"No NetCDF-file in content, with filelist {zf.namelist()}")
+        with tempfile.NamedTemporaryFile(suffix=".nc", delete=False) as tmp:
+            tmp.write(zf.read(nc_file_name))
+            tmp_path = tmp.name
+            try:
+                result = read_netcdf(Path(tmp_path))
+            finally:
+                os.remove(tmp_path)
+
+            return result
+
+
 def read_netcdf(
     nc_file: Path,
     time_series_type: str | None = None,
@@ -62,62 +100,62 @@ def read_netcdf(
         TimeSeriesSet: timeseries
     """
     # Read file
-    ds = Dataset(nc_file, mode="r")
+    with Dataset(nc_file, mode="r") as ds:
 
-    # init TimeSeriesSet
-    time_series_set = TimeSeriesSet(time_zone=0.0)
+        # init TimeSeriesSet
+        time_series_set = TimeSeriesSet(time_zone=0.0)
 
-    # Get time-index for events
-    time_index = _parse_time(ds.variables["time"])
-    time_step = _get_time_step(time_index)
-    start_date = time_index[0].to_pydatetime()
-    end_date = time_index[-1].to_pydatetime()
+        # Get time-index for events
+        time_index = _parse_time(ds.variables["time"])
+        time_step = _get_time_step(time_index)
+        start_date = time_index[0].to_pydatetime()
+        end_date = time_index[-1].to_pydatetime()
 
-    # Get Locations
-    location_ids = _parse_locations(ds.variables["station_id"])
-    location_names = _parse_locations(ds.variables["station_names"])
+        # Get Locations
+        location_ids = _parse_locations(ds.variables["station_id"])
+        location_names = _parse_locations(ds.variables["station_names"])
 
-    # Get coordinates
-    x = list(ds.variables["x"][:].data)
-    y = list(ds.variables["y"][:].data)
-    lat = list(ds.variables["lat"][:].data)
-    lon = list(ds.variables["lon"][:].data)
-    z_fill = ds.variables["z"]._FillValue
-    z = [None if i == z_fill else float(i) for i in ds.variables["z"][:].data]
+        # Get coordinates
+        x = list(ds.variables["x"][:].data)
+        y = list(ds.variables["y"][:].data)
+        lat = list(ds.variables["lat"][:].data)
+        lon = list(ds.variables["lon"][:].data)
+        z_fill = ds.variables["z"]._FillValue
+        z = [None if i == z_fill else float(i) for i in ds.variables["z"][:].data]
 
-    # Get Parameters
-    parameter_ids = _get_parameter_id(ds)
+        # Get Parameters
+        parameter_ids = _get_parameter_id(ds)
 
-    # Populate TimeSeries
-    for parameter_id in parameter_ids:
-        var = ds.variables[parameter_id]
-        miss_val = float(var._FillValue)
-        for i in range(len(location_ids)):
-            # define header
-            header = Header(
-                type=time_series_type,
-                module_instance_id=module_instance_id,
-                location_id=location_ids[i],
-                parameter_id=parameter_id,
-                time_step=time_step,
-                start_date=start_date,
-                end_date=end_date,
-                x=float(x[i]),
-                y=float(y[i]),
-                lat=float(lat[i]),
-                lon=float(lon[i]),
-                units=var.units,
-                station_name=location_names[i],
-                z=z[i],
-                qualifier_id=None,
-                miss_val=miss_val,
-            )
+        # Populate TimeSeries
+        for parameter_id in parameter_ids:
+            var = ds.variables[parameter_id]
+            miss_val = float(var._FillValue)
+            for i in range(len(location_ids)):
+                # define header
+                header = Header(
+                    type=time_series_type,
+                    module_instance_id=module_instance_id,
+                    location_id=location_ids[i],
+                    parameter_id=parameter_id,
+                    time_step=time_step,
+                    start_date=start_date,
+                    end_date=end_date,
+                    x=float(x[i]),
+                    y=float(y[i]),
+                    lat=float(lat[i]),
+                    lon=float(lon[i]),
+                    units=var.units,
+                    station_name=location_names[i],
+                    z=z[i],
+                    qualifier_id=None,
+                    miss_val=miss_val,
+                )
 
-            # define events
-            data = {"value": pd.to_numeric(var[:, i].data, downcast="float")}
-            events = pd.DataFrame(data=data, index=time_index)
+                # define events
+                data = {"value": pd.to_numeric(var[:, i].data, downcast="float")}
+                events = pd.DataFrame(data=data, index=time_index)
 
-            # append to TimeSeriesSet
-            time_series_set.time_series.append(TimeSeries(header=header, events=events))
+                # append to TimeSeriesSet
+                time_series_set.time_series.append(TimeSeries(header=header, events=events))
 
     return time_series_set
