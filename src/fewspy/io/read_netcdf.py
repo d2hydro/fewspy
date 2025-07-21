@@ -3,7 +3,7 @@ from pathlib import Path
 import pandas as pd
 from fewspy.time_series import TimeSeriesSet, TimeSeries, Header
 import zipfile
-from io import  BytesIO
+from io import BytesIO
 import tempfile
 import os
 
@@ -50,38 +50,33 @@ def _get_parameter_id(ds):
     return parameter_ids
 
 
-
 def read_netcdf_from_content(content) -> TimeSeriesSet:
-    """Read zipped NetCDF content as TimeSeriesSet 
-
-    Parameters
-    ----------
-    content : Bytes
-        Zipped NetCDF content
-
-    Returns
-    -------
-    TimeSeriesSet
-        timeseries
-
-    Raises
-    ------
-    ValueError
-        In case no netcdf-file is present in content
-    """
+    """Read zipped NetCDF content as TimeSeriesSet."""
     with zipfile.ZipFile(BytesIO(content)) as zf:
-        nc_file_name  = next((name for name in zf.namelist() if name.endswith(".nc")), None)
+        nc_file_name = next(
+            (name for name in zf.namelist() if name.endswith(".nc")), None
+        )
         if nc_file_name is None:
-            raise ValueError(f"No NetCDF-file in content, with filelist {zf.namelist()}")
-        with tempfile.NamedTemporaryFile(suffix=".nc", delete=False) as tmp:
-            tmp.write(zf.read(nc_file_name))
-            tmp_path = tmp.name
-            try:
-                result = read_netcdf(Path(tmp_path))
-            finally:
-                os.remove(tmp_path)
+            raise ValueError(
+                f"No NetCDF-file in content, with filelist {zf.namelist()}"
+            )
 
-            return result
+        # Create a temp file path without opening the file
+        fd, tmp_path = tempfile.mkstemp(suffix=".nc")
+        os.close(fd)  # Close the low-level file descriptor
+
+        try:
+            with open(tmp_path, "wb") as f:
+                f.write(zf.read(nc_file_name))  # write zip contents to temp file
+
+            result = read_netcdf(Path(tmp_path))
+        finally:
+            try:
+                os.remove(tmp_path)
+            except PermissionError as e:
+                print(f"⚠️ Kon tijdelijk bestand niet verwijderen: {e}")
+
+        return result
 
 
 def read_netcdf(
@@ -101,7 +96,6 @@ def read_netcdf(
     """
     # Read file
     with Dataset(nc_file, mode="r") as ds:
-
         # init TimeSeriesSet
         time_series_set = TimeSeriesSet(time_zone=0.0)
 
@@ -156,6 +150,8 @@ def read_netcdf(
                 events = pd.DataFrame(data=data, index=time_index)
 
                 # append to TimeSeriesSet
-                time_series_set.time_series.append(TimeSeries(header=header, events=events))
+                time_series_set.time_series.append(
+                    TimeSeries(header=header, events=events)
+                )
 
     return time_series_set
