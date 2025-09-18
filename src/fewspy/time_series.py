@@ -7,6 +7,7 @@ from fewspy.utils.transformations import flatten_list
 from fewspy.io.header_file import get_header_file
 import warnings
 from pathlib import Path
+from fewspy.io.write_netcdf import write_netcdf
 
 
 DATETIME_KEYS = ["start_date", "end_date"]
@@ -286,6 +287,28 @@ class TimeSeriesSet:
         df.columns = columns
 
         return df
+
+    def to_netcdf(
+        self,
+        out_dir: Path,
+        global_attributes: dict = {"source": "fewspy"},
+        file_template: str = "{parameter_id}.nc",
+    ) -> None:
+        """Write fewspy.TimeSeriesSet to netCDF files, one per parameter_id.
+
+        Args:
+            out_dir (Path): Directory to save NetCDF files.
+            global_attributes (dict, optional): Global attributes for the NetCDF files. Defaults to {"source": "fewspy"}.
+            file_template (str, optional): Template for naming the NetCDF files. Defaults to "{parameter_id}.nc".
+        """
+        df = self.to_df()
+
+        write_netcdf(
+            df=df,
+            out_dir=out_dir,
+            global_attributes=global_attributes,
+            file_template=file_template,
+        )
 
     def to_parquet(self, parquet_file: Path, include_header: bool = False):
         """Write fewspy.TimeSeriesSet to arrow parquet file
