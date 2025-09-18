@@ -134,3 +134,4 @@ dmypy.json
 # Anything that can be executed by Windows
 *.cmd
 tests/hhnk/*
+!tests/hhnk/convert_twinpy.py
