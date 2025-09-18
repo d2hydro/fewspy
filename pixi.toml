@@ -23,6 +23,15 @@ pytest = "*"
 pytest-black = "*"
 pytest-flakes = "*"
 netcdf4 = "*"
+lazy_loader = "*" # alleen nodig voor TWINpy
+rasterio = "*" # alleen nodig voor TWINpy
+rioxarray = "*" # alleen nodig voor TWINpy
+tqdm = "*" # alleen nodig voor TWINpy
+gdal = "*"
+fiona = "*"
 
 [pypi-dependencies]
 fewspy = { path = ".", editable = true }
+hhnk_research_tools = "*" # alleen nodig voor TWINpy
+dotenv = "*" # alleen nodig voor TWINpy
+hkvfewspy = "*"

@@ -133,3 +133,4 @@ dmypy.json
 
 # Anything that can be executed by Windows
 *.cmd
+tests/hhnk/*

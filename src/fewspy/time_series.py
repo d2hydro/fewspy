@@ -1,5 +1,5 @@
 import pandas as pd
-from typing import List
+from typing import List, Literal, TypedDict, Optional
 from datetime import datetime
 from dataclasses import dataclass, field
 from fewspy.utils.conversions import camel_to_snake_case, dict_to_datetime
@@ -13,6 +13,11 @@ DATETIME_KEYS = ["start_date", "end_date"]
 FLOAT_KEYS = ["miss_val", "lat", "lon", "x", "y", "z"]
 STRING_KEYS = ["module_instance_id"]
 EVENT_COLUMNS = ["datetime", "value", "flag"]
+
+
+class TimeStepDict(TypedDict, total=False):
+    unit: Literal["second", "minute", "hour", "day", "month", "year", "nonequidistant"]
+    multiplier: Optional[int]
 
 
 def reliables(df: pd.DataFrame, threshold: int = 6) -> pd.DataFrame:
@@ -37,11 +42,11 @@ def reliables(df: pd.DataFrame, threshold: int = 6) -> pd.DataFrame:
 class Header:
     """FEWS-PI header-style dataclass"""
 
-    type: str
+    type: Literal["accumulative", "instantaneous"]
     module_instance_id: str | None
     location_id: str
     parameter_id: str
-    time_step: dict
+    time_step: TimeStepDict
     start_date: datetime
     end_date: datetime
     miss_val: float
