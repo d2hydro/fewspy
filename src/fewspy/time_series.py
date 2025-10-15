@@ -301,14 +301,15 @@ class TimeSeriesSet:
             global_attributes (dict, optional): Global attributes for the NetCDF files. Defaults to {"source": "fewspy"}.
             file_template (str, optional): Template for naming the NetCDF files. Defaults to "{parameter_id}.nc".
         """
-        df = self.to_df()
+        if not self.empty:
+            df = self.to_df()
 
-        write_netcdf(
-            df=df,
-            out_dir=out_dir,
-            global_attributes=global_attributes,
-            file_template=file_template,
-        )
+            write_netcdf(
+                df=df,
+                out_dir=out_dir,
+                global_attributes=global_attributes,
+                file_template=file_template,
+            )
 
     def to_parquet(self, parquet_file: Path, include_header: bool = False):
         """Write fewspy.TimeSeriesSet to arrow parquet file
