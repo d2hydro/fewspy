@@ -1,15 +1,14 @@
-import warnings
-from dataclasses import dataclass, field
-from datetime import datetime
-from pathlib import Path
-from typing import List, Literal, Optional, TypedDict
-
 import pandas as pd
-
-from fewspy.io.header_file import get_header_file
-from fewspy.io.write_netcdf import write_netcdf
+from typing import List, Literal, TypedDict, Optional
+from datetime import datetime
+from dataclasses import dataclass, field
 from fewspy.utils.conversions import camel_to_snake_case, dict_to_datetime
 from fewspy.utils.transformations import flatten_list
+from fewspy.io.header_file import get_header_file
+import warnings
+from pathlib import Path
+from fewspy.io.write_netcdf import write_netcdf
+
 
 DATETIME_KEYS = ["start_date", "end_date"]
 FLOAT_KEYS = ["miss_val", "lat", "lon", "x", "y", "z"]
@@ -280,27 +279,20 @@ class TimeSeriesSet:
         return list(set(flatten_list(qualifiers)))
 
     def to_df(self) -> pd.DataFrame:
-        if not self.empty:
-            columns = pd.MultiIndex.from_tuples(
-                [
-                    (i.header.location_id, i.header.parameter_id)
-                    for i in self.time_series
-                ],
-                names=["location_id", "parameter_id"],
-            )
-            df = pd.concat(
-                [reliables(i.events)["value"] for i in self.time_series], axis=1
-            )
-            df.columns = columns
+        columns = pd.MultiIndex.from_tuples(
+            [(i.header.location_id, i.header.parameter_id) for i in self.time_series],
+            names=["location_id", "parameter_id"],
+        )
+        df = pd.concat([reliables(i.events)["value"] for i in self.time_series], axis=1)
+        df.columns = columns
 
-            return df
+        return df
 
     def to_netcdf(
         self,
         out_dir: Path,
         global_attributes: dict = {"source": "fewspy"},
         file_template: str = "{parameter_id}.nc",
-        remove_dir: bool = False,
     ) -> None:
         """Write fewspy.TimeSeriesSet to netCDF files, one per parameter_id.
 
@@ -308,18 +300,15 @@ class TimeSeriesSet:
             out_dir (Path): Directory to save NetCDF files.
             global_attributes (dict, optional): Global attributes for the NetCDF files. Defaults to {"source": "fewspy"}.
             file_template (str, optional): Template for naming the NetCDF files. Defaults to "{parameter_id}.nc".
-            remove_dir (bool, optional): If True, removes the output directory before writing new files. Defaults to False.
         """
         df = self.to_df()
 
-        if df is not None:
-            write_netcdf(
-                df=df,
-                out_dir=out_dir,
-                global_attributes=global_attributes,
-                file_template=file_template,
-                remove_dir=remove_dir,
-            )
+        write_netcdf(
+            df=df,
+            out_dir=out_dir,
+            global_attributes=global_attributes,
+            file_template=file_template,
+        )
 
     def to_parquet(self, parquet_file: Path, include_header: bool = False):
         """Write fewspy.TimeSeriesSet to arrow parquet file
