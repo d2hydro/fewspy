@@ -1,9 +1,10 @@
-from pathlib import Path
 import shutil
-import pandas as pd
-from netCDF4 import date2num, Dataset
-from datetime import timezone, datetime
+from datetime import datetime, timezone
+from pathlib import Path
+
 import numpy as np
+import pandas as pd
+from netCDF4 import Dataset, date2num
 
 
 def _datetimeindex_to_nc_time(
@@ -21,18 +22,21 @@ def write_netcdf(
     out_dir: Path,
     global_attributes: dict = {"source": "fewspy"},
     file_template: str = "{parameter_id}.nc",
+    remove_dir: bool = False,
 ) -> None:
-    """Write
+    """Write a pandas DataFrame to netCDF files, one per parameter_id.
 
     Args:
         df (pd.DataFrame): _description_
         out_dir (Path): _description_
         global_attributes (dict(str), optional): _description_. Defaults to {"source": "fewspy"}.
         file_template (str, optional): _description_. Defaults to "{parameter_id}.nc".
+        remove_dir (bool, optional): If True, removes the output directory before writing. Defaults to False.
     """
 
     # prepare output directory
-    shutil.rmtree(out_dir, ignore_errors=True)
+    if remove_dir:
+        shutil.rmtree(out_dir, ignore_errors=True)
     out_dir.mkdir(exist_ok=True, parents=True)
 
     # write one netCDF file per parameter_id
