@@ -4,8 +4,5 @@ from fewspy.io.read_json import read_json
 from fewspy.io.read_netcdf import read_netcdf
 from fewspy.io.read_parquet import read_parquet
 from fewspy.io.write_netcdf import write_netcdf
-from fewspy.time_series import TimeSeries, TimeSeriesSet
 
-__version__ = "0.6.3"
-
-__all__ = ["Api", "read_xml", "read_json", "read_netcdf", "read_parquet", "write_netcdf", "TimeSeries", "TimeSeriesSet"]
+__all__ = ["Api", "read_xml", "read_json", "read_netcdf", "read_parquet", "write_netcdf"]

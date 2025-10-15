@@ -1,78 +1,105 @@
-import pandas as pd
-import xarray as xr
-import shutil
-from datetime import datetime, timezone
 from pathlib import Path
+import shutil
+import pandas as pd
+from netCDF4 import date2num, Dataset
+from datetime import timezone, datetime
+import numpy as np
 
-def _datetimeindex_to_nc_time(idx: pd.DatetimeIndex, units="seconds since 1970-01-01 00:00:00 UTC"):
-    # xarray gebruikt standaard np.datetime64, maar units kunnen worden toegevoegd als attribuut
-    return idx.to_numpy(), units
+
+def _datetimeindex_to_nc_time(
+    idx: pd.DatetimeIndex, units="seconds since 1970-01-01 00:00:00 UTC"
+):
+    # netCDF4.date2num expects naive datetimes + units/tz in string;
+    py_dt = [
+        d.to_pydatetime().replace(tzinfo=timezone.utc).replace(tzinfo=None) for d in idx
+    ]
+    return date2num(py_dt, units=units), units
+
 
 def write_netcdf(
     df: pd.DataFrame,
     out_dir: Path,
     global_attributes: dict = {"source": "fewspy"},
     file_template: str = "{parameter_id}.nc",
-    remove_dir: bool = False,
 ) -> None:
-    """Write NetCDF files using xarray
+    """Write
 
     Args:
-        df (pd.DataFrame): MultiIndex columns: (location_id, parameter_id)
-        out_dir (Path): Output directory
-        global_attributes (dict, optional): Global attributes for NetCDF file
-        file_template (str, optional): Filename template
-        remove_dir (bool, optional): Remove output dir before writing
+        df (pd.DataFrame): _description_
+        out_dir (Path): _description_
+        global_attributes (dict(str), optional): _description_. Defaults to {"source": "fewspy"}.
+        file_template (str, optional): _description_. Defaults to "{parameter_id}.nc".
     """
-    if remove_dir:
-        shutil.rmtree(out_dir, ignore_errors=True)
+
+    # prepare output directory
+    shutil.rmtree(out_dir, ignore_errors=True)
     out_dir.mkdir(exist_ok=True, parents=True)
 
+    # write one netCDF file per parameter_id
     for parameter_id in set(df.columns.get_level_values(1)):
-        dfp = df.loc[:, df.columns.get_level_values(1) == parameter_id].dropna(how="all")
-        values = dfp.to_numpy(dtype=float)
-        location_ids = dfp.columns.get_level_values(0).to_list()
-        time_vals, time_units = _datetimeindex_to_nc_time(dfp.index)
-
-        # Maak een xarray Dataset
-        ds = xr.Dataset(
-            {
-                parameter_id: (['time', 'stations'], values)
-            },
-            coords={
-                'time': ('time', time_vals, {'units': time_units}),
-                'station_id': ('stations', location_ids)
-            },
-            attrs={
-                'Conventions': 'CF-1.6',
-                'featureType': 'timeSeries',
-                'history': f"Created {datetime.now(timezone.utc).isoformat()}Z",
-                'parameter_id': parameter_id,
-                **global_attributes
-            }
+        # Filter dataframe for parameter_id and drop all-NaN rows
+        dfp = df.loc[:, df.columns.get_level_values(1) == parameter_id].dropna(
+            how="all"
         )
 
-        # Schrijf naar NetCDF
+        # to numpy
+        values = dfp.to_numpy(dtype=float)
+
+        # prepare dimensions
+        location_ids = dfp.columns.get_level_values(0).to_list()
+        strlen = max(len(s) for s in location_ids)
+        time_vals, time_units = _datetimeindex_to_nc_time(dfp.index)
+
+        # create netCDF file
         nc_file = out_dir / file_template.format(parameter_id=parameter_id)
-        ds.to_netcdf(nc_file, format="NETCDF4", engine="netcdf4", encoding={parameter_id: {"zlib": True, "complevel": 4}})
+        with Dataset(nc_file, "w", format="NETCDF4_CLASSIC") as nc:
+            n_time, n_stations = values.shape
 
-# Functie om NetCDF-bestand weer in een DataFrame te lezen
-def read_netcdf_to_dataframe(nc_path: Path, parameter_id: str) -> pd.DataFrame:
-    """
-    Lees een NetCDF-bestand (gemaakt door write_netcdf) terug naar een pandas DataFrame.
+            # dimensions
+            nc.createDimension("time", n_time)
+            nc.createDimension("stations", n_stations)
+            nc.createDimension("char_leng_id", strlen)  # for station_id
 
-    Args:
-        nc_path (Path): Pad naar NetCDF-bestand
-        parameter_id (str): Parameter die gelezen moet worden
+            # variables: time
+            vtime = nc.createVariable("time", "f8", ("time",))
+            vtime.units = time_units
+            vtime.standard_name = "time"
+            vtime.long_name = "time"
+            vtime.calendar = "gregorian"
+            vtime[:] = time_vals
 
-    Returns:
-        pd.DataFrame: DataFrame met MultiIndex columns (location_id, parameter_id)
-    """
-    ds = xr.open_dataset(nc_path)
-    values = ds[parameter_id].values
-    times = pd.to_datetime(ds['time'].values)
-    stations = ds['station_id'].to_numpy().tolist()  # converteer naar lijst van strings
-    stations = [str(s) for s in stations]
-    columns = pd.MultiIndex.from_product([stations, [parameter_id]], names=["location_id", "parameter_id"])
-    df = pd.DataFrame(values, index=times, columns=columns)
-    return df
+            # variables: station
+
+            vstation = nc.createVariable(
+                "station_id", "S1", ("stations", "char_leng_id")
+            )
+            vstation.long_name = "station identification code"
+            vstation.cf_role = "timeseries_id"
+
+            # convert list of strings to array of characters (FEWS style)
+            arr = np.array(location_ids, dtype=f"S{strlen}")  # fixed-length bytestrings
+            data = arr.view("S1").reshape(n_stations, strlen)
+            vstation[:, :] = data
+
+            # compression and chunks
+            compression_args = dict(zlib=True, complevel=4, shuffle=True)
+            chunks = (min(max(n_time // 10, 1), n_time), min(n_stations, 128))
+
+            vval = nc.createVariable(
+                parameter_id,
+                "f4",
+                ("time", "stations"),
+                fill_value=np.nan,
+                chunksizes=chunks,
+                **compression_args,
+            )
+            vval.coordinates = "time station_id"
+            vval[:] = values
+
+            # Globale attributen (CF-vriendelijk)
+            nc.Conventions = "CF-1.6"
+            nc.featureType = "timeSeries"
+            nc.history = f"Created {datetime.now(timezone.utc).isoformat()}Z"
+            nc.parameter_id = parameter_id
+            for key, value in global_attributes.items():
+                setattr(nc, key, value)
