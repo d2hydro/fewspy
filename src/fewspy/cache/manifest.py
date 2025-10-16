@@ -47,7 +47,9 @@ class Coverage(BaseModel):
             raise ValueError("end_date must be after start_date")
         return v
 
-    def update_coverage(self, start_date: datetime.datetime, end_date: datetime.datetime):
+    def update_coverage(
+        self, start_date: datetime.datetime, end_date: datetime.datetime
+    ):
         """Udate coverage start_date and end_date if the provided times are outside the current
 
         Parameters
@@ -71,7 +73,9 @@ class Coverage(BaseModel):
 
     def update_coverage_from_timeserieset(self, tss: TimeSeriesSet):
         for ts in tss.time_series:
-            self.update_coverage(start_date=ts.header.start_date, end_date=ts.header.end_date)
+            self.update_coverage(
+                start_date=ts.header.start_date, end_date=ts.header.end_date
+            )
 
 
 class Manifest(BaseModel):
@@ -105,14 +109,35 @@ class Manifest(BaseModel):
             json_data = json.load(f)
             for k, v in kwargs.items():
                 json_data[k] = v
-            return cls.model_validate(json_data)
+            manifest = cls.model_validate(json_data)
+            manifest.filepath = filepath
+            manifest.update_filepaths(filepath)
+            return manifest
+
+    def update_filepaths(self, filepath: Path):
+        """
+        Update filepath, cache_dirs and files paths to a new filepath location.
+        """
+        # Update manifest filepath
+        self.filepath = filepath
+
+        # Update cache_dirs to new parent directory
+        parent = filepath.parent
+        self.cache_dirs = [parent.joinpath(d.name) for d in self.cache_dirs]
+
+        # Update files paths to new parent directory
+        for file_entry in self.files:
+            filter_id, nc_file = file_entry.path.parts[-2:]
+            file_entry.path = self.current_cache_dir.joinpath(filter_id, nc_file)
 
     def validate_files(self):
         """Validate file cache on expected number of files, filex existence, size and hash"""
 
         # Validate that the number of files matches the expected count
         if len(self.files) != self.expected_file_count:
-            raise ValueError(f"Expected {self.expected_file_count} files, but got {len(self.files)}")
+            raise ValueError(
+                f"Expected {self.expected_file_count} files, but got {len(self.files)}"
+            )
 
         # Validate each file's existence, size, and hash
         errors = []
@@ -124,14 +149,49 @@ class Manifest(BaseModel):
             # Check file size
             actual_size = file_entry.path.stat().st_size
             if actual_size != file_entry.nbytes:
-                errors.append(f"Size mismatch for {file_entry.path}: expected {file_entry.nbytes}, got {actual_size}")
+                errors.append(
+                    f"Size mismatch for {file_entry.path}: expected {file_entry.nbytes}, got {actual_size}"
+                )
                 continue
             # Check file hash
             actual_hash = FieldEndtry._sha256(file_entry.path)
             if actual_hash != file_entry.sha256:
-                errors.append(f"Hash mismatch for {file_entry.path}: expected {file_entry.sha256}, got {actual_hash}")
+                errors.append(
+                    f"Hash mismatch for {file_entry.path}: expected {file_entry.sha256}, got {actual_hash}"
+                )
         if errors:
             raise ValueError("File validation errors:\n" + "\n".join(errors))
+
+    def get_entry(self, filter_id: str, parameter_id: str) -> FieldEndtry | None:
+        """Get a file entry by filter_id and location_id
+
+        Parameters
+        ----------
+        filter_id : str
+            The filter ID to search for
+        parameter_id : str
+            The parameter_id ID to search for
+
+        Returns
+        -------
+        FieldEndtry | None
+            The matching FieldEndtry if found. Otherwise, raises a ValueError.
+        """
+        entry = next(
+            (
+                i
+                for i in self.files
+                if (i.path.name == f"{parameter_id}.nc")
+                and (i.path.parent.name == filter_id)
+            ),
+            None,
+        )
+        if entry is None:
+            raise ValueError(
+                f"No entry found for filter_id '{filter_id}' and parameter_id '{parameter_id}'"
+            )
+
+        return entry
 
     def clean_cache_dirs(self):
         """Clean all directories in root_dir except those in cache_dirs"""
@@ -140,7 +200,9 @@ class Manifest(BaseModel):
         current_cache_dir = self.current_cache_dir
         root_dir = current_cache_dir.parent
         remove_candidates = [
-            d for d in root_dir.glob("*") if d.is_dir() and (d != current_cache_dir) and (d not in self.cache_dirs)
+            d
+            for d in root_dir.glob("*")
+            if d.is_dir() and (d != current_cache_dir) and (d not in self.cache_dirs)
         ]  # make sure we don't do current cache
         for i in remove_candidates:
             if i is not self.current_cache_dir:  # extra check
@@ -148,7 +210,10 @@ class Manifest(BaseModel):
 
     def update_cache_dirs(self):
         """Update cache_dirs list with current_cache_dir if not already present"""
-        if self.current_cache_dir is not None and self.current_cache_dir not in self.cache_dirs:
+        if (
+            self.current_cache_dir is not None
+            and self.current_cache_dir not in self.cache_dirs
+        ):
             self.cache_dirs.append(self.current_cache_dir)
 
         self.cache_dirs = sorted(self.cache_dirs, reverse=True)[: self.max_cache_count]

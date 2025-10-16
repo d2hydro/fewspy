@@ -23,13 +23,14 @@ pydantic="*"
 pytest = "*"
 pytest-black = "*"
 pytest-flakes = "*"
-netcdf4 = "*"
+netCDF4 = "*"
 lazy_loader = "*" # alleen nodig voor TWINpy
 rasterio = "*" # alleen nodig voor TWINpy
 rioxarray = "*" # alleen nodig voor TWINpy
 tqdm = "*" # alleen nodig voor TWINpy
 gdal = "*"
 fiona = "*"
+xarray="*"
 
 [pypi-dependencies]
 fewspy = { path = ".", editable = true }
