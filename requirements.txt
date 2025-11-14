@@ -1,5 +1,0 @@
-aiohttp
-pandas
-geopandas
-requests
-xarray

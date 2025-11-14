@@ -1,5 +1,42 @@
 [build-system]
-requires = ["setuptools>=45", "setuptools_scm[toml]>=6.2", "wheel"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
-[tool.setuptools_scm]
+[project]
+name = "fewspy"
+description = "A Python API for the Deltares FEWS PI REST Web Service"
+readme = "README.md"
+authors = [
+    { name = "Daniel Tollenaar", email = "daniel@d2hydro.nl" },
+]
+license = { text = "MIT" }
+
+# Tested for python 3.9, 3.12 and 3.13
+requires-python = ">=3.9,<3.14"
+dependencies = [
+    "aiohttp",
+    "lxml",
+    "nest-asyncio",
+    "pandas",
+    "pyarrow",
+    "pydantic",
+    "geopandas",
+    "requests",
+    "netCDF4",
+    "xarray"
+    ]
+
+dynamic = ["version"]
+
+[project.optional-dependencies]
+tests = ["pytest"]
+
+[tool.flake8]
+max-line-length = 120
+max-complexity = 10
+
+[tool.hatch.version]
+path = "fewspy/__init__.py"
+
+[project.urls]
+Source = "https://github.com/d2hydro/fewspy"
