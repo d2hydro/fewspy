@@ -7,4 +7,4 @@ from fewspy.io.write_netcdf import write_netcdf
 from fewspy.time_series import TimeSeries, TimeSeriesSet
 
 __all__ = ["Api", "read_xml", "read_json", "read_netcdf", "read_parquet", "write_netcdf", "TimeSeries", "TimeSeriesSet"]
-__version__ = "0.6.3"
+__version__ = "2025.11.0"
