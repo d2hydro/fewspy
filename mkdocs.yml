@@ -26,6 +26,7 @@ nav:
     - Code Reference:
         - Api: reference/api.md
         - Wrappers: reference/wrappers.md
+        - TimeSeries: reference/timeseries.md
     - Tutorials:
         - Installation: tutorials/installation_tutorial.md
  

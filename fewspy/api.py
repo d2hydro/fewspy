@@ -11,7 +11,7 @@ from .utils.url import validate_url
 import logging
 import urllib3
 
-from .wrappers import (
+from fewspy.wrappers import (
     get_time_series_async,
     get_qualifiers,
     get_time_series,
@@ -56,7 +56,6 @@ class Api:
             **kwargs,
             **dict(
                 url=f"{self.url}{url_post_fix}",
-                document_format=self.document_format,
                 verify=self.ssl_verify,
                 logger=self.logger,
             ),
@@ -161,6 +160,7 @@ class Api:
         omit_missing=True,
         show_statistics=False,
         parallel=False,
+        document_format:str="PI_JSON"
     ):
         """
         Get FEWS qualifiers as a pandas DataFrame
@@ -176,6 +176,7 @@ class Api:
             only_headers (bool): if True, only headers will be returned. Defaults to False.
             omit_missing (bool): if True, no missings values will be returned. Defaults to True.
             show_statistics (bool): if True, time series statistics will be included in header. Defaults to False.
+            document_format (str): request document format to return. Defaults to PI_JSON.
             parallel (bool): if True, timeseries are requested by the asynchronous wrapper. Defaults to False
 
         Returns:
@@ -184,6 +185,9 @@ class Api:
 
         """
         kwargs = self.__kwargs(url_post_fix="timeseries", kwargs=locals())
+        if (self.document_format != "PI_JSON") and parallel:
+            self.logger.warning("Wont run parallel, as this is only supported for documentFromat PI_JSON") 
+            parallel = False
         if parallel:
             kwargs.pop("only_headers")
             kwargs.pop("show_statistics")

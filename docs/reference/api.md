@@ -1,3 +1,3 @@
-# DataSets
-::: src.fewspy.api.Api
+# FEWS Rest API
+::: src.fewspy.api
 

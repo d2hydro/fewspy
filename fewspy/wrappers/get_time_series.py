@@ -6,8 +6,8 @@ from ..utils.transformations import parameters_to_fews
 from typing import List, Union
 from ..time_series import TimeSeriesSet
 from datetime import datetime
-import aiohttp
-import asyncio
+from fewspy.io.read_xml import read_xml_from_string
+from fewspy.io.read_netcdf import read_netcdf_from_content
 
 
 LOGGER = logging.getLogger(__name__)
@@ -73,9 +73,14 @@ def get_time_series(
 
     # parse the response
     if response.ok:
-        pi_time_series = response.json()
         logger.debug(response.url)
-        time_series_set = TimeSeriesSet.from_pi_time_series(pi_time_series)
+        if document_format == "PI_JSON":
+            pi_time_series = response.json()
+            time_series_set = TimeSeriesSet.from_dict(pi_time_series)
+        elif document_format == "PI_XML":
+            time_series_set = read_xml_from_string(response.text)
+        elif document_format == "PI_NETCDF":
+            time_series_set = read_netcdf_from_content(response.content)
         timer.report(report_string.format(status="parsed"))
         if time_series_set.empty:
             logger.debug(f"FEWS WebService request passing empty set: {response.url}")
