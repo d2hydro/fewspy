@@ -1,5 +1,5 @@
 # %%
-from lxml import objectify
+from lxml import etree
 from pathlib import Path
 from fewspy.utils.conversions import snake_to_camel_case
 from fewspy.time_series import TimeSeriesSet
@@ -71,9 +71,8 @@ def read_xml(xml_path: Path) -> TimeSeriesSet:
         TimeSeriesSet: timeseries
     """
 
-    xml_data = objectify.parse(xml_path)  # Parse XML data
+    xml_data = etree.parse(xml_path)  # Parse XML data
     return _parse_xml_data(xml_data)
-
 
 
 def read_xml_from_string(xml_string: str) -> TimeSeriesSet:
@@ -86,5 +85,5 @@ def read_xml_from_string(xml_string: str) -> TimeSeriesSet:
         TimeSeriesSet: timeseries
     """
 
-    xml_data = objectify.parse(BytesIO(xml_string.encode("utf-8")))
+    xml_data = etree.fromstring(xml_string.encode("utf-8"))
     return _parse_xml_data(xml_data)
