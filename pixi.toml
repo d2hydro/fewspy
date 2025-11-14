@@ -24,7 +24,9 @@ pytest = "*"
 pytest-black = "*"
 pytest-flakes = "*"
 netCDF4 = "*"
+twine = "*"
 xarray="*"
 
 [pypi-dependencies]
 fewspy = { path = ".", editable = true }
+build = "*"
