@@ -1,15 +1,11 @@
-# %%
 from lxml import etree
 from pathlib import Path
-from fewspy.utils.conversions import snake_to_camel_case
 from fewspy.time_series import TimeSeriesSet
-from io import BytesIO
 
 ns = {"pi": "http://www.wldelft.nl/fews/PI"}
 
 
 def _parse_xml_data(root) -> TimeSeriesSet:
-    # root = xml_data.getroot()  # Root element
 
     version = root.attrib.get("version")
     time_zone_element = root.find("pi:timeZone", namespaces=ns)
