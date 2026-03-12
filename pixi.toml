@@ -1,4 +1,4 @@
-[project]
+[workspace]
 name = "fewspy"
 version = "0.6.3"
 description = "A Python API for the Deltares FEWS PI REST Web Service"
