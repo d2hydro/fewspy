@@ -3,7 +3,8 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
 from typing import List, Literal, Optional, TypedDict
-
+from pydantic.dataclasses import dataclass
+from pydantic import ConfigDict
 import pandas as pd
 
 from fewspy.io.header_file import get_header_file
@@ -40,7 +41,7 @@ def reliables(df: pd.DataFrame, threshold: int = 6) -> pd.DataFrame:
         return df.loc[df["flag"] < threshold]
 
 
-@dataclass
+@dataclass(config=ConfigDict(arbitrary_types_allowed=True))
 class Header:
     """FEWS-PI header-style dataclass"""
 
@@ -142,6 +143,9 @@ class Events(pd.DataFrame):
 
         df = cls(pi_events)
 
+        if df.empty:
+            return pd.DataFrame(columns=EVENT_COLUMNS).set_index("datetime")
+
         # set datetime
         if tz_offset is not None:
             df["datetime"] = pd.to_datetime(
@@ -172,7 +176,7 @@ class Events(pd.DataFrame):
         return df
 
 
-@dataclass
+@dataclass(config=ConfigDict(arbitrary_types_allowed=True))
 class TimeSeries:
     """FEWS-PI time series"""
 
@@ -214,7 +218,7 @@ class TimeSeries:
         return cls(**kwargs)
 
 
-@dataclass
+@dataclass(config=ConfigDict(arbitrary_types_allowed=True))
 class TimeSeriesSet:
     """FEWS-PI time series set"""
 

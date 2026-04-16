@@ -7,10 +7,12 @@ EXPECTED_PARAMETER_IDS = ["vullingsgraad"]
 EXPECTED_QUALIFIER_IDS = []
 
 XML_FILE = data_dir.joinpath("io", "sample.xml")
+XML_ONLY_HEADERS_FILE = data_dir.joinpath("io", "sample_only_headers.xml")
 JSON_FILE = data_dir.joinpath("io", "sample.json")
 NC_FILE = data_dir.joinpath("io", "sample.nc")
 
 xml_ts = fewspy.read_xml(XML_FILE)
+xml_only_headers_ts = fewspy.read_xml(XML_ONLY_HEADERS_FILE)
 json_ts = fewspy.read_json(JSON_FILE)
 nc_ts = fewspy.read_netcdf(NC_FILE)
 

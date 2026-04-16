@@ -54,10 +54,10 @@ def _parse_xml_data(root) -> TimeSeriesSet:
                 data += [{k: v for k, v in zip(subchild.keys(), subchild.values())}]
 
         # add to time_series_set
-        if "start_date" not in metadata:
-            metadata["start_date"] = {"date": data[0]["date"], "time": data[0]["time"]}
-        if "end_date" not in metadata:
-            metadata["end_date"] = {"date": data[-1]["date"], "time": data[-1]["time"]}
+        if "startDate" not in metadata:
+            metadata["startDate"] = {"date": data[0]["date"], "time": data[0]["time"]}
+        if "endDate" not in metadata:
+            metadata["endDate"] = {"date": data[-1]["date"], "time": data[-1]["time"]}
 
         time_series_set["timeSeries"] += [{"header": metadata, "events": data}]
 
