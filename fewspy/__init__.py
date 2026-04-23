@@ -16,4 +16,4 @@ __all__ = [
     "TimeSeries",
     "TimeSeriesSet",
 ]
-__version__ = "2026.3.0"
+__version__ = "2026.4.0"
