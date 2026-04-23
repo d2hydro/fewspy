@@ -44,14 +44,17 @@ def reliables(df: pd.DataFrame, threshold: int = 6) -> pd.DataFrame:
 class Header:
     """FEWS-PI header-style dataclass"""
 
+    # required arguments
     type: Literal["accumulative", "instantaneous"]
-    module_instance_id: str | None
     location_id: str
     parameter_id: str
     time_step: TimeStepDict
     start_date: datetime
     end_date: datetime
-    miss_val: float
+
+    # Optional arguments
+    module_instance_id: str | None
+    miss_val: float = float("nan")
     lat: float | None = None
     lon: float | None = None
     x: float | None = None
