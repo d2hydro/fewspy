@@ -84,7 +84,8 @@ def read_netcdf(
 
     Args:
         nc_file (Path): path to the NetCDF file
-        time_series_type (str | None, optional): type for timeseries header. Defaults to None.
+        time_series_type (str | None, optional): type for timeseries header. Defaults to None. 
+        # TODO wvg; In fewspy\time_series.py Header this is a Literal["accumulative", "instantaneous"]. This should be consistent here.
         module_instance_id (str | None, optional): ModuleInstanceId for timeseries header. Defaults to None.
 
     Returns:
