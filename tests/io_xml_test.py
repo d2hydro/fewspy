@@ -14,7 +14,6 @@ NC_FILE = data_dir.joinpath("io", "sample.nc")
 xml_ts = fewspy.read_xml(XML_FILE)
 xml_only_headers_ts = fewspy.read_xml(XML_ONLY_HEADERS_FILE)
 json_ts = fewspy.read_json(JSON_FILE)
-nc_ts = fewspy.read_netcdf(NC_FILE)
 
 
 def test_xml_ts():
@@ -110,6 +109,8 @@ def test_netcdf_ts():
 
     Therefore we don't compare these info
     """
+    nc_ts = fewspy.read_netcdf(NC_FILE)
+
 
     assert nc_ts.time_zone == 0.0
     # headers
