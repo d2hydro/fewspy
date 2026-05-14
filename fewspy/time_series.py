@@ -1,8 +1,8 @@
 import warnings
-from dataclasses import dataclass, field
+from dataclasses import field
 from datetime import datetime
 from pathlib import Path
-from typing import List, Literal, Optional, TypedDict
+from typing import List, Literal, TypedDict
 from pydantic.dataclasses import dataclass
 from pydantic import ConfigDict
 import pandas as pd
@@ -18,9 +18,10 @@ STRING_KEYS = ["module_instance_id"]
 EVENT_COLUMNS = ["datetime", "value", "flag"]
 
 
+@dataclass(config=ConfigDict(arbitrary_types_allowed=False))
 class TimeStepDict(TypedDict, total=False):
     unit: Literal["second", "minute", "hour", "day", "month", "year", "nonequidistant"]
-    multiplier: Optional[int]
+    multiplier: int | None
 
 
 def reliables(df: pd.DataFrame, threshold: int = 6) -> pd.DataFrame:
@@ -54,7 +55,7 @@ class Header:
     end_date: datetime
 
     # Optional arguments
-    module_instance_id: str | None
+    module_instance_id: str | None = None
     miss_val: float = float("nan")
     lat: float | None = None
     lon: float | None = None
@@ -66,14 +67,14 @@ class Header:
     qualifier_id: List[str] | None = None
 
     @classmethod
-    def from_pi_header(cls, pi_header: dict):
+    def from_pi_header(cls, pi_header: dict) -> "Header":
         warnings.warn(
             "from_pi_header is depricated, use from_dict instead.", DeprecationWarning
         )
         return cls.from_dict(pi_header=pi_header)
 
     @classmethod
-    def from_dict(cls, pi_header: dict):
+    def from_dict(cls, pi_header: dict) -> "Header":
         """
         Parse Header from FEWS PI header dict.
 
@@ -95,7 +96,7 @@ class Header:
                 if v == "None":
                     v = None
                 else:
-                    str(v)
+                    v = str(v)
             elif k == "time_step":
                 if "multiplier" in v.keys():
                     v["multiplier"] = float(v["multiplier"])
@@ -117,8 +118,8 @@ class Events(pd.DataFrame):
 
     @classmethod
     def from_pi_events(
-        cls, pi_events: list, missing_value: float = None, tz_offset: float = None
-    ):
+        cls, pi_events: list, missing_value: float | None = None, tz_offset: float | None = None
+    ) -> pd.DataFrame:
         warnings.warn(
             "from_pi_events is deprecated, use from_dict instead.", DeprecationWarning
         )
@@ -128,8 +129,8 @@ class Events(pd.DataFrame):
 
     @classmethod
     def from_dict(
-        cls, pi_events: list, missing_value: float = None, tz_offset: float = None
-    ):
+        cls, pi_events: list, missing_value: float | None = None, tz_offset: float | None = None
+    ) -> pd.DataFrame:
         """
         Parse Events from FEWS PI events dict.
 
@@ -181,7 +182,7 @@ class TimeSeries:
     """FEWS-PI time series"""
 
     header: Header
-    events: Events = field(
+    events: Events | pd.DataFrame = field(
         default_factory=lambda: pd.DataFrame(columns=EVENT_COLUMNS).set_index(
             "datetime"
         )
@@ -191,7 +192,7 @@ class TimeSeries:
         return len(self.events)
 
     @classmethod
-    def from_pi_time_series(cls, pi_time_series: dict, time_zone: float = None):
+    def from_pi_time_series(cls, pi_time_series: dict, time_zone: float | None = None):
         warnings.warn(
             "from_pi_time_series is deprecated, use from_dict instead.",
             DeprecationWarning,
@@ -199,7 +200,7 @@ class TimeSeries:
         return cls.from_dict(pi_time_series=pi_time_series, time_zone=time_zone)
 
     @classmethod
-    def from_dict(cls, pi_time_series: dict, time_zone: float = None):
+    def from_dict(cls, pi_time_series: dict, time_zone: float | None = None):
         """Parse TimeSeries from FEWS PI timeseries dict.
 
         Args:
@@ -222,8 +223,8 @@ class TimeSeries:
 class TimeSeriesSet:
     """FEWS-PI time series set"""
 
-    version: str = None
-    time_zone: float = None
+    version: str | None = None
+    time_zone: float | None = None
     time_series: List[TimeSeries] = field(default_factory=list)
 
     def __len__(self):

@@ -54,10 +54,11 @@ def _parse_xml_data(root) -> TimeSeriesSet:
                 data += [{k: v for k, v in zip(subchild.keys(), subchild.values())}]
 
         # add to time_series_set
-        if "startDate" not in metadata:
-            metadata["startDate"] = {"date": data[0]["date"], "time": data[0]["time"]}
-        if "endDate" not in metadata:
-            metadata["endDate"] = {"date": data[-1]["date"], "time": data[-1]["time"]}
+        # TODO wvg; dit kan weg, startDate en endDate zijn verplichte velden in Header.
+        # if "startDate" not in metadata:
+        #     metadata["startDate"] = {"date": data[0]["date"], "time": data[0]["time"]}
+        # if "endDate" not in metadata:
+        #     metadata["endDate"] = {"date": data[-1]["date"], "time": data[-1]["time"]}
 
         time_series_set["timeSeries"] += [{"header": metadata, "events": data}]
 
