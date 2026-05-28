@@ -6,10 +6,7 @@ import zipfile
 from io import BytesIO
 import tempfile
 import os
-
-
-type = "instantaneous"
-module_instance_id = "Vullingsgraad"
+import warnings
 
 
 def _parse_time(time_var):
@@ -85,11 +82,21 @@ def read_netcdf(
     Args:
         nc_file (Path): path to the NetCDF file
         time_series_type (str | None, optional): type for timeseries header. Defaults to None.
+        Note (!) specifying time_series_type is advised. If you don't data will be interpreted as instantaneous
         module_instance_id (str | None, optional): ModuleInstanceId for timeseries header. Defaults to None.
 
     Returns:
         TimeSeriesSet: timeseries
     """
+    if time_series_type is None:
+        warnings.warn(
+            "time_series_type is None; defaulting to 'instantaneous'. "
+            "Pass time_series_type explicitly to avoid this warning.",
+            UserWarning,
+            stacklevel=2,
+        )
+        time_series_type = "instantaneous"
+
     # Read file
     with Dataset(nc_file, mode="r") as ds:
         # init TimeSeriesSet

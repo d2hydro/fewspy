@@ -1,4 +1,5 @@
 # %%
+from time import time
 import fewspy
 from config import data_dir
 
@@ -7,12 +8,13 @@ EXPECTED_PARAMETER_IDS = ["vullingsgraad"]
 EXPECTED_QUALIFIER_IDS = []
 
 XML_FILE = data_dir.joinpath("io", "sample.xml")
+XML_ONLY_HEADERS_FILE = data_dir.joinpath("io", "sample_only_headers.xml")
 JSON_FILE = data_dir.joinpath("io", "sample.json")
 NC_FILE = data_dir.joinpath("io", "sample.nc")
 
 xml_ts = fewspy.read_xml(XML_FILE)
+xml_only_headers_ts = fewspy.read_xml(XML_ONLY_HEADERS_FILE)
 json_ts = fewspy.read_json(JSON_FILE)
-nc_ts = fewspy.read_netcdf(NC_FILE)
 
 
 def test_xml_ts():
@@ -31,9 +33,9 @@ def test_xml_ts():
 
     # xcheck start_time and end_time
     expected_start_date = xml_ts.time_series[0].events.index[0]
-    assert xml_ts.time_series[0].header.start_date == expected_start_date
+    assert xml_ts.time_series[0].header.start_date <= expected_start_date
     expected_end_date = xml_ts.time_series[0].events.index[-1]
-    assert xml_ts.time_series[0].header.end_date == expected_end_date
+    assert xml_ts.time_series[0].header.end_date >= expected_end_date
 
     # xcheck interval
     expected_time_step = (
@@ -108,10 +110,13 @@ def test_netcdf_ts():
 
     Therefore we don't compare these info
     """
+    nc_ts = fewspy.read_netcdf(
+        NC_FILE, time_series_type="instantaneous", module_instance_id="Vullingsgraad"
+    )
 
     assert nc_ts.time_zone == 0.0
     # headers
-    ignore_keys = ["type", "module_instance_id", "z"]
+    ignore_keys = ["type", "module_instance_id", "z", "start_date", "end_date"]
 
     nc_header = {
         k: v

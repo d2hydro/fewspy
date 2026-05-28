@@ -30,3 +30,4 @@ xarray="*"
 [pypi-dependencies]
 fewspy = { path = ".", editable = true }
 build = "*"
+pydantic = "*"
