@@ -163,7 +163,7 @@ class Events(pd.DataFrame):
         if "flag" not in df.columns:
             df["flag"] = pd.Series(dtype="int")
         else:
-            df.loc[:, ["flag"]] = df["flag"].astype("int")
+            df["flag"] = df["flag"].astype("int")
 
         df["value"] = pd.to_numeric(df["value"], downcast="float")
 
@@ -292,7 +292,11 @@ class TimeSeriesSet:
             [(i.header.location_id, i.header.parameter_id) for i in self.time_series],
             names=["location_id", "parameter_id"],
         )
-        df = pd.concat([reliables(i.events)["value"] for i in self.time_series], axis=1)
+        df = pd.concat(
+            [reliables(i.events)["value"] for i in self.time_series],
+            axis=1,
+            sort=True,
+        )
         df.columns = columns
 
         return df
