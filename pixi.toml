@@ -10,6 +10,7 @@ license-file = "LICENSE"
 
 [tasks]
 tests = "pytest ./tests"
+pre-commit-install = "pre-commit install"
 
 [dependencies]
 aiohttp = "*"
@@ -18,6 +19,7 @@ ipykernel = "*"
 lxml = "*"
 nest-asyncio = "*"
 pandas = "*"
+pre-commit = "*"
 pyarrow = "*"
 pydantic="*"
 pytest = "*"
