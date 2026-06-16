@@ -1,23 +1,28 @@
 # %%
-from time import time
 import fewspy
-from config import data_dir
+import pytest
 
 EXPECTED_LOCATION_IDS = sorted(["CMB_03751-21", "CMB_6100-04"])
 EXPECTED_PARAMETER_IDS = ["vullingsgraad"]
 EXPECTED_QUALIFIER_IDS = []
 
-XML_FILE = data_dir.joinpath("io", "sample.xml")
-XML_ONLY_HEADERS_FILE = data_dir.joinpath("io", "sample_only_headers.xml")
-JSON_FILE = data_dir.joinpath("io", "sample.json")
-NC_FILE = data_dir.joinpath("io", "sample.nc")
 
-xml_ts = fewspy.read_xml(XML_FILE)
-xml_only_headers_ts = fewspy.read_xml(XML_ONLY_HEADERS_FILE)
-json_ts = fewspy.read_json(JSON_FILE)
+@pytest.fixture(scope="module")
+def xml_ts(data_dir):
+    return fewspy.read_xml(data_dir / "io" / "sample.xml")
 
 
-def test_xml_ts():
+@pytest.fixture(scope="module")
+def json_ts(data_dir):
+    return fewspy.read_json(data_dir / "io" / "sample.json")
+
+
+@pytest.fixture(scope="module")
+def nc_file(data_dir):
+    return data_dir / "io" / "sample.nc"
+
+
+def test_xml_ts(xml_ts):
     """Check xml time-series to expected values"""
     # check basic info
     assert xml_ts.version == "1.34"
@@ -49,7 +54,7 @@ def test_xml_ts():
     assert xml_ts.time_series[1].events["value"].sum() == 6053.0
 
 
-def test_json_ts():
+def test_json_ts(xml_ts, json_ts):
     """Check json time-series to xml-timeseries
 
 
@@ -97,7 +102,7 @@ def test_json_ts():
     assert json_ts.time_series[1].events.equals(xml_ts.time_series[1].events)
 
 
-def test_netcdf_ts():
+def test_netcdf_ts(xml_ts, nc_file):
     """Check json time-series to xml-timeseries
 
 
@@ -111,7 +116,7 @@ def test_netcdf_ts():
     Therefore we don't compare these info
     """
     nc_ts = fewspy.read_netcdf(
-        NC_FILE, time_series_type="instantaneous", module_instance_id="Vullingsgraad"
+        nc_file, time_series_type="instantaneous", module_instance_id="Vullingsgraad"
     )
 
     assert nc_ts.time_zone == 0.0
@@ -159,7 +164,7 @@ def test_netcdf_ts():
     )
 
 
-def test_parquet_ts(tmp_path):
+def test_parquet_ts(tmp_path, xml_ts):
     """Check json time-series to xml-timeseries
 
 
