@@ -9,7 +9,7 @@ license = "MIT"
 license-file = "LICENSE"
 
 [tasks]
-tests = "pytest ./tests"
+tests = "pytest --cov=fewspy --cov-report=term-missing ./tests"
 pre-commit-install = "pre-commit install"
 
 [dependencies]
@@ -24,6 +24,7 @@ pyarrow = "*"
 pydantic="*"
 pytest = ">=9.0.3,<10"
 pytest-black = "*"
+pytest-cov = "*"
 pytest-flakes = "*"
 netCDF4 = "*"
 twine = "*"
