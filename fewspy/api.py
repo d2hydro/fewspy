@@ -10,6 +10,7 @@ from .utils.timer import Timer
 from .utils.url import validate_url
 import logging
 import urllib3
+from typing import Literal
 
 from fewspy.wrappers import (
     get_time_series_async,
@@ -101,19 +102,24 @@ class Api:
 
         return result
 
-    def get_locations(self, filter_id=None, attributes=[], remove_duplicates=False):
+    def get_locations(
+        self,
+        filter_id=None,
+        attributes=[],
+        remove_duplicates=False,
+        document_format: Literal["PI_JSON", "GEO_JSON"] = "GEO_JSON",
+    ):
         """
-        Get FEWS qualifiers as a pandas DataFrame
+        Get FEWS locations as a GeoPandas GeoDataFrame
 
         Args:
-            E.g. http://localhost:8080/FewsWebServices/rest/fewspiservice/v1/qualifiers
             filter_id (str): the FEWS id of the filter to pass as request parameter
-            attributes (list): if not emtpy, the location attributes to include as columns in the pandas DataFrame.
+            attributes (list): if not empty, the location attributes to include as columns in the GeoDataFrame.
             remove_duplicates (bool): if True, duplicated location_ids are removed. Default = False
+            document_format (Literal["PI_JSON", "GEO_JSON"]): request document format to return. Supports "GEO_JSON" and "PI_JSON". Defaults to "GEO_JSON".
 
         Returns:
-            df (pandas.DataFrame): Pandas dataframe with index "id" and columns
-            "name" and "group_id".
+            gdf (geopandas.GeoDataFrame): GeoDataFrame with index "location_id".
 
         """
 
@@ -160,7 +166,7 @@ class Api:
         omit_missing=True,
         show_statistics=False,
         parallel=False,
-        document_format:str="PI_JSON"
+        document_format: str = "PI_JSON",
     ):
         """
         Get FEWS qualifiers as a pandas DataFrame
@@ -186,7 +192,9 @@ class Api:
         """
         kwargs = self.__kwargs(url_post_fix="timeseries", kwargs=locals())
         if (self.document_format != "PI_JSON") and parallel:
-            self.logger.warning("Wont run parallel, as this is only supported for documentFromat PI_JSON") 
+            self.logger.warning(
+                "Wont run parallel, as this is only supported for documentFromat PI_JSON"
+            )
             parallel = False
         if parallel:
             kwargs.pop("only_headers")

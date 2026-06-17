@@ -1,6 +1,6 @@
 # %%
 from datetime import datetime
-from config import api
+import pytest
 
 import logging
 
@@ -15,30 +15,33 @@ kwargs = dict(
     document_format="PI_XML",
 )
 
-timeseriesset = api.get_time_series(**kwargs)
+
+@pytest.fixture(scope="module")
+def timeseriesset(api):
+    return api.get_time_series(**kwargs)
 
 
-def test_time_zone():
+def test_time_zone(timeseriesset):
     assert timeseriesset.time_zone == 1.0
 
 
-def test_version():
+def test_version(timeseriesset):
     assert timeseriesset.version == "1.31"
 
 
-def test_empty():
+def test_empty(timeseriesset):
     assert not timeseriesset.empty
 
 
-def test_length():
+def test_length(timeseriesset):
     assert len(timeseriesset) == 2
 
 
-def test_parameter_ids():
+def test_parameter_ids(timeseriesset):
     assert timeseriesset.parameter_ids == ["WATHTE [m] [NAP] [OW]"]
 
 
-def test_location_ids():
+def test_location_ids(timeseriesset):
     assert all(
         [
             i in ["NL34.HL.KGM156.LWZ1", "NL34.HL.KGM156.HWZ1"]
@@ -47,5 +50,5 @@ def test_location_ids():
     )
 
 
-def test_qualifier_ids():
+def test_qualifier_ids(timeseriesset):
     assert timeseriesset.qualifier_ids == ["productie"]

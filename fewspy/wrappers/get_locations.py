@@ -10,6 +10,7 @@ from ..utils.conversions import (
     geo_datum_to_crs,
     xy_array_to_point,
 )
+from typing import Literal
 
 
 LOGGER = logging.getLogger(__name__)
@@ -18,11 +19,11 @@ LOGGER = logging.getLogger(__name__)
 def get_locations(
     url: str,
     filter_id: str = None,
-    document_format: str = "PI_JSON",
+    document_format: Literal["GEO_JSON", "PI_JSON"] = "GEO_JSON",
     attributes: list = [],
     verify: bool = False,
     logger=LOGGER,
-    remove_duplicates: bool = False
+    remove_duplicates: bool = False,
 ) -> pd.DataFrame:
     """
     Get FEWS qualifiers as a pandas DataFrame
@@ -51,32 +52,60 @@ def get_locations(
 
     # parse the response
     if response.status_code == 200:
-        # convert to gdf and snake_case
-        gdf = gpd.GeoDataFrame(response.json()["locations"], geometry=gpd.GeoSeries())
-        gdf.columns = [camel_to_snake_case(i) for i in gdf.columns]
+        if document_format == "PI_JSON":
+            # convert to gdf and snake_case
+            gdf = gpd.GeoDataFrame(
+                response.json()["locations"], geometry=gpd.GeoSeries()
+            )
+            gdf.columns = [camel_to_snake_case(i) for i in gdf.columns]
 
-        # remove duplicates
-        if remove_duplicates:
-            gdf.drop_duplicates(subset="location_id", inplace=True, ignore_index=True)
+            # remove duplicates
+            if remove_duplicates:
+                gdf.drop_duplicates(
+                    subset="location_id", inplace=True, ignore_index=True
+                )
 
-        # set index
-        gdf.set_index("location_id", inplace=True)
+            # set index
+            gdf.set_index("location_id", inplace=True)
 
-        # handle geometry and crs
-        gdf["geometry"] = xy_array_to_point(gdf[["x", "y"]].values)
-        gdf.crs = geo_datum_to_crs(response.json()["geoDatum"])
+            # handle geometry and crs
+            gdf["geometry"] = xy_array_to_point(gdf[["x", "y"]].values)
+            gdf.crs = geo_datum_to_crs(response.json()["geoDatum"])
 
+        elif document_format == "GEO_JSON":
+            # read from GeoJSON
+            data = response.json()
+
+            # we read as 4326
+            gdf = gpd.GeoDataFrame.from_features(data, crs="4326")
+            gdf.columns = [camel_to_snake_case(i) for i in gdf.columns]
+
+            # reproject if crs is provided
+            if "crs" in data.keys():
+                target_epsg = data["crs"]["properties"]["code"]
+                if target_epsg != 4326:
+                    gdf = gdf.to_crs(f"EPSG:{target_epsg}")
+
+            # remove duplicates
+            if remove_duplicates:
+                gdf.drop_duplicates(
+                    subset="location_id", inplace=True, ignore_index=True
+                )
+
+            # set index
+            gdf.set_index("location_id", inplace=True)
+        else:
+            raise ValueError(
+                f"Reading document_format {document_format} not implemented"
+            )
         # handle attributes
         if attributes:
             gdf.loc[:, attributes] = attributes_to_array(
                 gdf["attributes"].values, attributes
             )
         gdf.drop(columns=["attributes"], inplace=True)
-
         timer.report("Locations parsed")
 
+        return gdf
     else:
         logger.error(f"FEWS Server responds {response.text}")
-        gdf = gpd.GeoDataFrame()
-
-    return gdf

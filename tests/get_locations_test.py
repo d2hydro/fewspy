@@ -1,18 +1,28 @@
-from pathlib import Path
+# %%
 import geopandas as gpd
-from config import api
+import pytest
 
 ATTRIBUTES = ["MPN_IDENT", "MPN_BRON"]
-DATA_PATH = Path(__file__).parent / "data"
-REFERENCE_GPKG = DATA_PATH / "locations.gpkg"
-locations_reference = gpd.read_file(REFERENCE_GPKG).set_index("location_id")
-locations = api.get_locations(attributes=ATTRIBUTES)
 
 
-def _write_reference_set():
-    locations.to_file(REFERENCE_GPKG, driver="GPKG")
+@pytest.fixture(scope="module")
+def locations_reference(data_dir):
+    return gpd.read_file(data_dir / "locations.gpkg").set_index("location_id")
 
 
-def test_to_reference_set():
-    cols = [i for i in locations.columns if i != "geometry"]
+def _write_reference_set(api, data_dir):
+    locations = api.get_locations(attributes=ATTRIBUTES)
+    reference_gpkg = data_dir / "locations.gpkg"
+    locations.to_file(reference_gpkg, driver="GPKG")
+
+
+def test_pi_json_to_reference_set(api, locations_reference):
+    locations = api.get_locations(attributes=ATTRIBUTES, document_format="PI_JSON")
+    cols = [i for i in locations_reference.columns if i != "geometry"]
+    assert locations[cols].sort_index().equals(locations_reference[cols].sort_index())
+
+
+def test_geo_json_to_reference_set(api, locations_reference):
+    locations = api.get_locations(attributes=ATTRIBUTES, document_format="GEO_JSON")
+    cols = [i for i in locations_reference.columns if i != "geometry"]
     assert locations[cols].sort_index().equals(locations_reference[cols].sort_index())
