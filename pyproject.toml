@@ -37,7 +37,7 @@ max-complexity = 10
 
 [tool.hatch.version]
 source = "vcs"
-tag-pattern = '^v?(?P<version>\d{4}\.\d{1,2}\.\d+)$'
+tag-pattern = '^v?(?P<version>\d{4}\.\d{1,2}\.\d+(?:(?:a|b|rc)\d+)?(?:\.post\d+)?(?:\.dev\d+)?)$'
 
 [tool.hatch.version.raw-options]
 version_scheme = "no-guess-dev"
