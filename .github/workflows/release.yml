@@ -51,7 +51,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
-          python-version: "3.x"
+          python-version: "3.13"
 
       - name: Install build
         run: python -m pip install --upgrade build
@@ -65,7 +65,7 @@ jobs:
           tag_version="${{ github.event.release.tag_name }}"
           tag_version="${tag_version#v}"
           wheel="$(find dist -maxdepth 1 -name 'fewspy-*.whl' -print -quit)"
-          python -m pip install "$wheel"
+          python -m pip install --no-deps "$wheel"
           package_version="$(python -c "from importlib.metadata import version; print(version('fewspy'))")"
           test "$package_version" = "$tag_version"
 
