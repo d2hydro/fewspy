@@ -1,5 +1,5 @@
 [build-system]
-requires = ["hatchling"]
+requires = ["hatchling", "hatch-vcs"]
 build-backend = "hatchling.build"
 
 [project]
@@ -36,7 +36,11 @@ max-line-length = 120
 max-complexity = 10
 
 [tool.hatch.version]
-path = "fewspy/__init__.py"
+source = "vcs"
+tag-pattern = '^v?(?P<version>\d{4}\.\d{1,2}\.\d+)$'
+
+[tool.hatch.version.raw-options]
+version_scheme = "no-guess-dev"
 
 [project.urls]
 Source = "https://github.com/d2hydro/fewspy"

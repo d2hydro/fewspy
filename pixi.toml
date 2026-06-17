@@ -1,6 +1,5 @@
 [workspace]
 name = "fewspy"
-version = "0.6.3"
 description = "A Python API for the Deltares FEWS PI REST Web Service"
 channels = ["conda-forge"]
 platforms = ["win-64", "linux-64"]
@@ -10,7 +9,7 @@ license-file = "LICENSE"
 
 [tasks]
 tests = "pytest --cov=fewspy --cov-report=term-missing ./tests"
-pre-commit-install = "pre-commit install"
+build = "python -m build"
 
 [dependencies]
 aiohttp = "*"
@@ -19,7 +18,6 @@ ipykernel = "*"
 lxml = "*"
 nest-asyncio = "*"
 pandas = "*"
-pre-commit = "*"
 pyarrow = "*"
 pydantic="*"
 pytest = ">=9.0.3,<10"
@@ -27,7 +25,6 @@ pytest-black = "*"
 pytest-cov = "*"
 pytest-flakes = "*"
 netCDF4 = "*"
-twine = "*"
 xarray="*"
 
 [pypi-dependencies]

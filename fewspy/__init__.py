@@ -1,3 +1,5 @@
+from importlib.metadata import PackageNotFoundError, version
+
 from fewspy.api import Api
 from fewspy.io.read_xml import read_xml
 from fewspy.io.read_json import read_json
@@ -16,4 +18,8 @@ __all__ = [
     "TimeSeries",
     "TimeSeriesSet",
 ]
-__version__ = "2026.6.0"
+
+try:
+    __version__ = version("fewspy")
+except PackageNotFoundError:
+    __version__ = "0+unknown"
