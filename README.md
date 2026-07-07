@@ -35,6 +35,35 @@ We recommend to build your environment using [Anaconda](https://www.anaconda.com
 ```
 conda env create -f environment.yml
 ```
+
+## Authentication
+
+Fewspy continues to support the existing unauthenticated usage pattern. If your FEWS endpoint is protected by OAuth2 (Azure AD client credentials), you can pass an `oauth2` configuration to `Api`.
+
+```python
+from fewspy import Api
+
+api = Api(
+	url="https://fewsapi.hhnk.nl/FewsWebServices/rest/fewspiservice/v1/",
+	ssl_verify=True,
+	oauth2={
+		"token_url": "https://login.microsoftonline.com/<tenant-id>/oauth2/v2.0/token",
+		"client_id": "YOUR_CLIENT_ID_HERE",
+		"client_secret": "YOUR_CLIENT_SECRET_HERE",
+		"scope": "api://9905a90b-de6b-4251-a721-0acc7dadcd76/.default",
+		"cert": "/path/to/client_cert.pem",
+	},
+)
+
+ts = api.get_time_series(
+	filter_id="WDB_OW_KGM",
+	parameter_ids=["Q.meting"],
+	location_ids=["MPN-E-1071"],
+)
+```
+
+For already-issued tokens, you can also pass `bearer_token="..."` to `Api`.
+
 ## About
 
 Fewspy is developed and maintained by [D2Hydro](https://d2hydro.nl/) and freely available under an Open Source <a href="https://github.com/d2hydro/fewspy/blob/main/LICENSE" target="_blank">MIT license</a>.

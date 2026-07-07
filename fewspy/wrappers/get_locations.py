@@ -22,8 +22,10 @@ def get_locations(
     document_format: Literal["GEO_JSON", "PI_JSON"] = "GEO_JSON",
     attributes: list = [],
     verify: bool = False,
+    http_headers: dict = None,
     logger=LOGGER,
     remove_duplicates: bool = False,
+    headers: dict = None,
 ) -> pd.DataFrame:
     """
     Get FEWS qualifiers as a pandas DataFrame
@@ -46,8 +48,12 @@ def get_locations(
 
     # do the request
     timer = Timer(logger)
+    if (http_headers is not None) and (headers is not None):
+        raise ValueError("Use either http_headers or headers, not both")
+    if http_headers is None:
+        http_headers = headers
     parameters = parameters_to_fews(locals())
-    response = requests.get(url, parameters, verify=verify)
+    response = requests.get(url, parameters, verify=verify, headers=http_headers)
     timer.report("Locations request")
 
     # parse the response

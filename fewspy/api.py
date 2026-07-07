@@ -10,7 +10,9 @@ from .utils.timer import Timer
 from .utils.url import validate_url
 import logging
 import urllib3
-from typing import Literal
+from typing import Literal, Optional
+
+from fewspy.auth import OAuth2ClientCredentialsTokenProvider
 
 from fewspy.wrappers import (
     get_time_series_async,
@@ -34,11 +36,20 @@ class Api:
     For more info on how-to work with the FEWS REST Web Service, visit the Deltares Website: https://publicwiki.deltares.nl/display/FEWSDOC/FEWS+PI+REST+Web+Service
     """
 
-    def __init__(self, url, logger=None, ssl_verify=None):
+    def __init__(
+        self,
+        url,
+        logger=None,
+        ssl_verify=None,
+        bearer_token: Optional[str] = None,
+        oauth2: Optional[dict] = None,
+    ):
         self.document_format = "PI_JSON"
         self.logger = logger
         self.timer = Timer(logger)
         self.url, verify = validate_url(url)
+        self._bearer_token = bearer_token
+        self._oauth2_provider = None
 
         # set ssl_verify
         if ssl_verify is None:
@@ -52,6 +63,36 @@ class Api:
         else:
             self.logger = logger
 
+        if (self._bearer_token is not None) and (oauth2 is not None):
+            raise ValueError("Use either bearer_token or oauth2, not both")
+
+        if oauth2 is not None:
+            required_keys = ["token_url", "client_id", "client_secret", "scope"]
+            missing = [key for key in required_keys if key not in oauth2]
+            if missing:
+                raise ValueError(
+                    f"Missing oauth2 configuration keys: {', '.join(missing)}"
+                )
+
+            self._oauth2_provider = OAuth2ClientCredentialsTokenProvider(
+                token_url=oauth2["token_url"],
+                client_id=oauth2["client_id"],
+                client_secret=oauth2["client_secret"],
+                scope=oauth2["scope"],
+                cert=oauth2.get("cert"),
+                verify=oauth2.get("verify", self.ssl_verify),
+                timeout=oauth2.get("timeout", 30),
+                logger=self.logger,
+            )
+
+    def _request_headers(self) -> Optional[dict]:
+        headers = {}
+        if self._bearer_token is not None:
+            headers["Authorization"] = f"Bearer {self._bearer_token}"
+        if self._oauth2_provider is not None:
+            headers.update(self._oauth2_provider.get_auth_header())
+        return headers or None
+
     def __kwargs(self, url_post_fix: str, kwargs: dict) -> dict:
         kwargs = {
             **kwargs,
@@ -59,6 +100,7 @@ class Api:
                 url=f"{self.url}{url_post_fix}",
                 verify=self.ssl_verify,
                 logger=self.logger,
+                http_headers=self._request_headers(),
             ),
         }
         kwargs.pop("self")
@@ -138,7 +180,12 @@ class Api:
 
         """
         url = f"{self.url}qualifiers"
-        result = get_qualifiers(url, verify=self.ssl_verify, logger=self.logger)
+        result = get_qualifiers(
+            url,
+            verify=self.ssl_verify,
+            logger=self.logger,
+            http_headers=self._request_headers(),
+        )
         return result
 
     def get_timezone_id(self):
@@ -150,7 +197,12 @@ class Api:
 
         """
         url = f"{self.url}timezoneid"
-        result = get_timezone_id(url, verify=self.ssl_verify, logger=self.logger)
+        result = get_timezone_id(
+            url,
+            verify=self.ssl_verify,
+            logger=self.logger,
+            http_headers=self._request_headers(),
+        )
         return result
 
     def get_time_series(

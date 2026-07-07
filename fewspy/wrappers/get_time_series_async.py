@@ -52,7 +52,9 @@ def get_time_series_async(
     document_format: str = "PI_JSON",
     omit_missing: bool = True,
     verify: bool = False,
+    http_headers: dict = None,
     logger=LOGGER,
+    headers: dict = None,
 ) -> pd.DataFrame:
     """
 
@@ -78,6 +80,11 @@ def get_time_series_async(
         "name" and "group_id".
 
     """
+    if (http_headers is not None) and (headers is not None):
+        raise ValueError("Use either http_headers or headers, not both")
+    if http_headers is None:
+        http_headers = headers
+
     parameters = parameters_to_fews(locals(), bool_to_string=True)
 
     def _get_loop():
@@ -98,7 +105,11 @@ def get_time_series_async(
             parameters["qualifierIds"] = qualifier_id
         try:
             response = await session.request(
-                method="GET", url=url, params=parameters, ssl=verify
+                method="GET",
+                url=url,
+                params=parameters,
+                ssl=verify,
+                headers=http_headers,
             )
             response.raise_for_status()
         except Exception as err:

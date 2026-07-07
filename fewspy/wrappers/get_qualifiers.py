@@ -36,7 +36,13 @@ def _element_to_tuple(qualifier_element: ElementTree.Element) -> tuple:
     return (ident, name, group_id)
 
 
-def get_qualifiers(url: str, verify: bool = False, logger=LOGGER) -> pd.DataFrame:
+def get_qualifiers(
+    url: str,
+    verify: bool = False,
+    logger=LOGGER,
+    http_headers: dict = None,
+    headers: dict = None,
+) -> pd.DataFrame:
     """
     Get FEWS qualifiers as Pandas DataFrame
 
@@ -56,7 +62,11 @@ def get_qualifiers(url: str, verify: bool = False, logger=LOGGER) -> pd.DataFram
 
     # do the request
     timer = Timer(logger)
-    response = requests.get(url, verify=False)
+    if (http_headers is not None) and (headers is not None):
+        raise ValueError("Use either http_headers or headers, not both")
+    if http_headers is None:
+        http_headers = headers
+    response = requests.get(url, verify=verify, headers=http_headers)
     timer.report("Qualifiers request")
 
     # parse the response

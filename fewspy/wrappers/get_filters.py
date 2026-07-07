@@ -12,7 +12,9 @@ def get_filters(
     filter_id: str = None,
     document_format: str = "PI_JSON",
     verify: bool = False,
+    http_headers: dict = None,
     logger=LOGGER,
+    headers: dict = None,
 ) -> List[dict]:
     """
     Get FEWS qualifiers as a pandas DataFrame
@@ -35,8 +37,12 @@ def get_filters(
 
     # do the request
     timer = Timer(logger)
+    if (http_headers is not None) and (headers is not None):
+        raise ValueError("Use either http_headers or headers, not both")
+    if http_headers is None:
+        http_headers = headers
     parameters = parameters_to_fews(locals())
-    response = requests.get(url, parameters, verify=verify)
+    response = requests.get(url, parameters, verify=verify, headers=http_headers)
     timer.report("Filters request")
 
     # parse the response
