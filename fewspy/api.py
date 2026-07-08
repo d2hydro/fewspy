@@ -41,13 +41,20 @@ class Api:
         url,
         logger=None,
         ssl_verify=None,
+        validate_endpoint: bool = True,
         bearer_token: Optional[str] = None,
         oauth2: Optional[dict] = None,
     ):
         self.document_format = "PI_JSON"
         self.logger = logger
         self.timer = Timer(logger)
-        self.url, verify = validate_url(url)
+        if validate_endpoint:
+            self.url, verify = validate_url(url)
+        else:
+            if not url.endswith("/"):
+                url += "/"
+            self.url = url
+            verify = url.startswith("https")
         self._bearer_token = bearer_token
         self._oauth2_provider = None
 

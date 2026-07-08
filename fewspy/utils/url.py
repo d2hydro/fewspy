@@ -10,7 +10,7 @@ def validate_url(url: str, test_postfix: str = "timezoneid") -> str:
 
     Args:
         url: input url to be validated
-        test_postfix: postfix to url used for testing. Defaults to 'filters'.
+        test_postfix: postfix to url used for testing. Defaults to 'timezoneid'.
 
     Returns: validated url
 
@@ -21,8 +21,15 @@ def validate_url(url: str, test_postfix: str = "timezoneid") -> str:
         url += "/"
 
     # test with request
-    response = requests.get(f"{url}{test_postfix}", verify=False)
-    if not response.ok:
+    try:
+        response = requests.get(f"{url}{test_postfix}", verify=False)
+    except requests.RequestException as err:
+        raise URLNotFoundError(
+            f"{url} is not a root to a live FEWS PI Rest WebService"
+        ) from err
+
+    # 401/403 means the endpoint exists but is protected.
+    if response.status_code not in (401, 403) and not response.ok:
         raise URLNotFoundError(f"{url} is not a root to a live FEWS PI Rest WebService")
 
     # estimate ssl_verify

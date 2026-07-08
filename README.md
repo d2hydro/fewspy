@@ -64,6 +64,46 @@ ts = api.get_time_series(
 
 For already-issued tokens, you can also pass `bearer_token="..."` to `Api`.
 
+## OAuth2 integration tests (optional)
+
+The OAuth2 unit tests run without real credentials because they mock the token endpoint.
+
+If you want to run a real OAuth2 integration test against a FEWS endpoint:
+
+1. Copy `.env.development.example` to `.env.development` (or place the same variables in `.env`).
+2. Fill in your real values for:
+	- `FEWSPY_TEST_FEWS_URL`
+	- `FEWSPY_TEST_OAUTH2_TOKEN_URL`
+	- `FEWSPY_TEST_OAUTH2_CLIENT_ID`
+	- `FEWSPY_TEST_OAUTH2_CLIENT_SECRET`
+	- `FEWSPY_TEST_OAUTH2_SCOPE`
+3. Optionally set:
+	- `FEWSPY_TEST_OAUTH2_CERT`
+	- `FEWSPY_TEST_OAUTH2_VERIFY` (`true` or `false`)
+	- `FEWSPY_TEST_USE_TEMP_TOKEN` (`true` or `false`)
+	- `FEWSPY_TEST_ACCESS_TOKEN` (required when `FEWSPY_TEST_USE_TEMP_TOKEN=true`)
+4. Run:
+
+```
+pixi run pytest tests/oauth2_integration_test.py -q
+```
+
+If variables are missing, this integration test is skipped automatically.
+
+The integration tests are split into two steps:
+
+1. token ophalen (OAuth flow)\
+	prints `access_token` and `expires_in` for quick reuse during debugging;
+2. data ophalen (FEWS endpoint call with bearer token).
+
+When `FEWSPY_TEST_USE_TEMP_TOKEN=true`, OAuth token retrieval tests are skipped and the temporary bearer token is validated directly against FEWS endpoints. A clear failure is reported when the token is expired.
+
+To run only the temporary-token timeseries test (using the example parameters):
+
+```
+pixi run pytest tests/oauth2_integration_test.py -q -k temp_token
+```
+
 ## About
 
 Fewspy is developed and maintained by [D2Hydro](https://d2hydro.nl/) and freely available under an Open Source <a href="https://github.com/d2hydro/fewspy/blob/main/LICENSE" target="_blank">MIT license</a>.

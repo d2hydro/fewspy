@@ -104,3 +104,18 @@ def test_api_rejects_multiple_auth_methods(monkeypatch):
                 "scope": "api://example/.default",
             },
         )
+
+
+def test_api_can_skip_preflight_validation(monkeypatch):
+    def _failing_validate_url(url):
+        raise RuntimeError("preflight should not be called")
+
+    monkeypatch.setattr("fewspy.api.validate_url", _failing_validate_url)
+
+    api = Api(
+        url="https://example.test/fews",
+        validate_endpoint=False,
+    )
+
+    assert api.url == "https://example.test/fews/"
+    assert api.ssl_verify is True
