@@ -10,7 +10,7 @@ from ..utils.conversions import (
     geo_datum_to_crs,
     xy_array_to_point,
 )
-from typing import Literal
+from typing import Literal, Optional, Tuple, Union
 
 
 LOGGER = logging.getLogger(__name__)
@@ -22,6 +22,7 @@ def get_locations(
     document_format: Literal["GEO_JSON", "PI_JSON"] = "GEO_JSON",
     attributes: list = [],
     verify: bool = False,
+    cert: Optional[Union[str, Tuple[str, str]]] = None,
     http_headers: dict = None,
     logger=LOGGER,
     remove_duplicates: bool = False,
@@ -53,7 +54,13 @@ def get_locations(
     if http_headers is None:
         http_headers = headers
     parameters = parameters_to_fews(locals())
-    response = requests.get(url, parameters, verify=verify, headers=http_headers)
+    response = requests.get(
+        url,
+        parameters,
+        verify=verify,
+        cert=cert,
+        headers=http_headers,
+    )
     timer.report("Locations request")
 
     # parse the response

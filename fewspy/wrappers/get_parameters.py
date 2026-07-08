@@ -1,7 +1,7 @@
 import requests
 import logging
 import pandas as pd
-from typing import List
+from typing import List, Optional, Tuple, Union
 from ..utils.timer import Timer
 from ..utils.transformations import parameters_to_fews
 from ..utils.conversions import camel_to_snake_case
@@ -23,6 +23,7 @@ def get_parameters(
     filter_id: str = None,
     document_format: str = "PI_JSON",
     verify: bool = False,
+    cert: Optional[Union[str, Tuple[str, str]]] = None,
     http_headers: dict = None,
     logger=LOGGER,
     headers: dict = None,
@@ -53,7 +54,13 @@ def get_parameters(
     if http_headers is None:
         http_headers = headers
     parameters = parameters_to_fews(locals())
-    response = requests.get(url, parameters, verify=verify, headers=http_headers)
+    response = requests.get(
+        url,
+        parameters,
+        verify=verify,
+        cert=cert,
+        headers=http_headers,
+    )
     timer.report("Parameters request")
 
     # parse the response

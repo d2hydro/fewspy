@@ -2,7 +2,7 @@
 
 import logging
 import time
-from typing import Optional
+from typing import Optional, Tuple, Union
 
 import requests
 from requests.auth import HTTPBasicAuth
@@ -20,7 +20,7 @@ class OAuth2ClientCredentialsTokenProvider:
         client_id: str,
         client_secret: str,
         scope: str,
-        cert: Optional[str] = None,
+        cert: Optional[Union[str, Tuple[str, str]]] = None,
         verify: bool = True,
         timeout: int = 30,
         logger=LOGGER,

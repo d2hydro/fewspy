@@ -3,7 +3,7 @@ import pandas as pd
 import logging
 from ..utils.timer import Timer
 from ..utils.transformations import parameters_to_fews
-from typing import List, Union
+from typing import List, Optional, Tuple, Union
 from ..time_series import TimeSeriesSet
 from datetime import datetime
 from fewspy.io.read_xml import read_xml_from_string
@@ -34,6 +34,7 @@ def get_time_series(
     show_statistics: bool = False,
     document_format: str = "PI_JSON",
     verify: bool = False,
+    cert: Optional[Union[str, Tuple[str, str]]] = None,
     http_headers: dict = None,
     logger=LOGGER,
     headers: dict = None,
@@ -74,7 +75,13 @@ def get_time_series(
     if http_headers is None:
         http_headers = headers
     parameters = parameters_to_fews(locals())
-    response = requests.get(url, parameters, verify=verify, headers=http_headers)
+    response = requests.get(
+        url,
+        parameters,
+        verify=verify,
+        cert=cert,
+        headers=http_headers,
+    )
     timer.report(report_string.format(status="request"))
 
     # parse the response

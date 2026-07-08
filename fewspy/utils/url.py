@@ -1,11 +1,16 @@
 import requests
+from typing import Optional, Tuple, Union
 
 
 class URLNotFoundError(Exception):
     pass
 
 
-def validate_url(url: str, test_postfix: str = "timezoneid") -> str:
+def validate_url(
+    url: str,
+    test_postfix: str = "timezoneid",
+    cert: Optional[Union[str, Tuple[str, str]]] = None,
+) -> str:
     """
 
     Args:
@@ -22,7 +27,7 @@ def validate_url(url: str, test_postfix: str = "timezoneid") -> str:
 
     # test with request
     try:
-        response = requests.get(f"{url}{test_postfix}", verify=False)
+        response = requests.get(f"{url}{test_postfix}", verify=False, cert=cert)
     except requests.RequestException as err:
         raise URLNotFoundError(
             f"{url} is not a root to a live FEWS PI Rest WebService"

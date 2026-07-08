@@ -3,7 +3,7 @@ import pandas as pd
 import logging
 from fewspy.utils.timer import Timer
 from fewspy.utils.transformations import parameters_to_fews
-from typing import List, Union
+from typing import List, Optional, Tuple, Union
 from fewspy.time_series import TimeSeriesSet
 from aiohttp import ClientSession
 
@@ -11,6 +11,7 @@ from datetime import datetime
 import aiohttp
 import asyncio
 import nest_asyncio
+import ssl
 
 nest_asyncio.apply()
 
@@ -52,6 +53,7 @@ def get_time_series_async(
     document_format: str = "PI_JSON",
     omit_missing: bool = True,
     verify: bool = False,
+    cert: Optional[Union[str, Tuple[str, str]]] = None,
     http_headers: dict = None,
     logger=LOGGER,
     headers: dict = None,
@@ -87,6 +89,25 @@ def get_time_series_async(
 
     parameters = parameters_to_fews(locals(), bool_to_string=True)
 
+    def _ssl_context(
+        verify: bool, cert: Optional[Union[str, Tuple[str, str]]]
+    ) -> Union[bool, ssl.SSLContext]:
+        if cert is None:
+            return verify
+
+        if verify:
+            context = ssl.create_default_context()
+        else:
+            context = ssl._create_unverified_context()
+
+        if isinstance(cert, tuple):
+            context.load_cert_chain(certfile=cert[0], keyfile=cert[1])
+        else:
+            context.load_cert_chain(certfile=cert)
+        return context
+
+    ssl_context = _ssl_context(verify=verify, cert=cert)
+
     def _get_loop():
         try:
             loop = asyncio.get_event_loop()
@@ -108,7 +129,7 @@ def get_time_series_async(
                 method="GET",
                 url=url,
                 params=parameters,
-                ssl=verify,
+                ssl=ssl_context,
                 headers=http_headers,
             )
             response.raise_for_status()

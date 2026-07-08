@@ -2,6 +2,7 @@ import requests
 from xml.etree import ElementTree
 import pandas as pd
 import logging
+from typing import Optional, Tuple, Union
 from ..utils.timer import Timer
 
 NS = "{http://www.wldelft.nl/fews/PI}"
@@ -39,6 +40,7 @@ def _element_to_tuple(qualifier_element: ElementTree.Element) -> tuple:
 def get_qualifiers(
     url: str,
     verify: bool = False,
+    cert: Optional[Union[str, Tuple[str, str]]] = None,
     logger=LOGGER,
     http_headers: dict = None,
     headers: dict = None,
@@ -66,7 +68,7 @@ def get_qualifiers(
         raise ValueError("Use either http_headers or headers, not both")
     if http_headers is None:
         http_headers = headers
-    response = requests.get(url, verify=verify, headers=http_headers)
+    response = requests.get(url, verify=verify, cert=cert, headers=http_headers)
     timer.report("Qualifiers request")
 
     # parse the response

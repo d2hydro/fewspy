@@ -10,7 +10,7 @@ from .utils.timer import Timer
 from .utils.url import validate_url
 import logging
 import urllib3
-from typing import Literal, Optional
+from typing import Literal, Optional, Tuple, Union
 
 from fewspy.auth import OAuth2ClientCredentialsTokenProvider
 
@@ -44,12 +44,14 @@ class Api:
         validate_endpoint: bool = True,
         bearer_token: Optional[str] = None,
         oauth2: Optional[dict] = None,
+        cert: Optional[Union[str, Tuple[str, str]]] = None,
     ):
         self.document_format = "PI_JSON"
         self.logger = logger
         self.timer = Timer(logger)
+        self.cert = cert
         if validate_endpoint:
-            self.url, verify = validate_url(url)
+            self.url, verify = validate_url(url, cert=self.cert)
         else:
             if not url.endswith("/"):
                 url += "/"
@@ -86,7 +88,7 @@ class Api:
                 client_id=oauth2["client_id"],
                 client_secret=oauth2["client_secret"],
                 scope=oauth2["scope"],
-                cert=oauth2.get("cert"),
+                cert=oauth2.get("cert", self.cert),
                 verify=oauth2.get("verify", self.ssl_verify),
                 timeout=oauth2.get("timeout", 30),
                 logger=self.logger,
@@ -106,6 +108,7 @@ class Api:
             **dict(
                 url=f"{self.url}{url_post_fix}",
                 verify=self.ssl_verify,
+                cert=self.cert,
                 logger=self.logger,
                 http_headers=self._request_headers(),
             ),
@@ -190,6 +193,7 @@ class Api:
         result = get_qualifiers(
             url,
             verify=self.ssl_verify,
+            cert=self.cert,
             logger=self.logger,
             http_headers=self._request_headers(),
         )
@@ -207,6 +211,7 @@ class Api:
         result = get_timezone_id(
             url,
             verify=self.ssl_verify,
+            cert=self.cert,
             logger=self.logger,
             http_headers=self._request_headers(),
         )
