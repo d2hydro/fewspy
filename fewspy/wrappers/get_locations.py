@@ -1,5 +1,4 @@
 import requests
-import pandas as pd
 import geopandas as gpd
 import logging
 from ..utils.timer import Timer
@@ -24,7 +23,7 @@ def get_locations(
     verify: bool = False,
     logger=LOGGER,
     remove_duplicates: bool = False,
-) -> pd.DataFrame:
+) -> gpd.GeoDataFrame:
     """
     Get FEWS qualifiers as a pandas DataFrame
 
@@ -39,8 +38,7 @@ def get_locations(
         logger (logging.Logger, optional): Logger to pass logging to. By default, a logger will ge created.
 
     Returns:
-        df (pandas.DataFrame): Pandas dataframe with index "id" and columns
-        "name" and "group_id".
+        gdf (geopandas.GeoDataFrame): geopandas GeoDataFrame with index "id". Geometry is Point(x,y) if PI_JSON is requested. It is features geometry if GEO_JSON is requested
 
     """
 
