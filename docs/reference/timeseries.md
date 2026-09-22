@@ -67,3 +67,52 @@ conversion methods; it is an operation argument, not persistent set state.
 Cache selection also accepts `series_key="header"` and returns all matching full
 identities across the manifest's header-mode files. Location filtering does not
 collapse series that share the same location and parameter.
+
+
+## Readable archive filenames
+
+Choose archive-style names explicitly; existing naming remains the default:
+
+```python
+time_series_set.to_netcdf(
+    out_dir,
+    series_key="header",
+    file_naming="archive",
+    include_time_series_type=False,
+)
+```
+
+The archive pattern is
+`<parameterId>_[<qualifierIds>]_<timeStep>_<valueType>_<moduleInstanceId>.nc`.
+Module instance is always included. Set `include_time_series_type=True` to append
+`_<timeSeriesType>` before `.nc`. The full type is retained literally, including
+spaces, for example `P_[]_hour-1_scalar_Import_external historical.nc`.
+The suffix controls naming only: time-series type always participates in identity,
+grouping, and metadata. If omitting it causes a collision, export raises an error.
+
+Qualifiers are joined with underscores in header order and enclosed in literal
+square brackets: `[q1_q2]`. Without qualifiers the segment is `[]`. When using
+glob patterns, escape the brackets or use literal path matching. This is an explicit fewspy convention: the linked
+FEWS documentation only illustrates a single qualifier and does not specify how
+multiple qualifiers are joined. Underscores inside identifiers are preserved;
+ambiguous combinations such as `["a_b", "c"]` and `["a", "b_c"]` cause an error
+if their filenames collide, including when a previous export already exists.
+
+An available `time_step.id` is used literally, such as `SETS60`. Otherwise the
+name uses `<unit>-<multiplier>` (multiplier defaults to 1), optionally followed by
+`-div<divider>`. Irregular steps use `nonequidistant`. These fallback tokens are
+fewspy representations, not inferred FEWS timestep IDs. Original timestep
+attributes remain unchanged in the metadata even when a naming token is shared.
+
+Archive names contain no JSON or percent-encoding. Invalid filename characters,
+control characters, reserved device names, overlong names and filename collisions
+are rejected before files are written. Missing or empty value type and module
+instance are rejected rather than guessed; a requested type suffix must also be
+available. Parameter and qualifier IDs must be nonempty.
+
+The low-level `write_netcdf` function supports the same options. Custom templates
+can include `{identity}` for the archive stem and `{parameter_id}` for the literal
+parameter. Archive naming requires `series_key="header"`; the type-suffix option
+requires archive naming. The reader is unchanged: it reconstructs headers from
+`fewspy_headers`, never by splitting filenames. This option changes naming only
+and does not implement FEWS's native archive metadata format.

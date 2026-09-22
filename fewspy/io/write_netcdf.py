@@ -19,7 +19,50 @@ def _datetimeindex_to_nc_time(
     return date2num(py_dt, units=units), units
 
 
-def _header_groups(df, file_template):
+def _validate_file_naming(series_key, file_naming, include_time_series_type):
+    if file_naming not in ("default", "archive"):
+        raise ValueError("file_naming must be 'default' or 'archive'")
+    if file_naming == "archive" and series_key != "header":
+        raise ValueError("file_naming='archive' requires series_key='header'")
+    if include_time_series_type and file_naming != "archive":
+        raise ValueError("include_time_series_type requires file_naming='archive'")
+
+
+def _archive_identity(header, include_time_series_type):
+    """Build a readable name; the NetCDF metadata remains authoritative."""
+    step = header.time_step
+    timestep = step.get("id")
+    if not timestep:
+        unit = step.get("unit")
+        if not unit:
+            raise ValueError("Archive naming requires a timestep id or unit")
+        timestep = unit
+        if unit != "nonequidistant":
+            multiplier = step.get("multiplier")
+            timestep += f"-{1 if multiplier is None else multiplier}"
+            if step.get("divider") is not None:
+                timestep += f"-div{step['divider']}"
+    qualifiers = header.qualifier_id or []
+    parts = [
+        header.parameter_id,
+        "[" + "_".join(qualifiers) + "]",
+        timestep,
+        header.value_type,
+        header.module_instance_id,
+    ]
+    if include_time_series_type:
+        parts.append(header.time_series_type)
+    if any(part is None or part == "" for part in [*parts, *qualifiers]):
+        raise ValueError(
+            "Archive naming requires nonempty parameter, qualifiers, value_type, "
+            "module_instance_id and any requested time_series_type"
+        )
+    return "_".join(parts)
+
+
+def _header_groups(
+    df, file_template, file_naming="default", include_time_series_type=False
+):
     from fewspy.time_series import Header, HEADER_KEY_FIELDS, canonical_json
 
     if list(df.columns.names) != HEADER_KEY_FIELDS:
@@ -57,15 +100,32 @@ def _header_groups(df, file_template):
             header.time_series_type,
         ]
         identity = "_".join(quote(canonical_json(value), safe="") for value in parts)
+        if file_naming == "archive":
+            identity = _archive_identity(header, include_time_series_type)
         template = (
             "{identity}.nc" if file_template == "{parameter_id}.nc" else file_template
         )
         filename = template.format(
-            identity=identity, parameter_id=quote(header.parameter_id, safe="")
+            identity=identity,
+            parameter_id=(
+                header.parameter_id
+                if file_naming == "archive"
+                else quote(header.parameter_id, safe="")
+            ),
         )
         if (
             Path(filename).name != filename
             or any(c in filename for c in '<>:"/\\|?*')
+            or any(ord(c) < 32 for c in filename)
+            or filename.split(".")[0].upper()
+            in {
+                "CON",
+                "PRN",
+                "AUX",
+                "NUL",
+                *[f"COM{i}" for i in range(1, 10)],
+                *[f"LPT{i}" for i in range(1, 10)],
+            }
             or filename.endswith((".", " "))
             or len(filename.encode("utf-8")) > 240
         ):
@@ -74,7 +134,7 @@ def _header_groups(df, file_template):
             )
         if filename.casefold() in filenames:
             raise ValueError(
-                "NetCDF filename collision: include {identity} in file_template"
+                "NetCDF filename collision: use a unique template or include_time_series_type=True; check qualifier separators"
             )
         filenames.add(filename.casefold())
         result.append(
@@ -95,6 +155,8 @@ def write_netcdf(
     file_template: str = "{parameter_id}.nc",
     remove_dir: bool = False,
     series_key: str = "location_parameter",
+    file_naming: str = "default",
+    include_time_series_type: bool = False,
 ) -> None:
     """Write a pandas DataFrame to netCDF files, one per parameter_id.
 
@@ -102,7 +164,10 @@ def write_netcdf(
         df (pd.DataFrame): Reliable values from TimeSeriesSet.to_df.
         series_key: "location_parameter" (default) or "header". Header mode
             requires the full column identity and fewspy_headers metadata.
-        out_dir (Path): _description_
+        file_naming: "default" preserves existing names; "archive" uses readable
+            parameter, qualifiers, timestep, value type and module instance.
+        include_time_series_type: Append the full type in archive mode.
+        out_dir (Path): Output directory.
         global_attributes (dict(str), optional): _description_. Defaults to {"source": "fewspy"}.
         file_template (str, optional): _description_. Defaults to "{parameter_id}.nc".
         remove_dir (bool, optional): If True, removes the output directory before writing. Defaults to False.
@@ -111,8 +176,11 @@ def write_netcdf(
     from fewspy.time_series import validate_series_key
 
     validate_series_key(series_key)
+    _validate_file_naming(series_key, file_naming, include_time_series_type)
     if series_key == "header":
-        groups = _header_groups(df, file_template)
+        groups = _header_groups(
+            df, file_template, file_naming, include_time_series_type
+        )
         # Validate against existing files before changing anything.
         if not remove_dir:
             for _, _, filename, headers in groups:

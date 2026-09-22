@@ -10,7 +10,7 @@ from pydantic import ConfigDict
 import pandas as pd
 
 from fewspy.io.header_file import get_header_file
-from fewspy.io.write_netcdf import write_netcdf
+from fewspy.io.write_netcdf import write_netcdf, _validate_file_naming
 from fewspy.utils.conversions import camel_to_snake_case, dict_to_datetime
 from fewspy.utils.transformations import flatten_list
 
@@ -388,6 +388,8 @@ class TimeSeriesSet:
         file_template: str = "{parameter_id}.nc",
         remove_dir: bool = False,
         series_key: SeriesKey = "location_parameter",
+        file_naming: Literal["default", "archive"] = "default",
+        include_time_series_type: bool = False,
     ) -> None:
         """Write fewspy.TimeSeriesSet to netCDF files, one per parameter_id.
 
@@ -399,8 +401,12 @@ class TimeSeriesSet:
             series_key: "location_parameter" (default) or "header". Header mode
                 groups matching identities across locations and uses archive-style
                 filenames. Custom templates can use {identity}.
+            file_naming: "default" preserves existing names; "archive" uses readable
+                names and requires series_key="header".
+            include_time_series_type: Append the full type to archive names.
         """
         validate_series_key(series_key)
+        _validate_file_naming(series_key, file_naming, include_time_series_type)
         if not self.empty or (series_key == "header" and self.time_series):
             df = self.to_df(series_key=series_key)
 
@@ -411,6 +417,8 @@ class TimeSeriesSet:
                 file_template=file_template,
                 remove_dir=remove_dir,
                 series_key=series_key,
+                file_naming=file_naming,
+                include_time_series_type=include_time_series_type,
             )
 
     def to_parquet(

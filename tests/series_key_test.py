@@ -462,3 +462,148 @@ def test_xml_preserves_identity_fields():
     assert header.qualifier_id == ["a", "b"]
     assert header.time_series_type == "external historical"
     assert header.value_type == "scalar"
+
+
+@pytest.mark.parametrize(
+    "qualifiers,expected",
+    [
+        (None, "P_[]_hour-1_scalar_M.nc"),
+        ([], "P_[]_hour-1_scalar_M.nc"),
+        (["q"], "P_[q]_hour-1_scalar_M.nc"),
+        (["q1", "q2"], "P_[q1_q2]_hour-1_scalar_M.nc"),
+    ],
+)
+def test_archive_names_and_metadata(header_series, tmp_path, qualifiers, expected):
+    ts = header_series.time_series[0]
+    ts.header.qualifier_id = qualifiers
+    series = TimeSeriesSet(time_series=[ts])
+    series.to_netcdf(tmp_path, series_key="header", file_naming="archive")
+    assert [p.name for p in tmp_path.iterdir()] == [expected]
+    restored = read_netcdf(tmp_path / expected, series_key="header")
+    assert restored.time_series[0].header.to_json() == ts.header.to_json()
+    pd.testing.assert_frame_equal(
+        restored.to_df("header"),
+        series.to_df("header"),
+        check_dtype=False,
+        check_freq=False,
+    )
+
+
+@pytest.mark.parametrize(
+    "step,token",
+    [
+        ({"id": "SETS60", "unit": "second", "multiplier": 60}, "SETS60"),
+        ({"unit": "minute", "multiplier": 15}, "minute-15"),
+        ({"unit": "month"}, "month-1"),
+        ({"unit": "second", "multiplier": 1, "divider": 2}, "second-1-div2"),
+        ({"unit": "nonequidistant"}, "nonequidistant"),
+    ],
+)
+def test_archive_timestep(header_series, tmp_path, step, token):
+    ts = header_series.time_series[0]
+    ts.header.time_step = step
+    TimeSeriesSet(time_series=[ts]).to_netcdf(
+        tmp_path, series_key="header", file_naming="archive"
+    )
+    assert (tmp_path / f"P_[]_{token}_scalar_M.nc").is_file()
+
+
+def test_archive_type_suffix_and_collision(header_series, tmp_path):
+    series = TimeSeriesSet(
+        time_series=[header_series.time_series[0], header_series.time_series[3]]
+    )
+    with pytest.raises(ValueError, match="collision"):
+        series.to_netcdf(tmp_path, series_key="header", file_naming="archive")
+    assert not list(tmp_path.iterdir())
+    series.to_netcdf(
+        tmp_path,
+        series_key="header",
+        file_naming="archive",
+        include_time_series_type=True,
+    )
+    assert {p.name for p in tmp_path.iterdir()} == {
+        "P_[]_hour-1_scalar_M_external historical.nc",
+        "P_[]_hour-1_scalar_M_simulated historical.nc",
+    }
+
+
+def test_archive_qualifier_collision(header_series, tmp_path):
+    first = deepcopy(header_series.time_series[0])
+    second = deepcopy(first)
+    first.header.qualifier_id = ["a_b", "c"]
+    second.header.qualifier_id = ["a", "b_c"]
+    series = TimeSeriesSet(time_series=[first, second])
+    with pytest.raises(ValueError, match="collision"):
+        series.to_netcdf(tmp_path, series_key="header", file_naming="archive")
+    assert not list(tmp_path.iterdir())
+    TimeSeriesSet(time_series=[first]).to_netcdf(
+        tmp_path, series_key="header", file_naming="archive"
+    )
+    path = next(tmp_path.glob("*.nc"))
+    before = path.read_bytes()
+    with pytest.raises(ValueError, match="overwrite"):
+        TimeSeriesSet(time_series=[second]).to_netcdf(
+            tmp_path, series_key="header", file_naming="archive"
+        )
+    assert path.read_bytes() == before
+
+
+@pytest.mark.parametrize("bad", ["a/b", "a\\b", "a:b", "a?b", "a\x00b", "a\nb"])
+def test_archive_invalid_characters(header_series, tmp_path, bad):
+    ts = header_series.time_series[0]
+    ts.header.qualifier_id = [bad]
+    with pytest.raises(ValueError, match="Invalid"):
+        TimeSeriesSet(time_series=[ts]).to_netcdf(
+            tmp_path, series_key="header", file_naming="archive"
+        )
+    assert not list(tmp_path.iterdir())
+
+
+@pytest.mark.parametrize("field", ["module_instance_id", "value_type"])
+def test_archive_requires_available_identity_fields(header_series, tmp_path, field):
+    ts = header_series.time_series[0]
+    setattr(ts.header, field, None)
+    with pytest.raises(ValueError, match="requires nonempty"):
+        TimeSeriesSet(time_series=[ts]).to_netcdf(
+            tmp_path, series_key="header", file_naming="archive"
+        )
+
+
+@pytest.mark.parametrize(
+    "options",
+    [
+        {"file_naming": "unknown"},
+        {"file_naming": "archive"},
+        {"include_time_series_type": True},
+    ],
+)
+def test_archive_option_validation(tmp_path, options):
+    with pytest.raises(ValueError):
+        TimeSeriesSet().to_netcdf(tmp_path, **options)
+
+
+def test_archive_modules_and_template(header_series, tmp_path):
+    from fewspy.io.write_netcdf import write_netcdf
+
+    series = TimeSeriesSet(time_series=header_series.time_series[:2])
+    write_netcdf(
+        series.to_df("header"),
+        tmp_path,
+        series_key="header",
+        file_naming="archive",
+        file_template="prefix_{identity}.nc",
+    )
+    assert {p.name for p in tmp_path.iterdir()} == {
+        "prefix_P_[]_hour-1_scalar_M.nc",
+        "prefix_P_[]_hour-1_scalar_M2.nc",
+    }
+
+
+def test_archive_empty_qualifier_rejected(header_series, tmp_path):
+    ts = header_series.time_series[0]
+    ts.header.qualifier_id = [""]
+    with pytest.raises(ValueError, match="requires nonempty"):
+        TimeSeriesSet(time_series=[ts]).to_netcdf(
+            tmp_path, series_key="header", file_naming="archive"
+        )
+    assert not list(tmp_path.iterdir())
