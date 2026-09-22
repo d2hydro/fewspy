@@ -559,13 +559,58 @@ def test_archive_invalid_characters(header_series, tmp_path, bad):
     assert not list(tmp_path.iterdir())
 
 
-@pytest.mark.parametrize("field", ["module_instance_id", "value_type"])
-def test_archive_requires_available_identity_fields(header_series, tmp_path, field):
+@pytest.mark.parametrize(
+    "field", ["module_instance_id", "value_type", "time_series_type"]
+)
+def test_archive_missing_optional_fields(header_series, tmp_path, field):
     ts = header_series.time_series[0]
     setattr(ts.header, field, None)
+    series = TimeSeriesSet(time_series=[ts])
+    series.to_netcdf(
+        tmp_path,
+        series_key="header",
+        file_naming="archive",
+        include_time_series_type=True,
+    )
+    path = next(tmp_path.glob("*.nc"))
+    expected = {
+        "module_instance_id": "P_[]_hour-1_scalar_null_external historical.nc",
+        "value_type": "P_[]_hour-1_M_external historical.nc",
+        "time_series_type": "P_[]_hour-1_scalar_M.nc",
+    }
+    assert path.name == expected[field]
+    restored = read_netcdf(path, series_key="header")
+    assert restored.time_series[0].header.to_json() == ts.header.to_json()
+
+
+@pytest.mark.parametrize("field", ["module_instance_id"])
+def test_archive_null_token_collision(header_series, tmp_path, field):
+    first = deepcopy(header_series.time_series[0])
+    second = deepcopy(first)
+    setattr(first.header, field, None)
+    setattr(second.header, field, "null")
+    with pytest.raises(ValueError, match="collision"):
+        TimeSeriesSet(time_series=[first, second]).to_netcdf(
+            tmp_path,
+            series_key="header",
+            file_naming="archive",
+            include_time_series_type=True,
+        )
+    assert not list(tmp_path.iterdir())
+
+
+@pytest.mark.parametrize(
+    "field", ["module_instance_id", "value_type", "time_series_type"]
+)
+def test_archive_empty_optional_fields_rejected(header_series, tmp_path, field):
+    ts = header_series.time_series[0]
+    setattr(ts.header, field, "")
     with pytest.raises(ValueError, match="requires nonempty"):
         TimeSeriesSet(time_series=[ts]).to_netcdf(
-            tmp_path, series_key="header", file_naming="archive"
+            tmp_path,
+            series_key="header",
+            file_naming="archive",
+            include_time_series_type=True,
         )
 
 
@@ -606,4 +651,51 @@ def test_archive_empty_qualifier_rejected(header_series, tmp_path):
         TimeSeriesSet(time_series=[ts]).to_netcdf(
             tmp_path, series_key="header", file_naming="archive"
         )
+    assert not list(tmp_path.iterdir())
+
+
+@pytest.mark.parametrize("include_type", [False, True])
+def test_archive_missing_both_types(header_series, tmp_path, include_type):
+    ts = header_series.time_series[0]
+    ts.header.value_type = None
+    ts.header.time_series_type = None
+    TimeSeriesSet(time_series=[ts]).to_netcdf(
+        tmp_path,
+        series_key="header",
+        file_naming="archive",
+        include_time_series_type=include_type,
+    )
+    path = tmp_path / "P_[]_hour-1_M.nc"
+    restored = read_netcdf(path, series_key="header")
+    assert restored.time_series[0].header.to_json() == ts.header.to_json()
+
+
+@pytest.mark.parametrize("field", ["value_type", "time_series_type"])
+def test_archive_literal_null_type_is_distinct(header_series, tmp_path, field):
+    first = deepcopy(header_series.time_series[0])
+    second = deepcopy(first)
+    setattr(first.header, field, None)
+    setattr(second.header, field, "null")
+    TimeSeriesSet(time_series=[first, second]).to_netcdf(
+        tmp_path,
+        series_key="header",
+        file_naming="archive",
+        include_time_series_type=True,
+    )
+    paths = list(tmp_path.glob("*.nc"))
+    assert len(paths) == 2
+    assert {
+        getattr(read_netcdf(path, series_key="header").time_series[0].header, field)
+        for path in paths
+    } == {None, "null"}
+
+
+def test_archive_omitted_value_type_collision(header_series, tmp_path):
+    first = deepcopy(header_series.time_series[0])
+    second = deepcopy(first)
+    first.header.value_type = None
+    first.header.module_instance_id = "scalar_M"
+    series = TimeSeriesSet(time_series=[first, second])
+    with pytest.raises(ValueError, match="collision"):
+        series.to_netcdf(tmp_path, series_key="header", file_naming="archive")
     assert not list(tmp_path.iterdir())

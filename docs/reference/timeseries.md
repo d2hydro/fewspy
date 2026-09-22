@@ -5,12 +5,12 @@ See also: https://publicwiki.deltares.nl/display/FEWSDOC/Delft-Fews+Published+In
 ::: src.fewspy.time_series
 
 
-## Full FEWS series identity
+## Available FEWS header identity
 
 The default remains `series_key="location_parameter"`: two DataFrame column
 levels, existing selection behavior, and one NetCDF file named `{parameter_id}.nc`.
 
-Use `series_key="header"` explicitly for full identity:
+Use `series_key="header"` explicitly to preserve the available header identity:
 
 ```python
 frame = time_series_set.to_df(series_key="header")
@@ -26,6 +26,9 @@ restored = fewspy.read_parquet(parquet_file, series_key="header")
 `time_series_type`, `time_step`, `qualifier_id`. The PI `type` field
 (instantaneous/accumulative) remains separate from `timeSeriesType`.
 Missing optional fields remain missing; fewspy does not infer their values.
+PI API responses may omit `valueType` and `timeSeriesType`. Header mode preserves
+all available identity fields but cannot distinguish series solely by information
+that was not supplied. The PI `type` field is not a substitute for either field.
 
 Timesteps use compact JSON with sorted attribute names, including multiplier,
 divider, and ID when present. Qualifiers use JSON arrays, retaining the original
@@ -35,10 +38,10 @@ This avoids ambiguities between, for example, `["a,b"]` and `["a", "b"]`.
 Select a series with `frame[header.series_identity("header")]`.
 
 Header-mode NetCDF files group stations only when the other six identity fields
-match. Filenames contain percent-encoded JSON components in this order:
+match. With `file_naming="default"`, filenames contain percent-encoded JSON components in this order:
 `parameter_qualifiers_timestep_valueType_moduleInstance_timeSeriesType.nc`.
 This adapts the [FEWS Open Archive scalar naming pattern](https://publicwiki.deltares.nl/spaces/FEWSDOC/pages/112167200/22-2+Export+to+Delft-FEWS+Open+Archive).
-Fewspy always includes module instance and time-series type so names do not depend
+This default naming includes module instance and time-series type so names do not depend
 on what other series happen to be exported. Location IDs remain the station
 coordinate. Each file also stores the complete headers in `fewspy_headers`,
 a format marker, and values in the `value` variable. Identity is never inferred
@@ -83,9 +86,11 @@ time_series_set.to_netcdf(
 ```
 
 The archive pattern is
-`<parameterId>_[<qualifierIds>]_<timeStep>_<valueType>_<moduleInstanceId>.nc`.
+`<parameterId>_[<qualifierIds>]_<timeStep>[_<valueType>]_<moduleInstanceId>.nc`.
+Here `[_<valueType>]` denotes an optional segment; the brackets around qualifiers
+are literal filename characters. Value type is included only when known.
 Module instance is always included. Set `include_time_series_type=True` to append
-`_<timeSeriesType>` before `.nc`. The full type is retained literally, including
+`_<timeSeriesType>` before `.nc` only when that field is known. The full type is retained literally, including
 spaces, for example `P_[]_hour-1_scalar_Import_external historical.nc`.
 The suffix controls naming only: time-series type always participates in identity,
 grouping, and metadata. If omitting it causes a collision, export raises an error.
@@ -106,9 +111,13 @@ attributes remain unchanged in the metadata even when a naming token is shared.
 
 Archive names contain no JSON or percent-encoding. Invalid filename characters,
 control characters, reserved device names, overlong names and filename collisions
-are rejected before files are written. Missing or empty value type and module
-instance are rejected rather than guessed; a requested type suffix must also be
-available. Parameter and qualifier IDs must be nonempty.
+are rejected before files are written. Missing (`None`) value type and time-series
+type are omitted, without placeholders or extra separators. For example, with
+both types missing: `P_[]_hour-1_Import.nc`. Metadata retains `None`.
+A missing module instance still uses the literal token `null`; a literal module
+identifier `null` can collide with this token. Any filename collision causes
+export to fail rather than overwrite a different series. Empty strings remain
+invalid. Parameter and qualifier IDs must be nonempty.
 
 The low-level `write_netcdf` function supports the same options. Custom templates
 can include `{identity}` for the archive stem and `{parameter_id}` for the literal

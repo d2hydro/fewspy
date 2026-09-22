@@ -47,17 +47,18 @@ def _archive_identity(header, include_time_series_type):
         header.parameter_id,
         "[" + "_".join(qualifiers) + "]",
         timestep,
-        header.value_type,
-        header.module_instance_id,
     ]
-    if include_time_series_type:
+    if header.value_type is not None:
+        parts.append(header.value_type)
+    parts.append(header.module_instance_id)
+    if include_time_series_type and header.time_series_type is not None:
         parts.append(header.time_series_type)
-    if any(part is None or part == "" for part in [*parts, *qualifiers]):
+    if not header.parameter_id or any(part == "" for part in [*parts, *qualifiers]):
         raise ValueError(
             "Archive naming requires nonempty parameter, qualifiers, value_type, "
             "module_instance_id and any requested time_series_type"
         )
-    return "_".join(parts)
+    return "_".join("null" if part is None else part for part in parts)
 
 
 def _header_groups(
@@ -166,7 +167,8 @@ def write_netcdf(
             requires the full column identity and fewspy_headers metadata.
         file_naming: "default" preserves existing names; "archive" uses readable
             parameter, qualifiers, timestep, value type and module instance.
-        include_time_series_type: Append the full type in archive mode.
+        include_time_series_type: Append the full type in archive mode when known.
+        Missing value_type and time_series_type are omitted from archive names.
         out_dir (Path): Output directory.
         global_attributes (dict(str), optional): _description_. Defaults to {"source": "fewspy"}.
         file_template (str, optional): _description_. Defaults to "{parameter_id}.nc".

@@ -403,7 +403,8 @@ class TimeSeriesSet:
                 filenames. Custom templates can use {identity}.
             file_naming: "default" preserves existing names; "archive" uses readable
                 names and requires series_key="header".
-            include_time_series_type: Append the full type to archive names.
+            include_time_series_type: Append the full type to archive names when known.
+                Missing value_type and time_series_type are omitted from archive names.
         """
         validate_series_key(series_key)
         _validate_file_naming(series_key, file_naming, include_time_series_type)
