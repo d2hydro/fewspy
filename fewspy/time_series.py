@@ -1,4 +1,6 @@
 import warnings
+import json
+from dataclasses import asdict
 from dataclasses import field
 from datetime import datetime
 from pathlib import Path
@@ -15,6 +17,27 @@ from fewspy.utils.transformations import flatten_list
 DATETIME_KEYS = ["start_date", "end_date"]
 FLOAT_KEYS = ["miss_val", "lat", "lon", "x", "y", "z"]
 STRING_KEYS = ["module_instance_id"]
+SeriesKey = Literal["location_parameter", "header"]
+HEADER_KEY_FIELDS = [
+    "module_instance_id",
+    "value_type",
+    "location_id",
+    "parameter_id",
+    "time_series_type",
+    "time_step",
+    "qualifier_id",
+]
+
+
+def validate_series_key(series_key):
+    if series_key not in ("location_parameter", "header"):
+        raise ValueError("series_key must be 'location_parameter' or 'header'")
+
+
+def canonical_json(value):
+    return json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+
+
 EVENT_COLUMNS = ["datetime", "value", "flag"]
 
 
@@ -22,6 +45,8 @@ EVENT_COLUMNS = ["datetime", "value", "flag"]
 class TimeStepDict(TypedDict, total=False):
     unit: Literal["second", "minute", "hour", "day", "month", "year", "nonequidistant"]
     multiplier: int | None
+    divider: int | None
+    id: str | None
 
 
 def reliables(df: pd.DataFrame, threshold: int = 6) -> pd.DataFrame:
@@ -65,6 +90,34 @@ class Header:
     station_name: str | None = None
     z: float | None = None
     qualifier_id: List[str] | None = None
+    value_type: str | None = None
+    time_series_type: str | None = None
+
+    def series_identity(self, series_key: SeriesKey = "location_parameter") -> tuple:
+        """Hashable FEWS identity; nested fields use unambiguous canonical JSON.
+
+        Qualifier order is retained, as in the PI header. None and [] both mean
+        no qualifiers. Missing optional scalar fields remain None.
+        """
+        validate_series_key(series_key)
+        if series_key == "location_parameter":
+            return self.location_id, self.parameter_id
+        return (
+            self.module_instance_id,
+            self.value_type,
+            self.location_id,
+            self.parameter_id,
+            self.time_series_type,
+            canonical_json(self.time_step),
+            canonical_json(self.qualifier_id or []),
+        )
+
+    def to_json(self):
+        return json.dumps(asdict(self), default=lambda value: value.isoformat())
+
+    @classmethod
+    def from_json(cls, value):
+        return cls(**json.loads(value))
 
     @classmethod
     def from_pi_header(cls, pi_header: dict) -> "Header":
@@ -107,6 +160,9 @@ class Header:
 
     def to_row(self):
         flat = self.__dict__.copy()
+        for key in ("value_type", "time_series_type"):
+            if flat.get(key) is None:
+                flat.pop(key, None)
         ts = flat.pop("time_step", {})
         flat["time_step.unit"] = ts.get("unit")
         flat["time_step.multiplier"] = ts.get("multiplier")
@@ -118,7 +174,10 @@ class Events(pd.DataFrame):
 
     @classmethod
     def from_pi_events(
-        cls, pi_events: list, missing_value: float | None = None, tz_offset: float | None = None
+        cls,
+        pi_events: list,
+        missing_value: float | None = None,
+        tz_offset: float | None = None,
     ) -> pd.DataFrame:
         warnings.warn(
             "from_pi_events is deprecated, use from_dict instead.", DeprecationWarning
@@ -129,7 +188,10 @@ class Events(pd.DataFrame):
 
     @classmethod
     def from_dict(
-        cls, pi_events: list, missing_value: float | None = None, tz_offset: float | None = None
+        cls,
+        pi_events: list,
+        missing_value: float | None = None,
+        tz_offset: float | None = None,
     ) -> pd.DataFrame:
         """
         Parse Events from FEWS PI events dict.
@@ -287,11 +349,27 @@ class TimeSeriesSet:
 
         return list(set(flatten_list(qualifiers)))
 
-    def to_df(self) -> pd.DataFrame:
+    def to_df(self, series_key: SeriesKey = "location_parameter") -> pd.DataFrame:
+        """Reliable values with location/parameter columns or seven header levels.
+
+        Header mode stores complete headers in DataFrame.attrs for I/O. Timestep
+        and qualifier levels are canonical JSON strings; no hashes are used.
+        """
+        validate_series_key(series_key)
         columns = pd.MultiIndex.from_tuples(
-            [(i.header.location_id, i.header.parameter_id) for i in self.time_series],
-            names=["location_id", "parameter_id"],
+            [i.header.series_identity(series_key) for i in self.time_series],
+            names=(
+                HEADER_KEY_FIELDS
+                if series_key == "header"
+                else ["location_id", "parameter_id"]
+            ),
         )
+        if series_key == "header" and not self.time_series:
+            df = pd.DataFrame(
+                columns=columns, index=pd.DatetimeIndex([], name="datetime")
+            )
+            df.attrs["fewspy_headers"] = []
+            return df
         df = pd.concat(
             [reliables(i.events)["value"] for i in self.time_series],
             axis=1,
@@ -299,6 +377,8 @@ class TimeSeriesSet:
         )
         df.columns = columns
 
+        if series_key == "header":
+            df.attrs["fewspy_headers"] = [i.header.to_json() for i in self.time_series]
         return df
 
     def to_netcdf(
@@ -307,6 +387,7 @@ class TimeSeriesSet:
         global_attributes: dict = {"source": "fewspy"},
         file_template: str = "{parameter_id}.nc",
         remove_dir: bool = False,
+        series_key: SeriesKey = "location_parameter",
     ) -> None:
         """Write fewspy.TimeSeriesSet to netCDF files, one per parameter_id.
 
@@ -315,9 +396,13 @@ class TimeSeriesSet:
             global_attributes (dict, optional): Global attributes for the NetCDF files. Defaults to {"source": "fewspy"}.
             file_template (str, optional): Template for naming the NetCDF files. Defaults to "{parameter_id}.nc".
             remove_dir (bool, optional): If True, removes the output directory before writing. Defaults to False.
+            series_key: "location_parameter" (default) or "header". Header mode
+                groups matching identities across locations and uses archive-style
+                filenames. Custom templates can use {identity}.
         """
-        if not self.empty:
-            df = self.to_df()
+        validate_series_key(series_key)
+        if not self.empty or (series_key == "header" and self.time_series):
+            df = self.to_df(series_key=series_key)
 
             write_netcdf(
                 df=df,
@@ -325,22 +410,35 @@ class TimeSeriesSet:
                 global_attributes=global_attributes,
                 file_template=file_template,
                 remove_dir=remove_dir,
+                series_key=series_key,
             )
 
-    def to_parquet(self, parquet_file: Path, include_header: bool = False):
+    def to_parquet(
+        self,
+        parquet_file: Path,
+        include_header: bool = False,
+        series_key: SeriesKey = "location_parameter",
+    ):
         """Write fewspy.TimeSeriesSet to arrow parquet file
 
         Args:
             parquet_file (Path): parquet-file to store
             include_header (bool, optional): if true all headers will be stored as a parquet-file next to the timeseries. Defaults to False.
+            series_key: "location_parameter" (default) or "header". Header mode
+                always embeds complete headers in the event file's metadata.
         """
 
+        validate_series_key(series_key)
         # make dir-structure to file(s)
         parquet_file.parent.mkdir(exist_ok=True, parents=True)
         parquet_file.unlink(missing_ok=True)
 
         # concat events to one dataframe and write to parquet
-        df = self.to_df()
+        df = self.to_df(series_key=series_key)
+        if series_key == "header":
+            # Parquet cannot reliably encode nested MultiIndex levels. Keep the
+            # complete headers in pandas metadata and use positional columns.
+            df.columns = [str(i) for i in range(len(df.columns))]
         df.to_parquet(parquet_file, engine="pyarrow")
 
         # if include_header, write header_file

@@ -21,15 +21,36 @@ def _column_to_time_series(df, column):
     return df
 
 
-def read_parquet(parquet_file: Path) -> TimeSeriesSet:
+def read_parquet(
+    parquet_file: Path, series_key: str = "location_parameter"
+) -> TimeSeriesSet:
     """Parse parquet file to fewspy TimeSeriesSet
 
     Args:
         parquet_file (Path): path to parquet-file
+        series_key: "location_parameter" (default) or "header". Header mode
+            reads embedded complete headers instead of the legacy sidecar.
 
     Returns:
         TimeSeriesSet: timeseries
     """
+    from fewspy.time_series import validate_series_key
+
+    validate_series_key(series_key)
+    if series_key == "header":
+        df = pd.read_parquet(parquet_file, engine="pyarrow")
+        headers = df.attrs.get("fewspy_headers")
+        if headers is None or len(headers) != len(df.columns):
+            raise ValueError("Parquet has no matching full FEWS header metadata")
+        return TimeSeriesSet(
+            time_series=[
+                TimeSeries(
+                    header=Header.from_json(header),
+                    events=df.iloc[:, [i]].set_axis(["value"], axis=1),
+                )
+                for i, header in enumerate(headers)
+            ]
+        )
     # header to list of dict
     header_df = pd.read_parquet(get_header_file(parquet_file))
     header_df.set_index(["location_id", "parameter_id"], drop=False, inplace=True)

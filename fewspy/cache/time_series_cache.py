@@ -168,6 +168,7 @@ class TimeSeriesCache:
         start_time: Optional[datetime | str] = None,
         end_time: Optional[datetime | str] = None,
         location_ids: Optional[list[str]] = None,
+        series_key: str = "location_parameter",
     ) -> pd.DataFrame:
         """fetch time series data from NetCDF file based on filter_id and parameter_id
 
@@ -177,10 +178,34 @@ class TimeSeriesCache:
             start_time (Optional[datetime  |  str], optional): start_time Defaults to None.
             end_time (Optional[datetime  |  str], optional): end_time. Defaults to None.
             location_ids (Optional[list[str]], optional): location_ids. Defaults to None.
+            series_key: "location_parameter" (default) or "header"; header mode
+                selects all matching identities from header-mode NetCDF files.
 
         Returns:
             pd.DataFrame: DataFrame with datetime index and MultiIndex columns (location_id, parameter_id)
         """
+        from fewspy.time_series import TimeSeriesSet, validate_series_key
+        from fewspy.io.read_netcdf import read_netcdf
+
+        validate_series_key(series_key)
+        if series_key == "header":
+            result = TimeSeriesSet()
+            for entry in self.manifest.files:
+                if entry.path.parent.name != filter_id:
+                    continue
+                dataset = self._datasets[self._key_for(entry.path)]
+                if dataset.attrs.get("parameter_id") != parameter_id:
+                    continue
+                part = read_netcdf(entry.path, series_key="header")
+                result.time_series.extend(
+                    ts
+                    for ts in part.time_series
+                    if location_ids is None or ts.header.location_id in location_ids
+                )
+            if not result.time_series:
+                raise ValueError("No full-header series match the cache selection")
+            return result.to_df(series_key="header").loc[start_time:end_time]
+
         dataset = self._get_open_ds(filter_id=filter_id, parameter_id=parameter_id)
         da = dataset[parameter_id]
 

@@ -7,6 +7,7 @@ from io import BytesIO
 import tempfile
 import os
 import warnings
+import json
 
 
 def _parse_time(time_var):
@@ -47,8 +48,21 @@ def _get_parameter_id(ds):
     return parameter_ids
 
 
-def read_netcdf_from_content(content) -> TimeSeriesSet:
+def read_netcdf_from_content(content, series_key="location_parameter") -> TimeSeriesSet:
     """Read zipped NetCDF content as TimeSeriesSet."""
+    from fewspy.time_series import validate_series_key
+
+    validate_series_key(series_key)
+    if series_key == "header":
+        result = TimeSeriesSet(time_zone=0.0)
+        with zipfile.ZipFile(BytesIO(content)) as archive:
+            names = [name for name in archive.namelist() if name.endswith(".nc")]
+            if not names:
+                raise ValueError("No NetCDF-file in content")
+            for name in names:
+                with Dataset("memory", memory=archive.read(name)) as ds:
+                    result.time_series.extend(_read_header_dataset(ds).time_series)
+        return result
     with zipfile.ZipFile(BytesIO(content)) as zf:
         nc_file_name = next(
             (name for name in zf.namelist() if name.endswith(".nc")), None
@@ -76,11 +90,14 @@ def read_netcdf(
     nc_file: Path,
     time_series_type: str | None = None,
     module_instance_id: str | None = None,
+    series_key: str = "location_parameter",
 ) -> TimeSeriesSet:
     """Read the content of a NetCDF file into a fewspy TimeSeriesSet
 
     Args:
         nc_file (Path): path to the NetCDF file
+        series_key: "location_parameter" (default) or "header". Header mode
+            requires stored fewspy metadata and restores headers without overrides.
         time_series_type (str | None, optional): type for timeseries header. Defaults to None.
         Note (!) specifying time_series_type is advised. If you don't data will be interpreted as instantaneous
         module_instance_id (str | None, optional): ModuleInstanceId for timeseries header. Defaults to None.
@@ -88,6 +105,12 @@ def read_netcdf(
     Returns:
         TimeSeriesSet: timeseries
     """
+    from fewspy.time_series import validate_series_key
+
+    validate_series_key(series_key)
+    if series_key == "header":
+        with Dataset(nc_file, mode="r") as ds:
+            return _read_header_dataset(ds)
     if time_series_type is None:
         warnings.warn(
             "time_series_type is None; defaulting to 'instantaneous'. "
@@ -158,3 +181,24 @@ def read_netcdf(
                 )
 
     return time_series_set
+
+
+def _read_header_dataset(ds):
+    """Reconstruct explicit headers without inferring identity from events."""
+    if getattr(ds, "fewspy_series_key", None) != "header":
+        raise ValueError("NetCDF has no full FEWS header metadata")
+    headers = json.loads(ds.fewspy_headers)
+    time_index = _parse_time(ds.variables["time"])
+    values = ds.variables["value"][:].filled(float("nan"))
+    if len(headers) != values.shape[1]:
+        raise ValueError("NetCDF header count does not match stations")
+    return TimeSeriesSet(
+        time_zone=0.0,
+        time_series=[
+            TimeSeries(
+                header=Header.from_json(header),
+                events=pd.DataFrame({"value": values[:, i]}, index=time_index),
+            )
+            for i, header in enumerate(headers)
+        ],
+    )

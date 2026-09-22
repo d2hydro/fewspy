@@ -17,7 +17,19 @@ nest_asyncio.apply()
 LOGGER = logging.getLogger(__name__)
 
 
-def __result_async_to_time_series_set(async_result):
+def __result_async_to_time_series_set(async_result, series_key="location_parameter"):
+    from fewspy.time_series import validate_series_key
+
+    validate_series_key(series_key)
+    if series_key == "header":
+        result = TimeSeriesSet()
+        for response in async_result:
+            if isinstance(response, dict) and "timeSeries" in response:
+                part = TimeSeriesSet.from_dict(response)
+                result.time_series.extend(part.time_series)
+                result.version = part.version
+                result.time_zone = part.time_zone
+        return result
     time_series_set = TimeSeriesSet()
     time_series_set_gen = (i for i in async_result if "timeSeries" if type(i) == dict)
     time_series_set_list = [i for i in time_series_set_gen if "timeSeries" in i.keys()]
@@ -53,6 +65,7 @@ def get_time_series_async(
     omit_missing: bool = True,
     verify: bool = False,
     logger=LOGGER,
+    series_key="location_parameter",
 ) -> pd.DataFrame:
     """
 
@@ -68,6 +81,8 @@ def get_time_series_async(
         thinning (int): integer value for thinning parameter to use in request. Defaults to None.
         document_format (str): request document format to return. Defaults to PI_JSON.
         omit_missing (bool): if True, no missings values will be returned. Defaults to True
+        series_key: "location_parameter" (default) or "header"; header mode
+            preserves all series returned by asynchronous requests.
         verify (bool, optional): passed to requests.get verify parameter.
         Defaults to False.
         logger (logging.Logger, optional): Logger to pass logging to. By
@@ -78,6 +93,9 @@ def get_time_series_async(
         "name" and "group_id".
 
     """
+    from fewspy.time_series import validate_series_key
+
+    validate_series_key(series_key)
     parameters = parameters_to_fews(locals(), bool_to_string=True)
 
     def _get_loop():
@@ -92,13 +110,14 @@ def get_time_series_async(
 
     async def get_timeseries_async(location_id, parameter_id, qualifier_id, session):
         """Get timerseries using FEWS (asynchronously)"""
-        parameters["locationIds"] = [location_id]
-        parameters["parameterIds"] = [parameter_id]
+        request_parameters = parameters.copy()
+        request_parameters["locationIds"] = [location_id]
+        request_parameters["parameterIds"] = [parameter_id]
         if qualifier_id is not None:
-            parameters["qualifierIds"] = qualifier_id
+            request_parameters["qualifierIds"] = qualifier_id
         try:
             response = await session.request(
-                method="GET", url=url, params=parameters, ssl=verify
+                method="GET", url=url, params=request_parameters, ssl=verify
             )
             response.raise_for_status()
         except Exception as err:
@@ -141,5 +160,7 @@ def get_time_series_async(
     if __name__ == "fewspy.wrappers.get_time_series_async":
         loop = _get_loop()
         result_async = loop.run_until_complete(asynciee())
-        time_series_set = __result_async_to_time_series_set(result_async)
+        time_series_set = __result_async_to_time_series_set(
+            result_async, series_key=series_key
+        )
     return time_series_set

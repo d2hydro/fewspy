@@ -5,6 +5,7 @@ The module contains one class and methods corresponding with the FEWS PI-REST re
 https://publicwiki.deltares.nl/display/FEWSDOC/FEWS+PI+REST+Web+Service
 """
 
+from fewspy.time_series import validate_series_key
 import pandas as pd
 from .utils.timer import Timer
 from .utils.url import validate_url
@@ -167,6 +168,7 @@ class Api:
         show_statistics=False,
         parallel=False,
         document_format: str = "PI_JSON",
+        series_key: str = "location_parameter",
     ):
         """
         Get FEWS qualifiers as a pandas DataFrame
@@ -183,6 +185,8 @@ class Api:
             omit_missing (bool): if True, no missings values will be returned. Defaults to True.
             show_statistics (bool): if True, time series statistics will be included in header. Defaults to False.
             document_format (str): request document format to return. Defaults to PI_JSON.
+            series_key: "location_parameter" (default) or "header"; header mode
+                preserves all series returned by asynchronous requests.
             parallel (bool): if True, timeseries are requested by the asynchronous wrapper. Defaults to False
 
         Returns:
@@ -190,6 +194,7 @@ class Api:
             "name" and "group_id".
 
         """
+        validate_series_key(series_key)
         kwargs = self.__kwargs(url_post_fix="timeseries", kwargs=locals())
         if (self.document_format != "PI_JSON") and parallel:
             self.logger.warning(

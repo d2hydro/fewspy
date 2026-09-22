@@ -4,11 +4,10 @@ import logging
 from ..utils.timer import Timer
 from ..utils.transformations import parameters_to_fews
 from typing import List, Union
-from ..time_series import TimeSeriesSet
+from ..time_series import TimeSeriesSet, validate_series_key
 from datetime import datetime
 from fewspy.io.read_xml import read_xml_from_string
 from fewspy.io.read_netcdf import read_netcdf_from_content
-
 
 LOGGER = logging.getLogger(__name__)
 
@@ -35,6 +34,7 @@ def get_time_series(
     document_format: str = "PI_JSON",
     verify: bool = False,
     logger=LOGGER,
+    series_key: str = "location_parameter",
 ) -> pd.DataFrame:
     """
     Get FEWS qualifiers as a pandas DataFrame
@@ -53,6 +53,8 @@ def get_time_series(
         omit_missing (bool): if True, no missings values will be returned. Defaults to True.
         show_statistics (bool): if True, time series statistics will be included in header. Defaults to False.
         document_format (str): request document format to return. Defaults to PI_JSON.
+        series_key: "location_parameter" (default) or "header"; header mode
+            preserves all series returned by asynchronous requests.
         verify (bool, optional): passed to requests.get verify parameter.
         Defaults to False.
         logger (logging.Logger, optional): Logger to pass logging to. By
@@ -63,6 +65,7 @@ def get_time_series(
         "name" and "group_id".
 
     """
+    validate_series_key(series_key)
     report_string = _ts_or_headers(only_headers)
 
     # do the request
@@ -80,7 +83,9 @@ def get_time_series(
         elif document_format == "PI_XML":
             time_series_set = read_xml_from_string(response.text)
         elif document_format == "PI_NETCDF":
-            time_series_set = read_netcdf_from_content(response.content)
+            time_series_set = read_netcdf_from_content(
+                response.content, series_key=series_key
+            )
         timer.report(report_string.format(status="parsed"))
         if time_series_set.empty:
             logger.debug(f"FEWS WebService request passing empty set: {response.url}")
