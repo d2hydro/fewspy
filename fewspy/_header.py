@@ -1,4 +1,7 @@
-"""FEWS header models and identity helpers, independent of time-series I/O."""
+"""FEWS header models and identity helpers, independent of time-series I/O.
+
+This module is for internal use only. Import Header from fewspy.time_series.
+"""
 
 import json
 import warnings
