@@ -3,32 +3,32 @@ import os
 import pickle
 from pathlib import Path
 
-from TWINpy.app.TWIN_get_timeseries import TWIN_Timeserie
+from tmx.app.TMX_get_timeseries import TMX_Timeserie
 
 from fewspy.time_series import Events, Header, TimeSeries, TimeSeriesSet
 
 data_dir = Path(__file__).parent / "data"
-os.environ["TWIN_BASE_URL"] = ""
+os.environ["TMX_BASE_URL"] = ""
 
-with (data_dir / "twin_response.pickle").open("rb") as src:
+with (data_dir / "tmx_response.pickle").open("rb") as src:
     b = pickle.load(src)  # noqa: S301 - Trusted local conversion fixture.
-# df = pd.read_pickle(data_dir / "twin_response.pickle")
+# df = pd.read_pickle(data_dir / "tmx_response.pickle")
 
 
 # %%
 
 
 def convert_timeseries(
-    time_series: TWIN_Timeserie,
+    time_series: TMX_Timeserie,
     header_info: dict = {"type": "instantaneous", "time_step": {"unit": "nonequidistant"}},  # noqa: B006 - Preserve the existing read-only API default.
 ) -> TimeSeries:
-    """Converts TWIN_Timeserie to fewspy.TimeSeriesSet
+    """Converts TMX_Timeserie to fewspy.TimeSeriesSet
 
     Parameters
     ----------
-    time_series : TWIN_Timeserie
+    time_series : TMX_Timeserie
     header_info : dict, optional
-        Header-info missing in TWIN_Timeserie, by default {"type": "instantaneous", "time_step": {"unit": "nonequidistant"}}
+        Header-info missing in TMX_Timeserie, by default {"type": "instantaneous", "time_step": {"unit": "nonequidistant"}}
 
     Returns
     -------
