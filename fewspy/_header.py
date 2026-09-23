@@ -37,6 +37,22 @@ class SeriesKey(str, Enum):
 
 
 def canonical_json(value):
+    """Convert a value to JSON with a consistent representation.
+
+    Keys are sorted and whitespace is removed so that equivalent values always
+    produce the same string. For example, ``{"a": 1, "b": 2}`` and
+    ``{"b": 2, "a": 1}`` both become ``'{"a":1,"b":2}'``.
+
+    Parameters
+    ----------
+    value
+        Value to convert to JSON.
+
+    Returns
+    -------
+    str
+        JSON string with consistent key order and formatting.
+    """
     return json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
 
 
