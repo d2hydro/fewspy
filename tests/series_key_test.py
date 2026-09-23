@@ -202,6 +202,59 @@ def test_header_parquet_roundtrip(header_series, tmp_path, series_key):
     )
 
 
+@pytest.mark.parametrize(
+    "removed", [("location_id",), ("parameter_id", "time_step")]
+)
+def test_parquet_missing_header_fields(header_series, tmp_path, removed):
+    path = tmp_path / "series.parquet"
+    header_series.to_parquet(path, series_key="header")
+    df = pd.read_parquet(path)
+    header = json.loads(df.attrs["fewspy_headers"][1])
+    for field in removed:
+        del header[field]
+    df.attrs["fewspy_headers"][1] = json.dumps(header)
+    df.to_parquet(path)
+
+    with pytest.raises(ValueError) as error:
+        read_parquet(path, series_key="header")
+    assert str(error.value) == (
+        "Parquet header for column '1' is missing required fields: "
+        + ", ".join(sorted(removed))
+    )
+
+
+@pytest.mark.parametrize("headers", [None, []])
+def test_parquet_missing_header_metadata(header_series, tmp_path, headers):
+    path = tmp_path / "series.parquet"
+    header_series.to_parquet(path, series_key="header")
+    df = pd.read_parquet(path)
+    df.attrs["fewspy_headers"] = headers
+    df.to_parquet(path)
+
+    message = (
+        "Parquet is missing FEWS header metadata: fewspy_headers"
+        if headers is None
+        else f"Parquet has 0 FEWS headers for {len(df.columns)} columns"
+    )
+    with pytest.raises(ValueError, match=message):
+        read_parquet(path, series_key="header")
+
+
+def test_parquet_optional_header_fields(header_series, tmp_path):
+    path = tmp_path / "series.parquet"
+    header_series.to_parquet(path, series_key="header")
+    df = pd.read_parquet(path)
+    header = json.loads(df.attrs["fewspy_headers"][0])
+    del header["module_instance_id"]
+    del header["qualifier_id"]
+    df.attrs["fewspy_headers"][0] = json.dumps(header)
+    df.to_parquet(path)
+
+    restored = read_parquet(path, series_key="header")
+    assert restored.time_series[0].header.module_instance_id is None
+    assert restored.time_series[0].header.qualifier_id is None
+
+
 def test_collisions_fail_before_writing(header_series, tmp_path):
 
     with pytest.raises(ValueError, match="collision"):

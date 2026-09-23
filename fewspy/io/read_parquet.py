@@ -1,3 +1,5 @@
+import json
+from dataclasses import MISSING, fields
 from pathlib import Path
 
 import pandas as pd
@@ -40,15 +42,34 @@ def read_parquet(
     if series_key == SeriesKey.HEADER:
         df = pd.read_parquet(parquet_file, engine="pyarrow")
         headers = df.attrs.get("fewspy_headers")
-        if headers is None or len(headers) != len(df.columns):
-            raise ValueError("Parquet has no matching full FEWS header metadata")
+        if headers is None:
+            raise ValueError("Parquet is missing FEWS header metadata: fewspy_headers")
+        if len(headers) != len(df.columns):
+            raise ValueError(
+                f"Parquet has {len(headers)} FEWS headers for {len(df.columns)} columns"
+            )
+        required = {
+            field.name
+            for field in fields(Header)
+            if field.default is MISSING and field.default_factory is MISSING
+        }
+        parsed_headers = []
+        for column, header in zip(df.columns, headers):
+            header = json.loads(header)
+            missing = required - header.keys()
+            if missing:
+                raise ValueError(
+                    f"Parquet header for column {column!r} is missing required fields: "
+                    + ", ".join(sorted(missing))
+                )
+            parsed_headers.append(Header(**header))
         return TimeSeriesSet(
             time_series=[
                 TimeSeries(
-                    header=Header.from_json(header),
+                    header=header,
                     events=df.iloc[:, [i]].set_axis(["value"], axis=1),
                 )
-                for i, header in enumerate(headers)
+                for i, header in enumerate(parsed_headers)
             ]
         )
     # header to list of dict

@@ -76,6 +76,9 @@ without requiring a sidecar. NetCDF's low-level writer accepts DataFrames from
 `fewspy_headers` attributes remain available. Both formats retain the existing
 `to_df()` reliable-value filtering; this does not add flag serialization.
 
+Missing required fields in embedded Parquet headers raise `ValueError` naming
+the affected column and missing fields. Optional header fields remain optional.
+
 For asynchronous retrieval use
 `api.get_time_series(..., parallel=True, series_key="header")` to retain every
 series in each response. Requests remain concurrent. Pass the mode again to
