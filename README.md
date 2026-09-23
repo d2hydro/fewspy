@@ -19,11 +19,13 @@ Fewspy is build for speed; time-series requests are handled asynchronous, giving
 
 ## Installation
 
+Fewspy supports Python 3.10–3.14.
+
 Fewspy can be installed with pip in any environment with the following Python-packages properly installed:
 
 * requests
 * aiohttp
-* nest-asyncio
+* nest-asyncio (Python <3.14) or nest-asyncio2 (Python 3.14)
 * pandas
 * geopandas
 

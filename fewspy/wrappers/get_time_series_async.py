@@ -1,13 +1,18 @@
 import asyncio
 import logging
+import sys
 from datetime import datetime
 from typing import List, Union
 
 import aiohttp
-import nest_asyncio
 import pandas as pd
 import requests
 from aiohttp import ClientSession
+
+if sys.version_info >= (3, 14):
+    import nest_asyncio2 as nest_asyncio
+else:
+    import nest_asyncio
 
 from fewspy.time_series import SeriesKey, TimeSeriesSet
 from fewspy.utils.timer import Timer

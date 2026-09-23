@@ -12,11 +12,11 @@ tests = "pytest --cov=fewspy --cov-report=term-missing ./tests"
 build = "python -m build"
 
 [dependencies]
+python = "3.14.*"
 aiohttp = "*"
 geopandas = "*"
 ipykernel = "*"
 lxml = "*"
-nest-asyncio = "*"
 pandas = "*"
 pyarrow = "*"
 pydantic="*"

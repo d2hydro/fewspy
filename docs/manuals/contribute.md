@@ -33,17 +33,28 @@ dependency).
 The cache also used Python 3.11's `hashlib.file_digest`; incremental SHA-256
 hashing preserves the same file hashes on Python 3.10.
 
-The metadata now declares Python 3.10–3.13 and Pydantic >=2, and explicitly lists
-those direct dependencies. No existing dependency versions or Pixi lock entries
-were upgraded. Other runtime dependencies remain unconstrained: their oldest
-compatible versions have not been established.
+The metadata declares Python 3.10–3.14 and Pydantic >=2, and explicitly lists
+those direct dependencies. Runtime dependencies without version constraints have
+not had their oldest compatible versions established.
 
 `test-cov.yml` retains Pixi coverage and also installs `.[tests]` into a fresh
 virtual environment on every supported Python version, runs `pip check`, and runs
 the test suite outside the checkout so it imports the installed package. An extra
-Python 3.10 job tests Pydantic 2.0, the only declared dependency minimum; this is
+Python 3.10 job tests the Pydantic 2.0 minimum; this is
 not a minimum-version test of the entire dependency graph. Some tests contact the
 public FEWS service and therefore require network access and service availability.
+
+The Pixi development/test environment uses Python 3.14 on Windows and Linux.
+Run `pixi run tests` and `pixi run build` to test and build in that environment.
+The package CI matrix retains Python 3.10–3.13 alongside Python 3.14.
+
+Python 3.14 validation exposed a blocker in `nest-asyncio` 1.6.0: its patch breaks
+asyncio task tracking, causing aiohttp requests to fail with "Timeout context
+manager should be used inside a task". On Python 3.14, fewspy therefore uses
+[`nest-asyncio2`](https://github.com/Chaoses-Ib/nest-asyncio2) >=1.7.2, which fixes
+that compatibility issue while retaining nested event-loop support. Older Python
+versions continue using `nest-asyncio`. Other existing Pixi dependency versions
+are retained; compiled packages use Python 3.14 builds where required.
 
 Dependabot checks the root Python package manifest and GitHub Actions weekly;
 it does not manage Pixi. Its pull requests run the same PR tests without secrets;
