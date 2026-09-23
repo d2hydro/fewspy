@@ -34,27 +34,18 @@ def _parse_locations(stations_var):
     station_id_var = stations_var[:]
 
     return [
-        "".join([c.decode("utf-8") if isinstance(c, bytes) else "" for c in row])
-        .strip()
-        .replace("\x00", "")
+        "".join([c.decode("utf-8") if isinstance(c, bytes) else "" for c in row]).strip().replace("\x00", "")
         for row in station_id_var
     ]
 
 
 def _get_parameter_id(ds):
-    parameter_ids = [
-        var_name
-        for var_name, var in ds.variables.items()
-        if var.dimensions == ("time", "stations")
-    ]
+    parameter_ids = [var_name for var_name, var in ds.variables.items() if var.dimensions == ("time", "stations")]
     return parameter_ids
 
 
-def read_netcdf_from_content(
-    content, series_key: SeriesKey | str = SeriesKey.LOCATION_PARAMETER
-) -> TimeSeriesSet:
+def read_netcdf_from_content(content, series_key: SeriesKey | str = SeriesKey.LOCATION_PARAMETER) -> TimeSeriesSet:
     """Read zipped NetCDF content as TimeSeriesSet."""
-
     series_key = SeriesKey(series_key)
     if series_key == SeriesKey.HEADER:
         result = TimeSeriesSet(time_zone=0.0)
@@ -67,25 +58,21 @@ def read_netcdf_from_content(
                     result.time_series.extend(_read_header_dataset(ds).time_series)
         return result
     with zipfile.ZipFile(BytesIO(content)) as zf:
-        nc_file_name = next(
-            (name for name in zf.namelist() if name.endswith(".nc")), None
-        )
+        nc_file_name = next((name for name in zf.namelist() if name.endswith(".nc")), None)
         if nc_file_name is None:
-            raise ValueError(
-                f"No NetCDF-file in content, with filelist {zf.namelist()}"
-            )
+            raise ValueError(f"No NetCDF-file in content, with filelist {zf.namelist()}")
 
         # Create a temp file path without opening the file
         fd, tmp_path = tempfile.mkstemp(suffix=".nc")
         os.close(fd)  # Close the low-level file descriptor
 
         try:
-            with open(tmp_path, "wb") as f:
+            with Path(tmp_path).open("wb") as f:
                 f.write(zf.read(nc_file_name))  # write zip contents to temp file
 
             result = read_netcdf(Path(tmp_path))
         finally:
-            os.remove(tmp_path)
+            Path(tmp_path).unlink()
         return result
 
 
@@ -105,10 +92,10 @@ def read_netcdf(
         Note (!) specifying time_series_type is advised. If you don't data will be interpreted as instantaneous
         module_instance_id (str | None, optional): ModuleInstanceId for timeseries header. Defaults to None.
 
-    Returns:
+    Returns
+    -------
         TimeSeriesSet: timeseries
     """
-
     series_key = SeriesKey(series_key)
     if series_key == SeriesKey.HEADER:
         with Dataset(nc_file, mode="r") as ds:
@@ -178,9 +165,7 @@ def read_netcdf(
                 events = pd.DataFrame(data=data, index=time_index)
 
                 # append to TimeSeriesSet
-                time_series_set.time_series.append(
-                    TimeSeries(header=header, events=events)
-                )
+                time_series_set.time_series.append(TimeSeries(header=header, events=events))
 
     return time_series_set
 

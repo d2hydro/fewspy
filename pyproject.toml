@@ -42,9 +42,30 @@ dynamic = ["version"]
 [project.optional-dependencies]
 tests = ["pytest"]
 
-[tool.flake8]
-max-line-length = 120
-max-complexity = 10
+[tool.ruff]
+target-version = "py310"
+line-length = 120
+extend-exclude = [".pixi", ".tmp"]
+
+[tool.ruff.lint]
+# Targeting fewspy's oldest supported Python.
+select = [
+    "B", "C4", "D", "E", "F", "FURB", "I", "LOG", "NPY", "PD",
+    "PERF", "PTH", "RUF", "S", "SIM", "UP", "PLC0415",
+]
+ignore = [
+    "D1", "D400", "D401", "E501",
+    "PD002", "PD003", "PD008", "PD009", "PD010", "PD011", "PD013", "PD015",
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S101", "S603"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "numpy"
+
+[tool.ruff.lint.isort]
+combine-as-imports = true
 
 [tool.hatch.version]
 source = "vcs"

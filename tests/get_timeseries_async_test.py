@@ -5,7 +5,6 @@ from datetime import datetime
 
 import pytest
 
-
 LOCATION_IDS = ["NL34.HL.KGM156.HWZ1", "NL34.HL.KGM156.LWZ1"]
 PARAMETER_IDS = ["Q [m3/s] [NVT] [OW]", "WATHTE [m] [NAP] [OW]"]
 QUALIFIER_IDS = ["productie"]
@@ -99,11 +98,11 @@ def test_length(time_series_set):
 
 
 def test_parameter_ids(time_series_set):
-    assert all([i in PARAMETER_IDS for i in time_series_set.parameter_ids])
+    assert all(i in PARAMETER_IDS for i in time_series_set.parameter_ids)
 
 
 def test_location_ids(time_series_set):
-    assert all([i in LOCATION_IDS for i in time_series_set.location_ids])
+    assert all(i in LOCATION_IDS for i in time_series_set.location_ids)
 
 
 def test_qualifier_ids(time_series_set):

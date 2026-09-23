@@ -6,7 +6,7 @@ Fewspy is build for speed; time-series requests are handled asynchronous, giving
 
 [![test](https://github.com/d2hydro/fewspy/actions/workflows/test-cov.yml/badge.svg)](https://github.com/d2hydro/fewspy/actions/workflows/test-cov.yml)
 [![Coverage](https://img.shields.io/codecov/c/github/d2hydro/fewspy)](https://app.codecov.io/github/d2hydro/fewspy)
-[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![Code style: Ruff](https://img.shields.io/badge/code%20style-Ruff-D7FF64)](https://docs.astral.sh/ruff/)
 [![Release: latest](https://img.shields.io/github/v/release/d2hydro/fewspy)](https://pypi.org/project/fewspy)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 ---

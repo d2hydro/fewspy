@@ -21,9 +21,7 @@ from fewspy.time_series import Header, TimeSeries, TimeSeriesSet
 from fewspy.wrappers.get_time_series_async import __result_async_to_time_series_set
 
 
-@pytest.mark.parametrize(
-    "content", [b"", b"abc", b"FEWS" * 100_000], ids=["empty", "small", "multi-chunk"]
-)
+@pytest.mark.parametrize("content", [b"", b"abc", b"FEWS" * 100_000], ids=["empty", "small", "multi-chunk"])
 def test_manifest_file_digest(tmp_path, content):
     path = tmp_path / "series.nc"
     path.write_bytes(content)
@@ -34,9 +32,7 @@ def test_manifest_file_digest(tmp_path, content):
 
 def duplicate_series():
 
-    source = json.loads(
-        (Path(__file__).parent / "data/pi_time_series.json").read_text()
-    )
+    source = json.loads((Path(__file__).parent / "data/pi_time_series.json").read_text())
 
     first = source["timeSeries"][0]
 
@@ -75,7 +71,6 @@ def test_default_netcdf_layout(tmp_path):
     assert [p.name for p in tmp_path.iterdir()] == [f"{parameter}.nc"]
 
     with Dataset(tmp_path / f"{parameter}.nc") as ds:
-
         assert len(ds.dimensions["stations"]) == 2
 
         assert ds.variables[parameter].dimensions == ("time", "stations")
@@ -86,17 +81,17 @@ def test_default_netcdf_layout(tmp_path):
 @pytest.fixture
 def header_series():
 
-    base = dict(
-        type="instantaneous",
-        location_id="L",
-        parameter_id="P",
-        time_step={"unit": "hour", "multiplier": 1},
-        start_date="2024-01-01T00:00:00",
-        end_date="2024-01-01T01:00:00",
-        module_instance_id="M",
-        value_type="scalar",
-        time_series_type="external historical",
-    )
+    base = {
+        "type": "instantaneous",
+        "location_id": "L",
+        "parameter_id": "P",
+        "time_step": {"unit": "hour", "multiplier": 1},
+        "start_date": "2024-01-01T00:00:00",
+        "end_date": "2024-01-01T01:00:00",
+        "module_instance_id": "M",
+        "value_type": "scalar",
+        "time_series_type": "external historical",
+    }
 
     variants = [
         {},
@@ -119,9 +114,7 @@ def header_series():
                 header=Header(**(base | variant)),
                 events=pd.DataFrame(
                     {"value": [float(i), float(i + 1)]},
-                    index=pd.date_range(
-                        "2024-01-01", periods=2, freq="h", name="datetime"
-                    ),
+                    index=pd.date_range("2024-01-01", periods=2, freq="h", name="datetime"),
                 ),
             )
             for i, variant in enumerate(variants)
@@ -138,7 +131,6 @@ def test_header_identity_and_dataframe(header_series):
     assert df.columns.is_unique
 
     for i, series in enumerate(header_series.time_series):
-
         assert df[series.header.series_identity("header")].iloc[0] == i
 
     h = deepcopy(header_series.time_series[0].header)
@@ -147,15 +139,11 @@ def test_header_identity_and_dataframe(header_series):
 
     h.time_step = {"multiplier": 1, "unit": "hour"}
 
-    assert h.series_identity("header") == header_series.time_series[
-        0
-    ].header.series_identity("header")
+    assert h.series_identity("header") == header_series.time_series[0].header.series_identity("header")
 
     h.qualifier_id = ["a", "b"]
 
-    assert h.series_identity("header") == header_series.time_series[
-        6
-    ].header.series_identity("header")
+    assert h.series_identity("header") == header_series.time_series[6].header.series_identity("header")
 
     assert Header.from_json(h.to_json()).qualifier_id == ["a", "b"]
 
@@ -172,30 +160,22 @@ def test_netcdf_header_roundtrip(header_series, tmp_path, series_key):
     restored = TimeSeriesSet()
 
     for path in files:
-
         restored.time_series.extend(read_netcdf(path, series_key=series_key).time_series)
 
-    expected = {
-        ts.header.series_identity("header"): ts for ts in header_series.time_series
-    }
+    expected = {ts.header.series_identity("header"): ts for ts in header_series.time_series}
 
     assert len(restored) == len(expected)
 
     for ts in restored.time_series:
-
         original = expected[ts.header.series_identity("header")]
 
         assert ts.header.to_json() == original.header.to_json()
 
-        pd.testing.assert_frame_equal(
-            ts.events, original.events, check_dtype=False, check_freq=False
-        )
+        pd.testing.assert_frame_equal(ts.events, original.events, check_dtype=False, check_freq=False)
 
     again = tmp_path / "again"
 
-    TimeSeriesSet(time_series=list(reversed(header_series.time_series))).to_netcdf(
-        again, series_key=series_key
-    )
+    TimeSeriesSet(time_series=list(reversed(header_series.time_series))).to_netcdf(again, series_key=series_key)
 
     assert {p.name for p in files} == {p.name for p in again.glob("*.nc")}
 
@@ -209,14 +189,10 @@ def test_header_parquet_roundtrip(header_series, tmp_path, series_key):
 
     restored = read_parquet(path, series_key=series_key)
 
-    pd.testing.assert_frame_equal(
-        header_series.to_df("header"), restored.to_df("header"), check_freq=False
-    )
+    pd.testing.assert_frame_equal(header_series.to_df("header"), restored.to_df("header"), check_freq=False)
 
 
-@pytest.mark.parametrize(
-    "removed", [("location_id",), ("parameter_id", "time_step")]
-)
+@pytest.mark.parametrize("removed", [("location_id",), ("parameter_id", "time_step")])
 def test_parquet_missing_header_fields(header_series, tmp_path, removed):
     path = tmp_path / "series.parquet"
     header_series.to_parquet(path, series_key="header")
@@ -230,8 +206,7 @@ def test_parquet_missing_header_fields(header_series, tmp_path, removed):
     with pytest.raises(ValueError) as error:
         read_parquet(path, series_key="header")
     assert str(error.value) == (
-        "Parquet header for column '1' is missing required fields: "
-        + ", ".join(sorted(removed))
+        "Parquet header for column '1' is missing required fields: " + ", ".join(sorted(removed))
     )
 
 
@@ -270,7 +245,6 @@ def test_parquet_optional_header_fields(header_series, tmp_path):
 def test_collisions_fail_before_writing(header_series, tmp_path):
 
     with pytest.raises(ValueError, match="collision"):
-
         header_series.to_netcdf(tmp_path, series_key="header", file_template="same.nc")
 
     assert not list(tmp_path.iterdir())
@@ -278,7 +252,6 @@ def test_collisions_fail_before_writing(header_series, tmp_path):
     header_series.time_series.append(deepcopy(header_series.time_series[0]))
 
     with pytest.raises(ValueError, match="Duplicate"):
-
         header_series.to_netcdf(tmp_path, series_key="header")
 
     assert not list(tmp_path.iterdir())
@@ -290,24 +263,19 @@ def test_sparse_netcdf(header_series, tmp_path, events):
     ts = header_series.time_series[0]
 
     if events == "empty":
-
         ts.events = ts.events.iloc[:0]
 
     elif events == "single":
-
         ts.events = ts.events.iloc[:1]
 
     else:
-
         ts.events["flag"] = 9
 
     TimeSeriesSet(time_series=[ts]).to_netcdf(tmp_path, series_key="header")
 
     restored = read_netcdf(next(tmp_path.glob("*.nc")), series_key="header")
 
-    assert restored.time_series[0].header.series_identity(
-        "header"
-    ) == ts.header.series_identity("header")
+    assert restored.time_series[0].header.series_identity("header") == ts.header.series_identity("header")
 
 
 def test_zip_reads_all_header_files(header_series, tmp_path):
@@ -317,9 +285,7 @@ def test_zip_reads_all_header_files(header_series, tmp_path):
     content = BytesIO()
 
     with zipfile.ZipFile(content, "w") as archive:
-
         for path in tmp_path.glob("*.nc"):
-
             archive.write(path, path.name)
 
     restored = read_netcdf_from_content(content.getvalue(), series_key="header")
@@ -330,9 +296,7 @@ def test_zip_reads_all_header_files(header_series, tmp_path):
 @pytest.mark.parametrize("series_key", ["header", SeriesKey.HEADER])
 def test_async_response_keeps_all_headers(series_key):
 
-    source = json.loads(
-        (Path(__file__).parent / "data/pi_time_series.json").read_text()
-    )
+    source = json.loads((Path(__file__).parent / "data/pi_time_series.json").read_text())
 
     assert len(__result_async_to_time_series_set([source])) == 1
 
@@ -344,28 +308,26 @@ def test_async_response_keeps_all_headers(series_key):
 def test_invalid_mode(header_series, tmp_path):
 
     with pytest.raises(ValueError, match="SeriesKey"):
-
         header_series.to_df("invalid")
 
     with pytest.raises(ValueError, match="SeriesKey"):
-
         header_series.to_netcdf(tmp_path, series_key="invalid")
 
 
 def test_pi_header_fields_and_qualifiers():
 
-    header = dict(
-        type="instantaneous",
-        locationId="L",
-        parameterId="P",
-        moduleInstanceId="M",
-        valueType="scalar",
-        timeSeriesType="external historical",
-        timeStep={"unit": "second", "multiplier": "1", "divider": "2"},
-        qualifierId=["a", "b"],
-        startDate={"date": "2024-01-01", "time": "00:00:00"},
-        endDate={"date": "2024-01-01", "time": "01:00:00"},
-    )
+    header = {
+        "type": "instantaneous",
+        "locationId": "L",
+        "parameterId": "P",
+        "moduleInstanceId": "M",
+        "valueType": "scalar",
+        "timeSeriesType": "external historical",
+        "timeStep": {"unit": "second", "multiplier": "1", "divider": "2"},
+        "qualifierId": ["a", "b"],
+        "startDate": {"date": "2024-01-01", "time": "00:00:00"},
+        "endDate": {"date": "2024-01-01", "time": "01:00:00"},
+    }
 
     parsed = Header.from_dict(header)
 
@@ -406,9 +368,7 @@ def test_cache_preserves_full_header_selection(header_series, tmp_path, series_k
 
 @pytest.mark.parametrize("series_key", ["location_parameter", SeriesKey.LOCATION_PARAMETER])
 def test_default_explicit_mode(header_series, series_key):
-    pd.testing.assert_frame_equal(
-        header_series.to_df(), header_series.to_df(series_key)
-    )
+    pd.testing.assert_frame_equal(header_series.to_df(), header_series.to_df(series_key))
 
 
 @pytest.mark.parametrize("series_key", ["header", SeriesKey.HEADER])
@@ -417,9 +377,7 @@ def test_api_passes_header_mode(monkeypatch, series_key):
     module = importlib.import_module("fewspy.api")
     captured = []
     monkeypatch.setattr(module, "validate_url", lambda url: (url, False))
-    monkeypatch.setattr(
-        module, "get_time_series_async", lambda **kwargs: captured.append(kwargs)
-    )
+    monkeypatch.setattr(module, "get_time_series_async", lambda **kwargs: captured.append(kwargs))
     api = Api("https://example.com/", ssl_verify=False)
     api.get_time_series("filter", parallel=True, series_key=series_key)
     assert captured[0]["series_key"] is SeriesKey.HEADER
@@ -445,9 +403,9 @@ def test_filename_escaping_and_unicode(header_series, tmp_path):
     path = next(tmp_path.glob("*.nc"))
     assert "%2F" in path.name
     restored = read_netcdf(path, series_key="header")
-    assert restored.time_series[0].header.series_identity(
+    assert restored.time_series[0].header.series_identity("header") == series.time_series[0].header.series_identity(
         "header"
-    ) == series.time_series[0].header.series_identity("header")
+    )
 
 
 def test_selected_dataframe_writer(header_series, tmp_path):
@@ -457,18 +415,13 @@ def test_selected_dataframe_writer(header_series, tmp_path):
     restored = TimeSeriesSet()
     for path in tmp_path.glob("*.nc"):
         restored.time_series.extend(read_netcdf(path, series_key="header").time_series)
-    assert {ts.header.series_identity("header") for ts in restored.time_series} == set(
-        selected.columns
-    )
+    assert {ts.header.series_identity("header") for ts in restored.time_series} == set(selected.columns)
 
 
 def test_missing_optional_identity_roundtrip(tmp_path):
     series = duplicate_series()
     series.to_netcdf(tmp_path, series_key="header")
-    restored = [
-        read_netcdf(p, series_key="header").time_series[0]
-        for p in tmp_path.glob("*.nc")
-    ]
+    restored = [read_netcdf(p, series_key="header").time_series[0] for p in tmp_path.glob("*.nc")]
     assert {ts.header.series_identity("header") for ts in restored} == {
         ts.header.series_identity("header") for ts in series.time_series
     }
@@ -483,9 +436,7 @@ def test_empty_header_set(tmp_path):
 
 
 def test_default_parquet_layout(tmp_path):
-    source = json.loads(
-        (Path(__file__).parent / "data/pi_time_series.json").read_text()
-    )
+    source = json.loads((Path(__file__).parent / "data/pi_time_series.json").read_text())
     series = TimeSeriesSet.from_dict(source)
     path = tmp_path / "default.parquet"
     series.to_parquet(path, include_header=True)
@@ -554,16 +505,12 @@ def test_archive_names_and_metadata(header_series, tmp_path, qualifiers, expecte
 def test_archive_timestep(header_series, tmp_path, step, token):
     ts = header_series.time_series[0]
     ts.header.time_step = step
-    TimeSeriesSet(time_series=[ts]).to_netcdf(
-        tmp_path, series_key="header", file_naming="archive"
-    )
+    TimeSeriesSet(time_series=[ts]).to_netcdf(tmp_path, series_key="header", file_naming="archive")
     assert (tmp_path / f"P_[]_{token}_scalar_M.nc").is_file()
 
 
 def test_archive_type_suffix_and_collision(header_series, tmp_path):
-    series = TimeSeriesSet(
-        time_series=[header_series.time_series[0], header_series.time_series[3]]
-    )
+    series = TimeSeriesSet(time_series=[header_series.time_series[0], header_series.time_series[3]])
     with pytest.raises(ValueError, match="collision"):
         series.to_netcdf(tmp_path, series_key="header", file_naming="archive")
     assert not list(tmp_path.iterdir())
@@ -588,15 +535,11 @@ def test_archive_qualifier_collision(header_series, tmp_path):
     with pytest.raises(ValueError, match="collision"):
         series.to_netcdf(tmp_path, series_key="header", file_naming="archive")
     assert not list(tmp_path.iterdir())
-    TimeSeriesSet(time_series=[first]).to_netcdf(
-        tmp_path, series_key="header", file_naming="archive"
-    )
+    TimeSeriesSet(time_series=[first]).to_netcdf(tmp_path, series_key="header", file_naming="archive")
     path = next(tmp_path.glob("*.nc"))
     before = path.read_bytes()
     with pytest.raises(ValueError, match="overwrite"):
-        TimeSeriesSet(time_series=[second]).to_netcdf(
-            tmp_path, series_key="header", file_naming="archive"
-        )
+        TimeSeriesSet(time_series=[second]).to_netcdf(tmp_path, series_key="header", file_naming="archive")
     assert path.read_bytes() == before
 
 
@@ -605,15 +548,11 @@ def test_archive_invalid_characters(header_series, tmp_path, bad):
     ts = header_series.time_series[0]
     ts.header.qualifier_id = [bad]
     with pytest.raises(ValueError, match="Invalid"):
-        TimeSeriesSet(time_series=[ts]).to_netcdf(
-            tmp_path, series_key="header", file_naming="archive"
-        )
+        TimeSeriesSet(time_series=[ts]).to_netcdf(tmp_path, series_key="header", file_naming="archive")
     assert not list(tmp_path.iterdir())
 
 
-@pytest.mark.parametrize(
-    "field", ["module_instance_id", "value_type", "time_series_type"]
-)
+@pytest.mark.parametrize("field", ["module_instance_id", "value_type", "time_series_type"])
 def test_archive_missing_optional_fields(header_series, tmp_path, field):
     ts = header_series.time_series[0]
     setattr(ts.header, field, None)
@@ -651,9 +590,7 @@ def test_archive_null_token_collision(header_series, tmp_path, field):
     assert not list(tmp_path.iterdir())
 
 
-@pytest.mark.parametrize(
-    "field", ["module_instance_id", "value_type", "time_series_type"]
-)
+@pytest.mark.parametrize("field", ["module_instance_id", "value_type", "time_series_type"])
 def test_archive_empty_optional_fields_rejected(header_series, tmp_path, field):
     ts = header_series.time_series[0]
     setattr(ts.header, field, "")
@@ -699,9 +636,7 @@ def test_archive_empty_qualifier_rejected(header_series, tmp_path):
     ts = header_series.time_series[0]
     ts.header.qualifier_id = [""]
     with pytest.raises(ValueError, match="requires nonempty"):
-        TimeSeriesSet(time_series=[ts]).to_netcdf(
-            tmp_path, series_key="header", file_naming="archive"
-        )
+        TimeSeriesSet(time_series=[ts]).to_netcdf(tmp_path, series_key="header", file_naming="archive")
     assert not list(tmp_path.iterdir())
 
 
@@ -735,10 +670,10 @@ def test_archive_literal_null_type_is_distinct(header_series, tmp_path, field):
     )
     paths = list(tmp_path.glob("*.nc"))
     assert len(paths) == 2
-    assert {
-        getattr(read_netcdf(path, series_key="header").time_series[0].header, field)
-        for path in paths
-    } == {None, "null"}
+    assert {getattr(read_netcdf(path, series_key="header").time_series[0].header, field) for path in paths} == {
+        None,
+        "null",
+    }
 
 
 def test_archive_omitted_value_type_collision(header_series, tmp_path):

@@ -2,12 +2,9 @@ import asyncio
 import logging
 import sys
 from datetime import datetime
-from typing import List, Union
 
 import aiohttp
 import pandas as pd
-import requests
-from aiohttp import ClientSession
 
 if sys.version_info >= (3, 14):
     import nest_asyncio2 as nest_asyncio
@@ -15,18 +12,14 @@ else:
     import nest_asyncio
 
 from fewspy.time_series import SeriesKey, TimeSeriesSet
-from fewspy.utils.timer import Timer
 from fewspy.utils.transformations import parameters_to_fews
-
 
 nest_asyncio.apply()
 
 LOGGER = logging.getLogger(__name__)
 
 
-def __result_async_to_time_series_set(
-    async_result, series_key: SeriesKey | str = SeriesKey.LOCATION_PARAMETER
-):
+def __result_async_to_time_series_set(async_result, series_key: SeriesKey | str = SeriesKey.LOCATION_PARAMETER):
     series_key = SeriesKey(series_key)
     if series_key == SeriesKey.HEADER:
         result = TimeSeriesSet()
@@ -38,22 +31,14 @@ def __result_async_to_time_series_set(
                 result.time_zone = part.time_zone
         return result
     time_series_set = TimeSeriesSet()
-    time_series_set_gen = (i for i in async_result if "timeSeries" if type(i) == dict)
-    time_series_set_list = [i for i in time_series_set_gen if "timeSeries" in i.keys()]
+    time_series_set_gen = (i for i in async_result if "timeSeries" if type(i) is dict)
+    time_series_set_list = [i for i in time_series_set_gen if "timeSeries" in i]
 
-    version = next((i for i in time_series_set_list if "version" in i.keys()), None)
+    version = next((i for i in time_series_set_list if "version" in i), None)
     if version is not None:
-        time_zone = next(
-            (i for i in time_series_set_list if "timeZone" in i.keys()), None
-        )
+        time_zone = next((i for i in time_series_set_list if "timeZone" in i), None)
         if time_zone is not None:
-            time_series = {
-                "timeSeries": [
-                    i["timeSeries"][0]
-                    for i in time_series_set_list
-                    if "timeSeries" in i.keys()
-                ]
-            }
+            time_series = {"timeSeries": [i["timeSeries"][0] for i in time_series_set_list if "timeSeries" in i]}
             pi_time_series = {**version, **time_zone, **time_series}
             time_series_set = TimeSeriesSet.from_dict(pi_time_series)
     return time_series_set
@@ -62,19 +47,19 @@ def __result_async_to_time_series_set(
 def get_time_series_async(
     url: str,
     filter_id: str,
-    location_ids: Union[str, List[str]] = None,
-    parameter_ids: Union[str, List[str]] = None,
-    qualifier_ids: Union[str, List[str]] = None,
-    start_time: datetime = None,
-    end_time: datetime = None,
-    thinning: int = None,
+    location_ids: str | list[str] | None = None,
+    parameter_ids: str | list[str] | None = None,
+    qualifier_ids: str | list[str] | None = None,
+    start_time: datetime | None = None,
+    end_time: datetime | None = None,
+    thinning: int | None = None,
     document_format: str = "PI_JSON",
     omit_missing: bool = True,
     verify: bool = False,
     logger=LOGGER,
     series_key: SeriesKey | str = SeriesKey.LOCATION_PARAMETER,
 ) -> pd.DataFrame:
-    """
+    """Retrieve FEWS time series concurrently.
 
     Args:
         url (str): url Delft-FEWS PI REST WebService.
@@ -95,12 +80,12 @@ def get_time_series_async(
         logger (logging.Logger, optional): Logger to pass logging to. By
         default, a logger will ge created.
 
-    Returns:
+    Returns
+    -------
         df (pandas.DataFrame): Pandas dataframe with index "id" and columns
         "name" and "group_id".
 
     """
-
     series_key = SeriesKey(series_key)
     parameters = parameters_to_fews(locals(), bool_to_string=True)
 
@@ -112,7 +97,7 @@ def get_time_series_async(
             asyncio.set_event_loop(loop)
         finally:
             loop.set_debug(True)
-            return loop
+            return loop  # noqa: B012 - Preserve existing exception/return behavior in this lint-only change.
 
     async def get_timeseries_async(location_id, parameter_id, qualifier_id, session):
         """Get timerseries using FEWS (asynchronously)"""
@@ -122,14 +107,10 @@ def get_time_series_async(
         if qualifier_id is not None:
             request_parameters["qualifierIds"] = qualifier_id
         try:
-            response = await session.request(
-                method="GET", url=url, params=request_parameters, ssl=verify
-            )
+            response = await session.request(method="GET", url=url, params=request_parameters, ssl=verify)
             response.raise_for_status()
         except Exception as err:
-            logger.error(
-                f"An error ocurred: {err} while executing url {url} with parameters {parameters}"
-            )
+            logger.error(f"An error ocurred: {err} while executing url {url} with parameters {parameters}")
             response = None
         response_json = await response.json()
         return response_json
@@ -137,9 +118,7 @@ def get_time_series_async(
     async def run_program(location_id, parameter_id, qualifier_id, session):
         """Wrapper for running program in an asynchronous manner"""
         try:
-            response = await get_timeseries_async(
-                location_id, parameter_id, qualifier_id, session
-            )
+            response = await get_timeseries_async(location_id, parameter_id, qualifier_id, session)
         except Exception as err:
             logger.error(f"Exception occured: {err}")
             response = None
@@ -148,17 +127,11 @@ def get_time_series_async(
 
     async def asynciee():
         async with aiohttp.ClientSession(loop=loop) as session:
-            args = [
-                (location_id, parameter_id)
-                for location_id in location_ids
-                for parameter_id in parameter_ids
-            ]
+            args = [(location_id, parameter_id) for location_id in location_ids for parameter_id in parameter_ids]
             if qualifier_ids is None:
                 args = [(*i, None) for i in args]
             else:
-                args = [
-                    (*i, qualifier_id) for i in args for qualifier_id in qualifier_ids
-                ]
+                args = [(*i, qualifier_id) for i in args for qualifier_id in qualifier_ids]
             fetch_all = [run_program(*i, session) for i in args]
             result_async = await asyncio.gather(*fetch_all)
             return result_async
@@ -166,7 +139,5 @@ def get_time_series_async(
     if __name__ == "fewspy.wrappers.get_time_series_async":
         loop = _get_loop()
         result_async = loop.run_until_complete(asynciee())
-        time_series_set = __result_async_to_time_series_set(
-            result_async, series_key=series_key
-        )
+        time_series_set = __result_async_to_time_series_set(result_async, series_key=series_key)
     return time_series_set

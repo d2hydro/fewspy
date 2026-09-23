@@ -4,7 +4,9 @@ import json
 import os
 import shutil
 from pathlib import Path
+
 from pydantic import BaseModel, field_validator
+
 from fewspy import __version__ as fewspy_version
 from fewspy.time_series import TimeSeriesSet
 
@@ -50,9 +52,7 @@ class Coverage(BaseModel):
             raise ValueError("end_date must be after start_date")
         return v
 
-    def update_coverage(
-        self, start_date: datetime.datetime, end_date: datetime.datetime
-    ):
+    def update_coverage(self, start_date: datetime.datetime, end_date: datetime.datetime):
         """Udate coverage start_date and end_date if the provided times are outside the current
 
         Parameters
@@ -62,23 +62,16 @@ class Coverage(BaseModel):
         end_date : datetime.datetime
             new end time to check
         """
-
         # update start_date if provided start_date is earlier or current is None
-        if self.start_date is None:
-            self.start_date = start_date
-        elif start_date < self.start_date:
+        if self.start_date is None or start_date < self.start_date:
             self.start_date = start_date
         # update end_date if provided end_date is later or current is None
-        if self.end_date is None:
-            self.end_date = end_date
-        elif end_date > self.end_date:
+        if self.end_date is None or end_date > self.end_date:
             self.end_date = end_date
 
     def update_coverage_from_timeserieset(self, tss: TimeSeriesSet):
         for ts in tss.time_series:
-            self.update_coverage(
-                start_date=ts.header.start_date, end_date=ts.header.end_date
-            )
+            self.update_coverage(start_date=ts.header.start_date, end_date=ts.header.end_date)
 
 
 class Manifest(BaseModel):
@@ -108,7 +101,7 @@ class Manifest(BaseModel):
 
     @classmethod
     def from_file(cls, filepath: Path, **kwargs) -> "Manifest":
-        with open(filepath, "r", encoding="utf-8") as f:
+        with Path(filepath).open(encoding="utf-8") as f:
             json_data = json.load(f)
             for k, v in kwargs.items():
                 json_data[k] = v
@@ -118,9 +111,7 @@ class Manifest(BaseModel):
             return manifest
 
     def update_filepaths(self, filepath: Path):
-        """
-        Update filepath, cache_dirs and files paths to a new filepath location.
-        """
+        """Update filepath, cache_dirs and files paths to a new filepath location."""
         # Update manifest filepath
         self.filepath = filepath
 
@@ -135,12 +126,9 @@ class Manifest(BaseModel):
 
     def validate_files(self):
         """Validate file cache on expected number of files, filex existence, size and hash"""
-
         # Validate that the number of files matches the expected count
         if len(self.files) != self.expected_file_count:
-            raise ValueError(
-                f"Expected {self.expected_file_count} files, but got {len(self.files)}"
-            )
+            raise ValueError(f"Expected {self.expected_file_count} files, but got {len(self.files)}")
 
         # Validate each file's existence, size, and hash
         errors = []
@@ -152,16 +140,12 @@ class Manifest(BaseModel):
             # Check file size
             actual_size = file_entry.path.stat().st_size
             if actual_size != file_entry.nbytes:
-                errors.append(
-                    f"Size mismatch for {file_entry.path}: expected {file_entry.nbytes}, got {actual_size}"
-                )
+                errors.append(f"Size mismatch for {file_entry.path}: expected {file_entry.nbytes}, got {actual_size}")
                 continue
             # Check file hash
             actual_hash = FieldEndtry._sha256(file_entry.path)
             if actual_hash != file_entry.sha256:
-                errors.append(
-                    f"Hash mismatch for {file_entry.path}: expected {file_entry.sha256}, got {actual_hash}"
-                )
+                errors.append(f"Hash mismatch for {file_entry.path}: expected {file_entry.sha256}, got {actual_hash}")
         if errors:
             raise ValueError("File validation errors:\n" + "\n".join(errors))
 
@@ -181,18 +165,11 @@ class Manifest(BaseModel):
             The matching FieldEndtry if found. Otherwise, raises a ValueError.
         """
         entry = next(
-            (
-                i
-                for i in self.files
-                if (i.path.name == f"{parameter_id}.nc")
-                and (i.path.parent.name == filter_id)
-            ),
+            (i for i in self.files if (i.path.name == f"{parameter_id}.nc") and (i.path.parent.name == filter_id)),
             None,
         )
         if entry is None:
-            raise ValueError(
-                f"No entry found for filter_id '{filter_id}' and parameter_id '{parameter_id}'"
-            )
+            raise ValueError(f"No entry found for filter_id '{filter_id}' and parameter_id '{parameter_id}'")
 
         return entry
 
@@ -203,9 +180,7 @@ class Manifest(BaseModel):
         current_cache_dir = self.current_cache_dir
         root_dir = current_cache_dir.parent
         remove_candidates = [
-            d
-            for d in root_dir.glob("*")
-            if d.is_dir() and (d != current_cache_dir) and (d not in self.cache_dirs)
+            d for d in root_dir.glob("*") if d.is_dir() and (d != current_cache_dir) and (d not in self.cache_dirs)
         ]  # make sure we don't do current cache
         for i in remove_candidates:
             if i is not self.current_cache_dir:  # extra check
@@ -213,10 +188,7 @@ class Manifest(BaseModel):
 
     def update_cache_dirs(self):
         """Update cache_dirs list with current_cache_dir if not already present"""
-        if (
-            self.current_cache_dir is not None
-            and self.current_cache_dir not in self.cache_dirs
-        ):
+        if self.current_cache_dir is not None and self.current_cache_dir not in self.cache_dirs:
             self.cache_dirs.append(self.current_cache_dir)
 
         self.cache_dirs = sorted(self.cache_dirs, reverse=True)[: self.max_cache_count]
@@ -231,7 +203,6 @@ class Manifest(BaseModel):
         clean_old_caches : bool, optional
             If True (default) clean old cache directories, by default True
         """
-
         # store filepath
         self.filepath = filepath
         tmp_filepath = filepath.with_name(f".{filepath.stem}.tmp.json")
@@ -243,11 +214,11 @@ class Manifest(BaseModel):
         self.update_cache_dirs()
 
         # atomic write data
-        with open(tmp_filepath, "w", encoding="utf-8") as f:
+        with tmp_filepath.open("w", encoding="utf-8") as f:
             f.write(self.model_dump_json(indent=2))
             f.flush()  # Python to kernel
             os.fsync(f.fileno())  # Ensure data is written to disk
-        os.replace(tmp_filepath, filepath)  # atomic replace
+        tmp_filepath.replace(filepath)  # atomic replace
 
         # clean old cache dirs
         if clean_old_caches:

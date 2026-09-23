@@ -1,23 +1,27 @@
-#%%
-from pathlib import Path
-import pickle
+# %%
 import os
+import pickle
+from pathlib import Path
 
 from TWINpy.app.TWIN_get_timeseries import TWIN_Timeserie
 
+from fewspy.time_series import Events, Header, TimeSeries, TimeSeriesSet
 
 data_dir = Path(__file__).parent / "data"
 os.environ["TWIN_BASE_URL"] = ""
 
-with open(data_dir / "twin_response.pickle", "rb") as src:
-    b = pickle.load(src)
+with (data_dir / "twin_response.pickle").open("rb") as src:
+    b = pickle.load(src)  # noqa: S301 - Trusted local conversion fixture.
 # df = pd.read_pickle(data_dir / "twin_response.pickle")
 
 
-#%%
-from fewspy.time_series import TimeSeries, TimeSeriesSet, Header, Events
+# %%
 
-def convert_timeseries(time_series:TWIN_Timeserie, header_info: dict = {"type": "instantaneous", "time_step": {"unit": "nonequidistant"}}) -> TimeSeries:
+
+def convert_timeseries(
+    time_series: TWIN_Timeserie,
+    header_info: dict = {"type": "instantaneous", "time_step": {"unit": "nonequidistant"}},  # noqa: B006 - Preserve the existing read-only API default.
+) -> TimeSeries:
     """Converts TWIN_Timeserie to fewspy.TimeSeriesSet
 
     Parameters
@@ -37,7 +41,8 @@ def convert_timeseries(time_series:TWIN_Timeserie, header_info: dict = {"type": 
     header["end_date"] = time_series.df.index.min()
 
     return TimeSeries(header=Header(**header), events=Events(time_series.df))
- 
-time_series_set = TimeSeriesSet(time_series = [convert_timeseries(i) for i in b.values()])
+
+
+time_series_set = TimeSeriesSet(time_series=[convert_timeseries(i) for i in b.values()])
 time_series_set.to_netcdf(out_dir=Path("netcdf"))
 # %%

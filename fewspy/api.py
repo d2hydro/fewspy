@@ -15,12 +15,12 @@ from fewspy.time_series import SeriesKey
 from fewspy.utils.timer import Timer
 from fewspy.utils.url import validate_url
 from fewspy.wrappers import (
-    get_time_series_async,
+    get_filters,
+    get_locations,
+    get_parameters,
     get_qualifiers,
     get_time_series,
-    get_locations,
-    get_filters,
-    get_parameters,
+    get_time_series_async,
     get_timezone_id,
 )
 
@@ -57,11 +57,11 @@ class Api:
     def __kwargs(self, url_post_fix: str, kwargs: dict) -> dict:
         kwargs = {
             **kwargs,
-            **dict(
-                url=f"{self.url}{url_post_fix}",
-                verify=self.ssl_verify,
-                logger=self.logger,
-            ),
+            **{
+                "url": f"{self.url}{url_post_fix}",
+                "verify": self.ssl_verify,
+                "logger": self.logger,
+            },
         }
         kwargs.pop("self")
         kwargs.pop("parallel", None)
@@ -74,12 +74,12 @@ class Api:
         Args:
             filter_id (str): the FEWS id of the filter to pass as request parameter
 
-        Returns:
+        Returns
+        -------
             df (pandas.DataFrame): Pandas dataframe with index "id" and columns
             "name" and "group_id".
 
         """
-
         kwargs = self.__kwargs(url_post_fix="parameters", kwargs=locals())
         result = get_parameters(**kwargs)
 
@@ -93,12 +93,12 @@ class Api:
             E.g. http://localhost:8080/FewsWebServices/rest/fewspiservice/v1/qualifiers
             filter_id (str): the FEWS id of the filter to pass as request parameter
 
-        Returns:
+        Returns
+        -------
             df (pandas.DataFrame): Pandas dataframe with index "id" and columns
             "name" and "group_id".
 
         """
-
         kwargs = self.__kwargs(url_post_fix="filters", kwargs=locals())
         result = get_filters(**kwargs)
 
@@ -107,7 +107,7 @@ class Api:
     def get_locations(
         self,
         filter_id=None,
-        attributes=[],
+        attributes=[],  # noqa: B006 - Preserve the existing read-only API default.
         remove_duplicates=False,
         document_format: Literal["PI_JSON", "GEO_JSON"] = "GEO_JSON",
     ):
@@ -120,11 +120,11 @@ class Api:
             remove_duplicates (bool): if True, duplicated location_ids are removed. Default = False
             document_format (Literal["PI_JSON", "GEO_JSON"]): request document format to return. Supports "GEO_JSON" and "PI_JSON". Defaults to "GEO_JSON".
 
-        Returns:
+        Returns
+        -------
             gdf (geopandas.GeoDataFrame): GeoDataFrame with index "location_id".
 
         """
-
         kwargs = self.__kwargs(url_post_fix="locations", kwargs=locals())
         result = get_locations(**kwargs)
 
@@ -134,7 +134,8 @@ class Api:
         """
         Get FEWS qualifiers as Pandas DataFrame
 
-        Returns:
+        Returns
+        -------
             df (pandas.DataFrame): Pandas dataframe with index "id" and columns
             "name" and "group_id".
 
@@ -147,7 +148,8 @@ class Api:
         """
         Get FEWS timezone_id
 
-        Returns:
+        Returns
+        -------
             str: timezone id FEWS API is running on
 
         """
@@ -190,7 +192,8 @@ class Api:
                 preserves all series returned by asynchronous requests.
             parallel (bool): if True, timeseries are requested by the asynchronous wrapper. Defaults to False
 
-        Returns:
+        Returns
+        -------
             df (pandas.DataFrame): Pandas dataframe with index "id" and columns
             "name" and "group_id".
 
@@ -198,9 +201,7 @@ class Api:
         series_key = SeriesKey(series_key)
         kwargs = self.__kwargs(url_post_fix="timeseries", kwargs=locals())
         if (self.document_format != "PI_JSON") and parallel:
-            self.logger.warning(
-                "Wont run parallel, as this is only supported for documentFromat PI_JSON"
-            )
+            self.logger.warning("Wont run parallel, as this is only supported for documentFromat PI_JSON")
             parallel = False
         if parallel:
             kwargs.pop("only_headers")

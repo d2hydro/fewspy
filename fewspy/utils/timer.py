@@ -3,7 +3,7 @@
 import time
 
 
-class Timer(object):
+class Timer:
     """Record function efficiency."""
 
     def __init__(self, logger):

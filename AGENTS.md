@@ -25,5 +25,6 @@ For code changes:
 * Test edge cases relevant to FEWS responses and metadata.
 * Keep changes scoped to the requested functionality; avoid unrelated refactoring.
 * Update documentation when the public API or user-visible behaviour changes.
+* Before completing a change, run `pixi run lint` (pre-commit on all files), fix all reported issues, and run the relevant tests. Ruff's `PLC0415` rule rejects imports inside functions and classes; version-dependent imports at module scope remain allowed.
 
 Use the repository configuration as the source of truth for environments, dependencies, formatting, linting and test commands.

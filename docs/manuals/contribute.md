@@ -9,12 +9,33 @@ In the remainder of this manual we assume you:
 Code-contributions can enter the main branch if:
 
 1. they are provided with docstring documentation
-2. are passing Flakes tests an Black styling
+2. pass the Ruff lint and formatting pre-commit hooks
 3. are covered Pytest
 
 ## Installation for development
 
 To setup your development environment follow the instructions at [Installation for development](installation.md#installation-for-development)
+
+Install the Pixi environment and enable the Git hooks once per clone:
+
+```console
+pixi install --locked
+pixi run pre-commit install
+```
+
+Before completing a change, run `pixi run lint` to run pre-commit on all tracked
+Python files and notebooks, then run the relevant tests (`pixi run tests` for
+the full suite). Hooks can modify files; review their edits and rerun until they
+pass. CI runs the same pre-commit command.
+
+Ruff is adapted to fewspy's Python 3.10 minimum,
+120-character lines, and tests' use of assertions and subprocesses. `PLC0415`
+rejects imports inside functions and classes; `E402` checks import placement at
+module level, and `I` checks ordering. Conditional module-level imports for Python
+compatibility remain allowed. Narrow, commented `noqa` exceptions retain existing
+request timeout/TLS behavior, XML parsing, read-only public mutable defaults,
+legacy event-loop exception handling, and trusted pickle fixtures. These behaviors
+are deliberately not changed as part of adopting linting.
 
 ## Package dependency validation
 

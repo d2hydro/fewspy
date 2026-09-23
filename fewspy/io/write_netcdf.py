@@ -11,13 +11,9 @@ from netCDF4 import Dataset, date2num
 from fewspy._header import HEADER_KEY_FIELDS, Header, SeriesKey, canonical_json
 
 
-def _datetimeindex_to_nc_time(
-    idx: pd.DatetimeIndex, units="seconds since 1970-01-01 00:00:00 UTC"
-):
+def _datetimeindex_to_nc_time(idx: pd.DatetimeIndex, units="seconds since 1970-01-01 00:00:00 UTC"):
     # netCDF4.date2num expects naive datetimes + units/tz in string;
-    py_dt = [
-        d.to_pydatetime().replace(tzinfo=timezone.utc).replace(tzinfo=None) for d in idx
-    ]
+    py_dt = [d.to_pydatetime().replace(tzinfo=timezone.utc).replace(tzinfo=None) for d in idx]
     return date2num(py_dt, units=units), units
 
 
@@ -63,22 +59,16 @@ def _archive_identity(header, include_time_series_type):
     return "_".join("null" if part is None else part for part in parts)
 
 
-def _header_groups(
-    df, file_template, file_naming="default", include_time_series_type=False
-):
+def _header_groups(df, file_template, file_naming="default", include_time_series_type=False):
     if list(df.columns.names) != HEADER_KEY_FIELDS:
-        raise ValueError(
-            "Header mode requires the full header MultiIndex from to_df(series_key='header')"
-        )
+        raise ValueError("Header mode requires the full header MultiIndex from to_df(series_key='header')")
     metadata = [Header.from_json(value) for value in df.attrs.get("fewspy_headers", [])]
     by_key = {header.series_identity(SeriesKey.HEADER): header for header in metadata}
     headers = []
     for column in df.columns:
         key = tuple(None if pd.isna(value) else value for value in column)
         if key not in by_key:
-            raise ValueError(
-                "DataFrame identity has no matching fewspy_headers metadata"
-            )
+            raise ValueError("DataFrame identity has no matching fewspy_headers metadata")
         headers.append(by_key[key])
     if df.columns.has_duplicates:
         raise ValueError("Duplicate full header identities cannot be written to NetCDF")
@@ -103,16 +93,10 @@ def _header_groups(
         identity = "_".join(quote(canonical_json(value), safe="") for value in parts)
         if file_naming == "archive":
             identity = _archive_identity(header, include_time_series_type)
-        template = (
-            "{identity}.nc" if file_template == "{parameter_id}.nc" else file_template
-        )
+        template = "{identity}.nc" if file_template == "{parameter_id}.nc" else file_template
         filename = template.format(
             identity=identity,
-            parameter_id=(
-                header.parameter_id
-                if file_naming == "archive"
-                else quote(header.parameter_id, safe="")
-            ),
+            parameter_id=(header.parameter_id if file_naming == "archive" else quote(header.parameter_id, safe="")),
         )
         if (
             Path(filename).name != filename
@@ -130,9 +114,7 @@ def _header_groups(
             or filename.endswith((".", " "))
             or len(filename.encode("utf-8")) > 240
         ):
-            raise ValueError(
-                "Invalid or overlong NetCDF filename; shorten the header identifiers or file_template"
-            )
+            raise ValueError("Invalid or overlong NetCDF filename; shorten the header identifiers or file_template")
         if filename.casefold() in filenames:
             raise ValueError(
                 "NetCDF filename collision: use a unique template or include_time_series_type=True; check qualifier separators"
@@ -152,7 +134,7 @@ def _header_groups(
 def write_netcdf(
     df: pd.DataFrame,
     out_dir: Path,
-    global_attributes: dict = {"source": "fewspy"},
+    global_attributes: dict = {"source": "fewspy"},  # noqa: B006 - Preserve the existing read-only API default.
     file_template: str = "{parameter_id}.nc",
     remove_dir: bool = False,
     series_key: SeriesKey | str = SeriesKey.LOCATION_PARAMETER,
@@ -174,32 +156,23 @@ def write_netcdf(
         file_template (str, optional): _description_. Defaults to "{parameter_id}.nc".
         remove_dir (bool, optional): If True, removes the output directory before writing. Defaults to False.
     """
-
     series_key = SeriesKey(series_key)
     _validate_file_naming(series_key, file_naming, include_time_series_type)
     if series_key == SeriesKey.HEADER:
-        groups = _header_groups(
-            df, file_template, file_naming, include_time_series_type
-        )
+        groups = _header_groups(df, file_template, file_naming, include_time_series_type)
         # Validate against existing files before changing anything.
         if not remove_dir:
             for _, _, filename, headers in groups:
                 path = out_dir / filename
                 if path.exists():
                     with Dataset(path) as existing:
-                        if getattr(existing, "fewspy_headers", None) != json.dumps(
-                            headers
-                        ):
-                            raise ValueError(
-                                f"Refusing to overwrite different headers in {path}"
-                            )
+                        if getattr(existing, "fewspy_headers", None) != json.dumps(headers):
+                            raise ValueError(f"Refusing to overwrite different headers in {path}")
     else:
         groups = [
             (
                 parameter,
-                df.loc[:, df.columns.get_level_values(1) == parameter].dropna(
-                    how="all"
-                ),
+                df.loc[:, df.columns.get_level_values(1) == parameter].dropna(how="all"),
                 file_template.format(parameter_id=parameter),
                 None,
             )
@@ -217,14 +190,8 @@ def write_netcdf(
         values = dfp.to_numpy(dtype=float)
 
         # prepare dimensions
-        location_ids = dfp.columns.get_level_values(
-            "location_id" if headers else 0
-        ).to_list()
-        strlen = (
-            max(len(s.encode("utf-8")) for s in location_ids)
-            if headers
-            else max(len(s) for s in location_ids)
-        )
+        location_ids = dfp.columns.get_level_values("location_id" if headers else 0).to_list()
+        strlen = max(len(s.encode("utf-8")) for s in location_ids) if headers else max(len(s) for s in location_ids)
         time_vals, time_units = _datetimeindex_to_nc_time(dfp.index)
 
         # create netCDF file
@@ -247,9 +214,7 @@ def write_netcdf(
 
             # variables: station
 
-            vstation = nc.createVariable(
-                "station_id", "S1", ("stations", "char_leng_id")
-            )
+            vstation = nc.createVariable("station_id", "S1", ("stations", "char_leng_id"))
             vstation.long_name = "station identification code"
             vstation.cf_role = "timeseries_id"
 
@@ -262,7 +227,7 @@ def write_netcdf(
             vstation[:, :] = data
 
             # compression and chunks
-            compression_args = dict(zlib=True, complevel=4, shuffle=True)
+            compression_args = {"zlib": True, "complevel": 4, "shuffle": True}
             chunks = (max(1, min(max(n_time // 10, 1), n_time)), min(n_stations, 128))
 
             vval = nc.createVariable(

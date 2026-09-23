@@ -1,6 +1,5 @@
 import logging
 from datetime import datetime
-from typing import List, Union
 
 import pandas as pd
 import requests
@@ -24,12 +23,12 @@ def _ts_or_headers(only_headers=False):
 def get_time_series(
     url: str,
     filter_id: str,
-    location_ids: Union[str, List[str]] = None,
-    parameter_ids: Union[str, List[str]] = None,
-    qualifier_ids: Union[str, List[str]] = None,
-    start_time: datetime = None,
-    end_time: datetime = None,
-    thinning: int = None,
+    location_ids: str | list[str] | None = None,
+    parameter_ids: str | list[str] | None = None,
+    qualifier_ids: str | list[str] | None = None,
+    start_time: datetime | None = None,
+    end_time: datetime | None = None,
+    thinning: int | None = None,
     only_headers: bool = False,
     omit_missing: bool = True,
     show_statistics: bool = False,
@@ -62,7 +61,8 @@ def get_time_series(
         logger (logging.Logger, optional): Logger to pass logging to. By
         default, a logger will ge created.
 
-    Returns:
+    Returns
+    -------
         df (pandas.DataFrame): Pandas dataframe with index "id" and columns
         "name" and "group_id".
 
@@ -73,7 +73,7 @@ def get_time_series(
     # do the request
     timer = Timer(logger)
     parameters = parameters_to_fews(locals())
-    response = requests.get(url, parameters, verify=verify)
+    response = requests.get(url, parameters, verify=verify)  # noqa: S113 - Preserve existing request timeout/TLS behavior.
     timer.report(report_string.format(status="request"))
 
     # parse the response
@@ -85,9 +85,7 @@ def get_time_series(
         elif document_format == "PI_XML":
             time_series_set = read_xml_from_string(response.text)
         elif document_format == "PI_NETCDF":
-            time_series_set = read_netcdf_from_content(
-                response.content, series_key=series_key
-            )
+            time_series_set = read_netcdf_from_content(response.content, series_key=series_key)
         timer.report(report_string.format(status="parsed"))
         if time_series_set.empty:
             logger.debug(f"FEWS WebService request passing empty set: {response.url}")

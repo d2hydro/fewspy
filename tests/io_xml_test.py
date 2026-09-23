@@ -1,6 +1,7 @@
 # %%
-import fewspy
 import pytest
+
+import fewspy
 
 EXPECTED_LOCATION_IDS = sorted(["CMB_03751-21", "CMB_6100-04"])
 EXPECTED_PARAMETER_IDS = ["vullingsgraad"]
@@ -43,9 +44,7 @@ def test_xml_ts(xml_ts):
     assert xml_ts.time_series[0].header.end_date >= expected_end_date
 
     # xcheck interval
-    expected_time_step = (
-        (expected_end_date - expected_start_date) / (len(xml_ts.time_series[0]) - 1)
-    ).total_seconds()
+    expected_time_step = ((expected_end_date - expected_start_date) / (len(xml_ts.time_series[0]) - 1)).total_seconds()
 
     assert xml_ts.time_series[0].header.time_step["multiplier"] == expected_time_step
 
@@ -56,7 +55,6 @@ def test_xml_ts(xml_ts):
 
 def test_json_ts(xml_ts, json_ts):
     """Check json time-series to xml-timeseries
-
 
     With FEWS API a sightly different header with documentFormat=PI_XML and documentFormat=PI_JSON are returned
         - start_date in JSON is request start_data in XML first available data
@@ -71,29 +69,13 @@ def test_json_ts(xml_ts, json_ts):
     # headers
     ignore_keys = ["start_date", "z"]
 
-    json_header = {
-        k: v
-        for k, v in json_ts.time_series[0].header.__dict__.items()
-        if k not in ignore_keys
-    }
-    xml_header = {
-        k: v
-        for k, v in xml_ts.time_series[0].header.__dict__.items()
-        if k not in ignore_keys
-    }
+    json_header = {k: v for k, v in json_ts.time_series[0].header.__dict__.items() if k not in ignore_keys}
+    xml_header = {k: v for k, v in xml_ts.time_series[0].header.__dict__.items() if k not in ignore_keys}
 
     assert json_header == xml_header
 
-    json_header = {
-        k: v
-        for k, v in json_ts.time_series[1].header.__dict__.items()
-        if k not in ignore_keys
-    }
-    xml_header = {
-        k: v
-        for k, v in xml_ts.time_series[1].header.__dict__.items()
-        if k not in ignore_keys
-    }
+    json_header = {k: v for k, v in json_ts.time_series[1].header.__dict__.items() if k not in ignore_keys}
+    xml_header = {k: v for k, v in xml_ts.time_series[1].header.__dict__.items() if k not in ignore_keys}
 
     assert json_header == xml_header
 
@@ -105,7 +87,6 @@ def test_json_ts(xml_ts, json_ts):
 def test_netcdf_ts(xml_ts, nc_file):
     """Check json time-series to xml-timeseries
 
-
     With NetCDF does not contain version-info. TimeZone will always be 0 (GMT) Per header is also doen't contain:
         - type
         - module_instance_id
@@ -115,58 +96,31 @@ def test_netcdf_ts(xml_ts, nc_file):
 
     Therefore we don't compare these info
     """
-    nc_ts = fewspy.read_netcdf(
-        nc_file, time_series_type="instantaneous", module_instance_id="Vullingsgraad"
-    )
+    nc_ts = fewspy.read_netcdf(nc_file, time_series_type="instantaneous", module_instance_id="Vullingsgraad")
 
     assert nc_ts.time_zone == 0.0
     # headers
     ignore_keys = ["type", "module_instance_id", "z", "start_date", "end_date"]
 
-    nc_header = {
-        k: v
-        for k, v in nc_ts.time_series[0].header.__dict__.items()
-        if k not in ignore_keys
-    }
+    nc_header = {k: v for k, v in nc_ts.time_series[0].header.__dict__.items() if k not in ignore_keys}
 
-    xml_header = {
-        k: v
-        for k, v in xml_ts.time_series[0].header.__dict__.items()
-        if k not in ignore_keys
-    }
+    xml_header = {k: v for k, v in xml_ts.time_series[0].header.__dict__.items() if k not in ignore_keys}
 
     assert nc_header == xml_header
 
-    nc_header = {
-        k: v
-        for k, v in nc_ts.time_series[1].header.__dict__.items()
-        if k not in ignore_keys
-    }
+    nc_header = {k: v for k, v in nc_ts.time_series[1].header.__dict__.items() if k not in ignore_keys}
 
-    xml_header = {
-        k: v
-        for k, v in xml_ts.time_series[1].header.__dict__.items()
-        if k not in ignore_keys
-    }
+    xml_header = {k: v for k, v in xml_ts.time_series[1].header.__dict__.items() if k not in ignore_keys}
 
     assert nc_header == xml_header
 
     # events
-    assert (
-        nc_ts.time_series[0]
-        .events[["value"]]
-        .equals(xml_ts.time_series[0].events[["value"]])
-    )
-    assert (
-        nc_ts.time_series[1]
-        .events[["value"]]
-        .equals(xml_ts.time_series[1].events[["value"]])
-    )
+    assert nc_ts.time_series[0].events[["value"]].equals(xml_ts.time_series[0].events[["value"]])
+    assert nc_ts.time_series[1].events[["value"]].equals(xml_ts.time_series[1].events[["value"]])
 
 
 def test_parquet_ts(tmp_path, xml_ts):
     """Check json time-series to xml-timeseries
-
 
     With NetCDF does not contain version-info. TimeZone will always be 0 (GMT) Per header is also doen't contain:
         - type
@@ -177,7 +131,6 @@ def test_parquet_ts(tmp_path, xml_ts):
 
     Therefore we don't compare these info
     """
-
     # make sure parquet-file does not exist
     parquet_file = tmp_path.joinpath("io", "sample.parquet")
     parquet_file.unlink(missing_ok=True)
@@ -195,42 +148,18 @@ def test_parquet_ts(tmp_path, xml_ts):
     # headers
     ignore_keys = []
 
-    parquet_header = {
-        k: v
-        for k, v in parquet_ts.time_series[0].header.__dict__.items()
-        if k not in ignore_keys
-    }
+    parquet_header = {k: v for k, v in parquet_ts.time_series[0].header.__dict__.items() if k not in ignore_keys}
 
-    xml_header = {
-        k: v
-        for k, v in xml_ts.time_series[0].header.__dict__.items()
-        if k not in ignore_keys
-    }
+    xml_header = {k: v for k, v in xml_ts.time_series[0].header.__dict__.items() if k not in ignore_keys}
 
     assert parquet_header == xml_header
 
-    parquet_header = {
-        k: v
-        for k, v in parquet_ts.time_series[1].header.__dict__.items()
-        if k not in ignore_keys
-    }
+    parquet_header = {k: v for k, v in parquet_ts.time_series[1].header.__dict__.items() if k not in ignore_keys}
 
-    xml_header = {
-        k: v
-        for k, v in xml_ts.time_series[1].header.__dict__.items()
-        if k not in ignore_keys
-    }
+    xml_header = {k: v for k, v in xml_ts.time_series[1].header.__dict__.items() if k not in ignore_keys}
 
     assert parquet_header == xml_header
 
     # events
-    assert (
-        parquet_ts.time_series[0]
-        .events[["value"]]
-        .equals(xml_ts.time_series[0].events[["value"]])
-    )
-    assert (
-        parquet_ts.time_series[1]
-        .events[["value"]]
-        .equals(xml_ts.time_series[1].events[["value"]])
-    )
+    assert parquet_ts.time_series[0].events[["value"]].equals(xml_ts.time_series[0].events[["value"]])
+    assert parquet_ts.time_series[1].events[["value"]].equals(xml_ts.time_series[1].events[["value"]])

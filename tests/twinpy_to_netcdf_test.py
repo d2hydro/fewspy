@@ -1,8 +1,8 @@
 # %%
-from fewspy.time_series import TimeSeriesSet
 import pickle
 from pathlib import Path
 
+from fewspy.time_series import TimeSeriesSet
 
 DATA_PATH = Path(__file__).parent / "data"
 twinpy_tss = DATA_PATH.joinpath("io", "twin_fewspy_ts.pickle")
@@ -12,8 +12,8 @@ tmpdir = DATA_PATH.joinpath("twinpy_to_netcdf")
 def test_twinpy(tmpdir):
 
     # open pickle
-    with open(twinpy_tss, "rb") as src:
-        time_series_set: TimeSeriesSet = pickle.load(src)
+    with twinpy_tss.open("rb") as src:
+        time_series_set: TimeSeriesSet = pickle.load(src)  # noqa: S301 - Trusted repository fixture.
 
     # to_netcdf settings
     out_dir = Path(tmpdir).joinpath("twinpy_to_netcdf")

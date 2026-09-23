@@ -5,7 +5,7 @@ import warnings
 from dataclasses import asdict
 from datetime import datetime
 from enum import Enum
-from typing import List, Literal
+from typing import Literal
 
 from pydantic import ConfigDict
 from pydantic.dataclasses import dataclass
@@ -70,13 +70,11 @@ class Header:
     units: str | None = None
     station_name: str | None = None
     z: float | None = None
-    qualifier_id: List[str] | None = None
+    qualifier_id: list[str] | None = None
     value_type: str | None = None
     time_series_type: str | None = None
 
-    def series_identity(
-        self, series_key: SeriesKey | str = SeriesKey.LOCATION_PARAMETER
-    ) -> tuple:
+    def series_identity(self, series_key: SeriesKey | str = SeriesKey.LOCATION_PARAMETER) -> tuple:
         """Hashable FEWS identity; nested fields use unambiguous canonical JSON.
 
         Qualifier order is retained, as in the PI header. None and [] both mean
@@ -104,9 +102,7 @@ class Header:
 
     @classmethod
     def from_pi_header(cls, pi_header: dict) -> "Header":
-        warnings.warn(
-            "from_pi_header is depricated, use from_dict instead.", DeprecationWarning
-        )
+        warnings.warn("from_pi_header is depricated, use from_dict instead.", DeprecationWarning, stacklevel=1)
         return cls.from_dict(pi_header=pi_header)
 
     @classmethod
@@ -117,7 +113,8 @@ class Header:
         Args:
             pi_header (dict): FEWS PI header as dictionary
 
-        Returns:
+        Returns
+        -------
             Header: FEWS-PI header-style dataclass
 
         """
@@ -129,13 +126,9 @@ class Header:
             elif k in FLOAT_KEYS:
                 v = float(v)
             elif k in STRING_KEYS:
-                if v == "None":
-                    v = None
-                else:
-                    v = str(v)
-            elif k == "time_step":
-                if "multiplier" in v.keys():
-                    v["multiplier"] = float(v["multiplier"])
+                v = None if v == "None" else str(v)
+            elif k == "time_step" and "multiplier" in v:
+                v["multiplier"] = float(v["multiplier"])
             return k, v
 
         args = (_convert_kv(k, v) for k, v in pi_header.items())

@@ -34,9 +34,7 @@ def test_enum_string_compatibility(mode):
         lambda key, path: Api.get_time_series(None, "filter", series_key=key),
         lambda key, path: get_time_series("", "filter", series_key=key),
         lambda key, path: get_time_series_async("", "filter", series_key=key),
-        lambda key, path: TimeSeriesCache.get_time_series(
-            None, "filter", "parameter", series_key=key
-        ),
+        lambda key, path: TimeSeriesCache.get_time_series(None, "filter", "parameter", series_key=key),
     ],
 )
 def test_invalid_mode_rejected_before_io(entry_point, invalid, tmp_path):
