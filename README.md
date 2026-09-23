@@ -21,22 +21,14 @@ Fewspy is build for speed; time-series requests are handled asynchronous, giving
 
 Fewspy supports Python 3.10–3.14.
 
-Fewspy can be installed with pip in any environment with the following Python-packages properly installed:
+Install Fewspy in your Python environment:
 
-* requests
-* aiohttp
-* nest-asyncio (Python <3.14) or nest-asyncio2 (Python 3.14)
-* pandas
-* geopandas
+```console
+python -m pip install fewspy
+```
 
-In that activated environment you can add fewspy via pip by:
-```
-pip install fewspy
-```
-We recommend to build your environment using [Anaconda](https://www.anaconda.com/). You can build an environment ánd install fewspy by conda in one go using this <a href="https://github.com/d2hydro/fewspy/blob/main/envs/environment.yml" target="_blank">environment.yml</a> from the command-line:
-```
-conda env create -f environment.yml
-```
+Pip installs all required dependencies automatically.
+
 ## About
 
 Fewspy is developed and maintained by [D2Hydro](https://d2hydro.nl/) and freely available under an Open Source <a href="https://github.com/d2hydro/fewspy/blob/main/LICENSE" target="_blank">MIT license</a>.
