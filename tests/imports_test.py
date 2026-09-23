@@ -3,6 +3,7 @@ import sys
 
 import pytest
 
+import fewspy.time_series as time_series
 from fewspy.time_series import TimeStepDict
 
 
@@ -13,6 +14,24 @@ def test_time_step_dict_preserves_optional_fields():
         "multiplier": 60,
         "divider": None,
     }
+
+
+def test_time_series_public_exports():
+    namespace = {}
+    # Exercise wildcard-import semantics with a fixed string and an isolated namespace.
+    exec("from fewspy.time_series import *", namespace)  # noqa: S102
+    expected = {
+        "Events",
+        "Header",
+        "SeriesKey",
+        "TimeStepDict",
+        "TimeSeries",
+        "TimeSeriesSet",
+        "reliables",
+    }
+    assert set(namespace) - {"__builtins__"} == expected
+    for name in expected:
+        assert namespace[name] is getattr(time_series, name)
 
 
 @pytest.mark.parametrize(

@@ -7,20 +7,25 @@ import pandas as pd
 from pydantic import ConfigDict
 from pydantic.dataclasses import dataclass
 
-# Re-export header types and helpers to preserve existing import paths.
 from fewspy._header import (
-    DATETIME_KEYS as DATETIME_KEYS,
-    FLOAT_KEYS as FLOAT_KEYS,
-    HEADER_KEY_FIELDS as HEADER_KEY_FIELDS,
-    STRING_KEYS as STRING_KEYS,
-    Header as Header,
-    SeriesKey as SeriesKey,
-    TimeStepDict as TimeStepDict,
-    canonical_json as canonical_json,
+    HEADER_KEY_FIELDS,
+    Header,
+    SeriesKey,
+    TimeStepDict,
 )
 from fewspy.io.header_file import get_header_file
 from fewspy.io.write_netcdf import _validate_file_naming, write_netcdf
 from fewspy.utils.transformations import flatten_list
+
+__all__ = [
+    "Events",
+    "Header",
+    "SeriesKey",
+    "TimeSeries",
+    "TimeSeriesSet",
+    "TimeStepDict",
+    "reliables",
+]  # Header is publicly part of fewspy.time_series
 
 EVENT_COLUMNS = ["datetime", "value", "flag"]
 
