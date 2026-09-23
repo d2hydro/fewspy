@@ -1,21 +1,23 @@
+import importlib
+import json
+import zipfile
 from copy import deepcopy
-
+from io import BytesIO
 from pathlib import Path
 
-import json
-
-
-import pytest
-from fewspy.time_series import Header, TimeSeries
-from fewspy.io.read_netcdf import read_netcdf, read_netcdf_from_content
-from fewspy.io.read_parquet import read_parquet
-
 import pandas as pd
-
+import pytest
 from netCDF4 import Dataset
 
-
-from fewspy.time_series import TimeSeriesSet
+from fewspy import Api
+from fewspy.cache.manifest import FieldEndtry, Manifest
+from fewspy.cache.time_series_cache import TimeSeriesCache
+from fewspy.io.read_netcdf import read_netcdf, read_netcdf_from_content
+from fewspy.io.read_parquet import read_parquet
+from fewspy.io.read_xml import read_xml_from_string
+from fewspy.io.write_netcdf import write_netcdf
+from fewspy.time_series import Header, TimeSeries, TimeSeriesSet
+from fewspy.wrappers.get_time_series_async import __result_async_to_time_series_set
 
 
 def duplicate_series():
@@ -67,15 +69,6 @@ def test_default_netcdf_layout(tmp_path):
         assert ds.variables[parameter].dimensions == ("time", "stations")
 
         assert "fewspy_headers" not in ds.ncattrs()
-
-
-import pytest
-
-from fewspy.time_series import Header, TimeSeries
-
-from fewspy.io.read_netcdf import read_netcdf, read_netcdf_from_content
-
-from fewspy.io.read_parquet import read_parquet
 
 
 @pytest.fixture
@@ -252,10 +245,6 @@ def test_sparse_netcdf(header_series, tmp_path, events):
 
 def test_zip_reads_all_header_files(header_series, tmp_path):
 
-    import zipfile
-
-    from io import BytesIO
-
     header_series.to_netcdf(tmp_path, series_key="header")
 
     content = BytesIO()
@@ -272,8 +261,6 @@ def test_zip_reads_all_header_files(header_series, tmp_path):
 
 
 def test_async_response_keeps_all_headers():
-
-    from fewspy.wrappers.get_time_series_async import __result_async_to_time_series_set
 
     source = json.loads(
         (Path(__file__).parent / "data/pi_time_series.json").read_text()
@@ -324,8 +311,6 @@ def test_pi_header_fields_and_qualifiers():
 
 
 def test_cache_preserves_full_header_selection(header_series, tmp_path):
-    from fewspy.cache.manifest import Manifest, FieldEndtry
-    from fewspy.cache.time_series_cache import TimeSeriesCache
 
     folder = tmp_path / "filter"
     header_series.to_netcdf(folder, series_key="header")
@@ -357,8 +342,6 @@ def test_default_explicit_mode(header_series):
 
 
 def test_api_passes_header_mode(monkeypatch):
-    import importlib
-    from fewspy import Api
 
     module = importlib.import_module("fewspy.api")
     captured = []
@@ -397,7 +380,6 @@ def test_filename_escaping_and_unicode(header_series, tmp_path):
 
 
 def test_selected_dataframe_writer(header_series, tmp_path):
-    from fewspy.io.write_netcdf import write_netcdf
 
     selected = header_series.to_df("header").iloc[:, [6, 1]]
     write_netcdf(selected, tmp_path, series_key="header")
@@ -447,7 +429,6 @@ def test_reject_missing_netcdf_header_metadata(tmp_path):
 
 
 def test_xml_preserves_identity_fields():
-    from fewspy.io.read_xml import read_xml_from_string
 
     xml = """<TimeSeries xmlns="http://www.wldelft.nl/fews/PI" version="1.31">
     <timeZone>0</timeZone><series><header>
@@ -628,7 +609,6 @@ def test_archive_option_validation(tmp_path, options):
 
 
 def test_archive_modules_and_template(header_series, tmp_path):
-    from fewspy.io.write_netcdf import write_netcdf
 
     series = TimeSeriesSet(time_series=header_series.time_series[:2])
     write_netcdf(

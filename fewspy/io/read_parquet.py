@@ -1,8 +1,9 @@
-# %%
-from fewspy.time_series import TimeSeriesSet, Header, TimeSeries
 from pathlib import Path
+
 import pandas as pd
+
 from fewspy.io.header_file import get_header_file
+from fewspy.time_series import Header, TimeSeries, TimeSeriesSet, validate_series_key
 
 
 def _row_to_header(row):
@@ -34,7 +35,6 @@ def read_parquet(
     Returns:
         TimeSeriesSet: timeseries
     """
-    from fewspy.time_series import validate_series_key
 
     validate_series_key(series_key)
     if series_key == "header":

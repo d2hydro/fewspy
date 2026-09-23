@@ -1,16 +1,18 @@
-import requests
-import pandas as pd
+import asyncio
 import logging
-from fewspy.utils.timer import Timer
-from fewspy.utils.transformations import parameters_to_fews
+from datetime import datetime
 from typing import List, Union
-from fewspy.time_series import TimeSeriesSet
+
+import aiohttp
+import nest_asyncio
+import pandas as pd
+import requests
 from aiohttp import ClientSession
 
-from datetime import datetime
-import aiohttp
-import asyncio
-import nest_asyncio
+from fewspy.time_series import TimeSeriesSet, validate_series_key
+from fewspy.utils.timer import Timer
+from fewspy.utils.transformations import parameters_to_fews
+
 
 nest_asyncio.apply()
 
@@ -18,8 +20,6 @@ LOGGER = logging.getLogger(__name__)
 
 
 def __result_async_to_time_series_set(async_result, series_key="location_parameter"):
-    from fewspy.time_series import validate_series_key
-
     validate_series_key(series_key)
     if series_key == "header":
         result = TimeSeriesSet()
@@ -93,7 +93,6 @@ def get_time_series_async(
         "name" and "group_id".
 
     """
-    from fewspy.time_series import validate_series_key
 
     validate_series_key(series_key)
     parameters = parameters_to_fews(locals(), bool_to_string=True)

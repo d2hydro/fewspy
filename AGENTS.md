@@ -9,6 +9,7 @@ Keep the library focused on providing a small, predictable Python interface to F
 ## Development
 
 * Follow the existing project structure, API patterns, naming and typing conventions.
+* Always place imports at the top of the file, after module comments and docstrings, following [PEP 8: Imports](https://peps.python.org/pep-0008/#imports). Group standard library, third-party, and local imports separately, with a blank line between groups. Resolve circular dependencies through module organization rather than imports inside functions or methods.
 * Prefer simple, explicit implementations over additional abstractions.
 * Preserve backwards compatibility of the public API unless a breaking change is explicitly requested.
 * Keep FEWS terminology and semantics intact; do not silently reinterpret FEWS concepts in the Python API.

@@ -1,12 +1,14 @@
-import shutil
 import json
-from urllib.parse import quote
+import shutil
 from datetime import datetime, timezone
 from pathlib import Path
+from urllib.parse import quote
 
 import numpy as np
 import pandas as pd
 from netCDF4 import Dataset, date2num
+
+from fewspy._header import HEADER_KEY_FIELDS, Header, canonical_json, validate_series_key
 
 
 def _datetimeindex_to_nc_time(
@@ -64,8 +66,6 @@ def _archive_identity(header, include_time_series_type):
 def _header_groups(
     df, file_template, file_naming="default", include_time_series_type=False
 ):
-    from fewspy.time_series import Header, HEADER_KEY_FIELDS, canonical_json
-
     if list(df.columns.names) != HEADER_KEY_FIELDS:
         raise ValueError(
             "Header mode requires the full header MultiIndex from to_df(series_key='header')"
@@ -174,8 +174,6 @@ def write_netcdf(
         file_template (str, optional): _description_. Defaults to "{parameter_id}.nc".
         remove_dir (bool, optional): If True, removes the output directory before writing. Defaults to False.
     """
-
-    from fewspy.time_series import validate_series_key
 
     validate_series_key(series_key)
     _validate_file_naming(series_key, file_naming, include_time_series_type)

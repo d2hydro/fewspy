@@ -1,11 +1,15 @@
-from fewspy.cache.manifest import Manifest
-from typing import Optional
 import threading
-import xarray as xr
-import pandas as pd
-from pathlib import Path
-import numpy as np
 from datetime import datetime
+from pathlib import Path
+from typing import Optional
+
+import numpy as np
+import pandas as pd
+import xarray as xr
+
+from fewspy.cache.manifest import Manifest
+from fewspy.io.read_netcdf import read_netcdf
+from fewspy.time_series import TimeSeriesSet, validate_series_key
 
 
 class TimeSeriesCache:
@@ -184,8 +188,6 @@ class TimeSeriesCache:
         Returns:
             pd.DataFrame: DataFrame with datetime index and MultiIndex columns (location_id, parameter_id)
         """
-        from fewspy.time_series import TimeSeriesSet, validate_series_key
-        from fewspy.io.read_netcdf import read_netcdf
 
         validate_series_key(series_key)
         if series_key == "header":

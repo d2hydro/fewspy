@@ -1,13 +1,15 @@
-from netCDF4 import Dataset, num2date
-from pathlib import Path
-import pandas as pd
-from fewspy.time_series import TimeSeriesSet, TimeSeries, Header
+import json
+import os
+import tempfile
+import warnings
 import zipfile
 from io import BytesIO
-import tempfile
-import os
-import warnings
-import json
+from pathlib import Path
+
+import pandas as pd
+from netCDF4 import Dataset, num2date
+
+from fewspy.time_series import Header, TimeSeries, TimeSeriesSet, validate_series_key
 
 
 def _parse_time(time_var):
@@ -50,7 +52,6 @@ def _get_parameter_id(ds):
 
 def read_netcdf_from_content(content, series_key="location_parameter") -> TimeSeriesSet:
     """Read zipped NetCDF content as TimeSeriesSet."""
-    from fewspy.time_series import validate_series_key
 
     validate_series_key(series_key)
     if series_key == "header":
@@ -105,7 +106,6 @@ def read_netcdf(
     Returns:
         TimeSeriesSet: timeseries
     """
-    from fewspy.time_series import validate_series_key
 
     validate_series_key(series_key)
     if series_key == "header":
