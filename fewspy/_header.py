@@ -8,7 +8,7 @@ import warnings
 from dataclasses import asdict
 from datetime import datetime
 from enum import Enum
-from typing import List, Literal
+from typing import Literal
 
 from pydantic import ConfigDict
 from pydantic.dataclasses import dataclass
@@ -89,7 +89,7 @@ class Header:
     units: str | None = None
     station_name: str | None = None
     z: float | None = None
-    qualifier_id: List[str] | None = None
+    qualifier_id: list[str] | None = None
     value_type: str | None = None
     time_series_type: str | None = None
 
