@@ -5,10 +5,11 @@ import warnings
 from dataclasses import asdict
 from datetime import datetime
 from enum import Enum
-from typing import List, Literal, TypedDict
+from typing import List, Literal
 
 from pydantic import ConfigDict
 from pydantic.dataclasses import dataclass
+from typing_extensions import TypedDict
 
 from fewspy.utils.conversions import camel_to_snake_case, dict_to_datetime
 
@@ -40,7 +41,6 @@ def canonical_json(value):
     return json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
 
 
-@dataclass(config=ConfigDict(arbitrary_types_allowed=False))
 class TimeStepDict(TypedDict, total=False):
     unit: Literal["second", "minute", "hour", "day", "month", "year", "nonequidistant"]
     multiplier: int | None

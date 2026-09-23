@@ -16,7 +16,46 @@ Code-contributions can enter the main branch if:
 
 To setup your development environment follow the instructions at [Installation for development](installation.md#installation-for-development)
 
+## Package dependency validation
+
+The dependency audit found that the previous metadata allowed Pydantic 1 even
+though the code uses Pydantic 2 APIs (`field_validator`, `model_validate`), and
+omitted the directly imported NumPy, Shapely and urllib3 packages. It also declared
+Python 3.9 support despite using evaluated `X | None` annotations, which require
+Python 3.10. The existing coverage job only tested the Pixi environment, not a
+clean installation of the published package dependencies.
+
+Clean-install validation also exposed an import failure on Python 3.10: the
+`TimeStepDict` TypedDict was decorated as a dataclass. It is now a plain TypedDict
+from `typing_extensions`, which Pydantic requires on Python versions below 3.12.
+`typing-extensions` is therefore also declared directly (already a Pydantic
+dependency).
+The cache also used Python 3.11's `hashlib.file_digest`; incremental SHA-256
+hashing preserves the same file hashes on Python 3.10.
+
+The metadata now declares Python 3.10–3.13 and Pydantic >=2, and explicitly lists
+those direct dependencies. No existing dependency versions or Pixi lock entries
+were upgraded. Other runtime dependencies remain unconstrained: their oldest
+compatible versions have not been established.
+
+`test-cov.yml` retains Pixi coverage and also installs `.[tests]` into a fresh
+virtual environment on every supported Python version, runs `pip check`, and runs
+the test suite outside the checkout so it imports the installed package. An extra
+Python 3.10 job tests Pydantic 2.0, the only declared dependency minimum; this is
+not a minimum-version test of the entire dependency graph. Some tests contact the
+public FEWS service and therefore require network access and service availability.
+
+Dependabot checks the root Python package manifest and GitHub Actions weekly;
+it does not manage Pixi. Its pull requests run the same PR tests without secrets;
+the Codecov upload is skipped for Dependabot. Unconstrained dependencies may not
+produce version-update PRs, and this configuration does not audit every resolved
+transitive dependency for vulnerabilities. Repository-level Dependabot alerts and
+security updates are managed separately in GitHub settings. See the
+[supported manifests](https://docs.github.com/en/code-security/reference/supply-chain-security/supported-ecosystems-and-repositories)
+and [Dependabot Actions restrictions](https://docs.github.com/en/code-security/reference/supply-chain-security/dependabot-on-actions).
+
 ## Small contributions
+
 
 For small contributions we propose the following workflow:
 

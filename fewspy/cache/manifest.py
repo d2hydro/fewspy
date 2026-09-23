@@ -20,8 +20,11 @@ class FieldEndtry(BaseModel):
 
     @classmethod
     def _sha256(cls, path: Path) -> str:
+        digest = hashlib.sha256()
         with path.open("rb") as f:
-            return hashlib.file_digest(f, "sha256").hexdigest()
+            while chunk := f.read(256 * 1024):
+                digest.update(chunk)
+        return digest.hexdigest()
 
     @field_validator("nbytes")
     @classmethod

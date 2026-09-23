@@ -3,6 +3,17 @@ import sys
 
 import pytest
 
+from fewspy.time_series import TimeStepDict
+
+
+def test_time_step_dict_preserves_optional_fields():
+    assert TimeStepDict(unit="nonequidistant") == {"unit": "nonequidistant"}
+    assert TimeStepDict(unit="second", multiplier=60, divider=None) == {
+        "unit": "second",
+        "multiplier": 60,
+        "divider": None,
+    }
+
 
 @pytest.mark.parametrize(
     "module",

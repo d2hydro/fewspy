@@ -1,3 +1,4 @@
+import hashlib
 import importlib
 import json
 import zipfile
@@ -18,6 +19,17 @@ from fewspy.io.read_xml import read_xml_from_string
 from fewspy.io.write_netcdf import write_netcdf
 from fewspy.time_series import Header, TimeSeries, TimeSeriesSet
 from fewspy.wrappers.get_time_series_async import __result_async_to_time_series_set
+
+
+@pytest.mark.parametrize(
+    "content", [b"", b"abc", b"FEWS" * 100_000], ids=["empty", "small", "multi-chunk"]
+)
+def test_manifest_file_digest(tmp_path, content):
+    path = tmp_path / "series.nc"
+    path.write_bytes(content)
+    entry = FieldEndtry.from_file(path)
+    assert entry.nbytes == len(content)
+    assert entry.sha256 == hashlib.sha256(content).hexdigest()
 
 
 def duplicate_series():

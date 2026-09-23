@@ -135,3 +135,6 @@ dmypy.json
 *.cmd
 tests/hhnk/*
 !tests/hhnk/convert_twinpy.py
+
+# .tmp dirs agents sometimes fail to clean (and shouldn't be committed)
+.tmp/*
