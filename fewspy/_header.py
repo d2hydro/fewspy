@@ -4,6 +4,7 @@ import json
 import warnings
 from dataclasses import asdict
 from datetime import datetime
+from enum import Enum
 from typing import List, Literal, TypedDict
 
 from pydantic import ConfigDict
@@ -14,7 +15,6 @@ from fewspy.utils.conversions import camel_to_snake_case, dict_to_datetime
 DATETIME_KEYS = ["start_date", "end_date"]
 FLOAT_KEYS = ["miss_val", "lat", "lon", "x", "y", "z"]
 STRING_KEYS = ["module_instance_id"]
-SeriesKey = Literal["location_parameter", "header"]
 HEADER_KEY_FIELDS = [
     "module_instance_id",
     "value_type",
@@ -26,9 +26,14 @@ HEADER_KEY_FIELDS = [
 ]
 
 
-def validate_series_key(series_key):
-    if series_key not in ("location_parameter", "header"):
-        raise ValueError("series_key must be 'location_parameter' or 'header'")
+class SeriesKey(str, Enum):
+    """Fields used to identify a FEWS time series."""
+
+    LOCATION_PARAMETER = "location_parameter"
+    HEADER = "header"
+
+    def __str__(self) -> str:
+        return self.value
 
 
 def canonical_json(value):
@@ -69,14 +74,16 @@ class Header:
     value_type: str | None = None
     time_series_type: str | None = None
 
-    def series_identity(self, series_key: SeriesKey = "location_parameter") -> tuple:
+    def series_identity(
+        self, series_key: SeriesKey | str = SeriesKey.LOCATION_PARAMETER
+    ) -> tuple:
         """Hashable FEWS identity; nested fields use unambiguous canonical JSON.
 
         Qualifier order is retained, as in the PI header. None and [] both mean
         no qualifiers. Missing optional scalar fields remain None.
         """
-        validate_series_key(series_key)
-        if series_key == "location_parameter":
+        series_key = SeriesKey(series_key)
+        if series_key == SeriesKey.LOCATION_PARAMETER:
             return self.location_id, self.parameter_id
         return (
             self.module_instance_id,

@@ -3,7 +3,7 @@ from pathlib import Path
 import pandas as pd
 
 from fewspy.io.header_file import get_header_file
-from fewspy.time_series import Header, TimeSeries, TimeSeriesSet, validate_series_key
+from fewspy.time_series import Header, SeriesKey, TimeSeries, TimeSeriesSet
 
 
 def _row_to_header(row):
@@ -23,7 +23,7 @@ def _column_to_time_series(df, column):
 
 
 def read_parquet(
-    parquet_file: Path, series_key: str = "location_parameter"
+    parquet_file: Path, series_key: SeriesKey | str = SeriesKey.LOCATION_PARAMETER
 ) -> TimeSeriesSet:
     """Parse parquet file to fewspy TimeSeriesSet
 
@@ -36,8 +36,8 @@ def read_parquet(
         TimeSeriesSet: timeseries
     """
 
-    validate_series_key(series_key)
-    if series_key == "header":
+    series_key = SeriesKey(series_key)
+    if series_key == SeriesKey.HEADER:
         df = pd.read_parquet(parquet_file, engine="pyarrow")
         headers = df.attrs.get("fewspy_headers")
         if headers is None or len(headers) != len(df.columns):

@@ -9,7 +9,7 @@ import pandas as pd
 import requests
 from aiohttp import ClientSession
 
-from fewspy.time_series import TimeSeriesSet, validate_series_key
+from fewspy.time_series import SeriesKey, TimeSeriesSet
 from fewspy.utils.timer import Timer
 from fewspy.utils.transformations import parameters_to_fews
 
@@ -19,9 +19,11 @@ nest_asyncio.apply()
 LOGGER = logging.getLogger(__name__)
 
 
-def __result_async_to_time_series_set(async_result, series_key="location_parameter"):
-    validate_series_key(series_key)
-    if series_key == "header":
+def __result_async_to_time_series_set(
+    async_result, series_key: SeriesKey | str = SeriesKey.LOCATION_PARAMETER
+):
+    series_key = SeriesKey(series_key)
+    if series_key == SeriesKey.HEADER:
         result = TimeSeriesSet()
         for response in async_result:
             if isinstance(response, dict) and "timeSeries" in response:
@@ -65,7 +67,7 @@ def get_time_series_async(
     omit_missing: bool = True,
     verify: bool = False,
     logger=LOGGER,
-    series_key="location_parameter",
+    series_key: SeriesKey | str = SeriesKey.LOCATION_PARAMETER,
 ) -> pd.DataFrame:
     """
 
@@ -94,7 +96,7 @@ def get_time_series_async(
 
     """
 
-    validate_series_key(series_key)
+    series_key = SeriesKey(series_key)
     parameters = parameters_to_fews(locals(), bool_to_string=True)
 
     def _get_loop():

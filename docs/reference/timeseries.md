@@ -10,6 +10,19 @@ See also: https://publicwiki.deltares.nl/display/FEWSDOC/Delft-Fews+Published+In
 The default remains `series_key="location_parameter"`: two DataFrame column
 levels, existing selection behavior, and one NetCDF file named `{parameter_id}.nc`.
 
+All `series_key` arguments also accept the string enum `SeriesKey`, available
+from `fewspy` and `fewspy.time_series`:
+
+```python
+from fewspy import SeriesKey
+
+frame = time_series_set.to_df(series_key=SeriesKey.HEADER)
+```
+
+`SeriesKey.LOCATION_PARAMETER` is the default; `SeriesKey.HEADER` preserves the
+available header identity. The strings `"location_parameter"` and `"header"`
+remain supported. Invalid values raise `ValueError` before requests or file I/O.
+
 Use `series_key="header"` explicitly to preserve the available header identity:
 
 ```python

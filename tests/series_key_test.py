@@ -9,7 +9,7 @@ import pandas as pd
 import pytest
 from netCDF4 import Dataset
 
-from fewspy import Api
+from fewspy import Api, SeriesKey
 from fewspy.cache.manifest import FieldEndtry, Manifest
 from fewspy.cache.time_series_cache import TimeSeriesCache
 from fewspy.io.read_netcdf import read_netcdf, read_netcdf_from_content
@@ -148,9 +148,10 @@ def test_header_identity_and_dataframe(header_series):
     assert Header.from_json(h.to_json()).qualifier_id == ["a", "b"]
 
 
-def test_netcdf_header_roundtrip(header_series, tmp_path):
+@pytest.mark.parametrize("series_key", ["header", SeriesKey.HEADER])
+def test_netcdf_header_roundtrip(header_series, tmp_path, series_key):
 
-    header_series.to_netcdf(tmp_path, series_key="header")
+    header_series.to_netcdf(tmp_path, series_key=series_key)
 
     files = list(tmp_path.glob("*.nc"))
 
@@ -160,7 +161,7 @@ def test_netcdf_header_roundtrip(header_series, tmp_path):
 
     for path in files:
 
-        restored.time_series.extend(read_netcdf(path, series_key="header").time_series)
+        restored.time_series.extend(read_netcdf(path, series_key=series_key).time_series)
 
     expected = {
         ts.header.series_identity("header"): ts for ts in header_series.time_series
@@ -181,19 +182,20 @@ def test_netcdf_header_roundtrip(header_series, tmp_path):
     again = tmp_path / "again"
 
     TimeSeriesSet(time_series=list(reversed(header_series.time_series))).to_netcdf(
-        again, series_key="header"
+        again, series_key=series_key
     )
 
     assert {p.name for p in files} == {p.name for p in again.glob("*.nc")}
 
 
-def test_header_parquet_roundtrip(header_series, tmp_path):
+@pytest.mark.parametrize("series_key", ["header", SeriesKey.HEADER])
+def test_header_parquet_roundtrip(header_series, tmp_path, series_key):
 
     path = tmp_path / "series.parquet"
 
-    header_series.to_parquet(path, series_key="header")
+    header_series.to_parquet(path, series_key=series_key)
 
-    restored = read_parquet(path, series_key="header")
+    restored = read_parquet(path, series_key=series_key)
 
     pd.testing.assert_frame_equal(
         header_series.to_df("header"), restored.to_df("header"), check_freq=False
@@ -260,7 +262,8 @@ def test_zip_reads_all_header_files(header_series, tmp_path):
     assert len(restored) == len(header_series)
 
 
-def test_async_response_keeps_all_headers():
+@pytest.mark.parametrize("series_key", ["header", SeriesKey.HEADER])
+def test_async_response_keeps_all_headers(series_key):
 
     source = json.loads(
         (Path(__file__).parent / "data/pi_time_series.json").read_text()
@@ -268,18 +271,18 @@ def test_async_response_keeps_all_headers():
 
     assert len(__result_async_to_time_series_set([source])) == 1
 
-    result = __result_async_to_time_series_set([None, source], series_key="header")
+    result = __result_async_to_time_series_set([None, source], series_key=series_key)
 
     assert len(result) == len(source["timeSeries"])
 
 
 def test_invalid_mode(header_series, tmp_path):
 
-    with pytest.raises(ValueError, match="series_key"):
+    with pytest.raises(ValueError, match="SeriesKey"):
 
         header_series.to_df("invalid")
 
-    with pytest.raises(ValueError, match="series_key"):
+    with pytest.raises(ValueError, match="SeriesKey"):
 
         header_series.to_netcdf(tmp_path, series_key="invalid")
 
@@ -310,10 +313,11 @@ def test_pi_header_fields_and_qualifiers():
     assert parsed.qualifier_id == ["a", "b"]
 
 
-def test_cache_preserves_full_header_selection(header_series, tmp_path):
+@pytest.mark.parametrize("series_key", ["header", SeriesKey.HEADER])
+def test_cache_preserves_full_header_selection(header_series, tmp_path, series_key):
 
     folder = tmp_path / "filter"
-    header_series.to_netcdf(folder, series_key="header")
+    header_series.to_netcdf(folder, series_key=series_key)
     manifest = Manifest(
         current_cache="20240101T000000",
         files=[FieldEndtry.from_file(p) for p in folder.glob("*.nc")],
@@ -325,7 +329,7 @@ def test_cache_preserves_full_header_selection(header_series, tmp_path):
             "P",
             location_ids=["L"],
             start_time="2024-01-01T01:00:00",
-            series_key="header",
+            series_key=series_key,
         )
         assert df.shape == (1, 11)
         assert df.columns.is_unique
@@ -335,13 +339,15 @@ def test_cache_preserves_full_header_selection(header_series, tmp_path):
             ds.close()
 
 
-def test_default_explicit_mode(header_series):
+@pytest.mark.parametrize("series_key", ["location_parameter", SeriesKey.LOCATION_PARAMETER])
+def test_default_explicit_mode(header_series, series_key):
     pd.testing.assert_frame_equal(
-        header_series.to_df(), header_series.to_df("location_parameter")
+        header_series.to_df(), header_series.to_df(series_key)
     )
 
 
-def test_api_passes_header_mode(monkeypatch):
+@pytest.mark.parametrize("series_key", ["header", SeriesKey.HEADER])
+def test_api_passes_header_mode(monkeypatch, series_key):
 
     module = importlib.import_module("fewspy.api")
     captured = []
@@ -350,8 +356,8 @@ def test_api_passes_header_mode(monkeypatch):
         module, "get_time_series_async", lambda **kwargs: captured.append(kwargs)
     )
     api = Api("https://example.com/", ssl_verify=False)
-    api.get_time_series("filter", parallel=True, series_key="header")
-    assert captured[0]["series_key"] == "header"
+    api.get_time_series("filter", parallel=True, series_key=series_key)
+    assert captured[0]["series_key"] is SeriesKey.HEADER
     assert "validate_series_key" not in captured[0]
 
 

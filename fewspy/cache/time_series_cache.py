@@ -9,7 +9,7 @@ import xarray as xr
 
 from fewspy.cache.manifest import Manifest
 from fewspy.io.read_netcdf import read_netcdf
-from fewspy.time_series import TimeSeriesSet, validate_series_key
+from fewspy.time_series import SeriesKey, TimeSeriesSet
 
 
 class TimeSeriesCache:
@@ -172,7 +172,7 @@ class TimeSeriesCache:
         start_time: Optional[datetime | str] = None,
         end_time: Optional[datetime | str] = None,
         location_ids: Optional[list[str]] = None,
-        series_key: str = "location_parameter",
+        series_key: SeriesKey | str = SeriesKey.LOCATION_PARAMETER,
     ) -> pd.DataFrame:
         """fetch time series data from NetCDF file based on filter_id and parameter_id
 
@@ -189,8 +189,8 @@ class TimeSeriesCache:
             pd.DataFrame: DataFrame with datetime index and MultiIndex columns (location_id, parameter_id)
         """
 
-        validate_series_key(series_key)
-        if series_key == "header":
+        series_key = SeriesKey(series_key)
+        if series_key == SeriesKey.HEADER:
             result = TimeSeriesSet()
             for entry in self.manifest.files:
                 if entry.path.parent.name != filter_id:
@@ -198,7 +198,7 @@ class TimeSeriesCache:
                 dataset = self._datasets[self._key_for(entry.path)]
                 if dataset.attrs.get("parameter_id") != parameter_id:
                     continue
-                part = read_netcdf(entry.path, series_key="header")
+                part = read_netcdf(entry.path, series_key=SeriesKey.HEADER)
                 result.time_series.extend(
                     ts
                     for ts in part.time_series
@@ -206,7 +206,7 @@ class TimeSeriesCache:
                 )
             if not result.time_series:
                 raise ValueError("No full-header series match the cache selection")
-            return result.to_df(series_key="header").loc[start_time:end_time]
+            return result.to_df(series_key=SeriesKey.HEADER).loc[start_time:end_time]
 
         dataset = self._get_open_ds(filter_id=filter_id, parameter_id=parameter_id)
         da = dataset[parameter_id]

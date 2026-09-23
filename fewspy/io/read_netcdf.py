@@ -9,7 +9,7 @@ from pathlib import Path
 import pandas as pd
 from netCDF4 import Dataset, num2date
 
-from fewspy.time_series import Header, TimeSeries, TimeSeriesSet, validate_series_key
+from fewspy.time_series import Header, SeriesKey, TimeSeries, TimeSeriesSet
 
 
 def _parse_time(time_var):
@@ -50,11 +50,13 @@ def _get_parameter_id(ds):
     return parameter_ids
 
 
-def read_netcdf_from_content(content, series_key="location_parameter") -> TimeSeriesSet:
+def read_netcdf_from_content(
+    content, series_key: SeriesKey | str = SeriesKey.LOCATION_PARAMETER
+) -> TimeSeriesSet:
     """Read zipped NetCDF content as TimeSeriesSet."""
 
-    validate_series_key(series_key)
-    if series_key == "header":
+    series_key = SeriesKey(series_key)
+    if series_key == SeriesKey.HEADER:
         result = TimeSeriesSet(time_zone=0.0)
         with zipfile.ZipFile(BytesIO(content)) as archive:
             names = [name for name in archive.namelist() if name.endswith(".nc")]
@@ -91,7 +93,7 @@ def read_netcdf(
     nc_file: Path,
     time_series_type: str | None = None,
     module_instance_id: str | None = None,
-    series_key: str = "location_parameter",
+    series_key: SeriesKey | str = SeriesKey.LOCATION_PARAMETER,
 ) -> TimeSeriesSet:
     """Read the content of a NetCDF file into a fewspy TimeSeriesSet
 
@@ -107,8 +109,8 @@ def read_netcdf(
         TimeSeriesSet: timeseries
     """
 
-    validate_series_key(series_key)
-    if series_key == "header":
+    series_key = SeriesKey(series_key)
+    if series_key == SeriesKey.HEADER:
         with Dataset(nc_file, mode="r") as ds:
             return _read_header_dataset(ds)
     if time_series_type is None:
@@ -185,7 +187,7 @@ def read_netcdf(
 
 def _read_header_dataset(ds):
     """Reconstruct explicit headers without inferring identity from events."""
-    if getattr(ds, "fewspy_series_key", None) != "header":
+    if getattr(ds, "fewspy_series_key", None) != SeriesKey.HEADER.value:
         raise ValueError("NetCDF has no full FEWS header metadata")
     headers = json.loads(ds.fewspy_headers)
     time_index = _parse_time(ds.variables["time"])

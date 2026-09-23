@@ -8,7 +8,7 @@ import numpy as np
 import pandas as pd
 from netCDF4 import Dataset, date2num
 
-from fewspy._header import HEADER_KEY_FIELDS, Header, canonical_json, validate_series_key
+from fewspy._header import HEADER_KEY_FIELDS, Header, SeriesKey, canonical_json
 
 
 def _datetimeindex_to_nc_time(
@@ -24,7 +24,7 @@ def _datetimeindex_to_nc_time(
 def _validate_file_naming(series_key, file_naming, include_time_series_type):
     if file_naming not in ("default", "archive"):
         raise ValueError("file_naming must be 'default' or 'archive'")
-    if file_naming == "archive" and series_key != "header":
+    if file_naming == "archive" and series_key != SeriesKey.HEADER:
         raise ValueError("file_naming='archive' requires series_key='header'")
     if include_time_series_type and file_naming != "archive":
         raise ValueError("include_time_series_type requires file_naming='archive'")
@@ -71,7 +71,7 @@ def _header_groups(
             "Header mode requires the full header MultiIndex from to_df(series_key='header')"
         )
     metadata = [Header.from_json(value) for value in df.attrs.get("fewspy_headers", [])]
-    by_key = {header.series_identity("header"): header for header in metadata}
+    by_key = {header.series_identity(SeriesKey.HEADER): header for header in metadata}
     headers = []
     for column in df.columns:
         key = tuple(None if pd.isna(value) else value for value in column)
@@ -84,7 +84,7 @@ def _header_groups(
         raise ValueError("Duplicate full header identities cannot be written to NetCDF")
     groups = {}
     for index, header in enumerate(headers):
-        key = header.series_identity("header")
+        key = header.series_identity(SeriesKey.HEADER)
         group = key[:2] + key[3:]  # Locations are the station dimension.
         groups.setdefault(group, []).append(index)
     filenames = set()
@@ -155,7 +155,7 @@ def write_netcdf(
     global_attributes: dict = {"source": "fewspy"},
     file_template: str = "{parameter_id}.nc",
     remove_dir: bool = False,
-    series_key: str = "location_parameter",
+    series_key: SeriesKey | str = SeriesKey.LOCATION_PARAMETER,
     file_naming: str = "default",
     include_time_series_type: bool = False,
 ) -> None:
@@ -175,9 +175,9 @@ def write_netcdf(
         remove_dir (bool, optional): If True, removes the output directory before writing. Defaults to False.
     """
 
-    validate_series_key(series_key)
+    series_key = SeriesKey(series_key)
     _validate_file_naming(series_key, file_naming, include_time_series_type)
-    if series_key == "header":
+    if series_key == SeriesKey.HEADER:
         groups = _header_groups(
             df, file_template, file_naming, include_time_series_type
         )
@@ -286,5 +286,5 @@ def write_netcdf(
 
             if headers:
                 nc.fewspy_headers = json.dumps(headers)
-                nc.fewspy_series_key = "header"
+                nc.fewspy_series_key = SeriesKey.HEADER.value
                 nc.parameter_id = parameter_id

@@ -1,13 +1,15 @@
-import requests
-import pandas as pd
 import logging
-from ..utils.timer import Timer
-from ..utils.transformations import parameters_to_fews
-from typing import List, Union
-from ..time_series import TimeSeriesSet, validate_series_key
 from datetime import datetime
-from fewspy.io.read_xml import read_xml_from_string
+from typing import List, Union
+
+import pandas as pd
+import requests
+
 from fewspy.io.read_netcdf import read_netcdf_from_content
+from fewspy.io.read_xml import read_xml_from_string
+from fewspy.time_series import SeriesKey, TimeSeriesSet
+from fewspy.utils.timer import Timer
+from fewspy.utils.transformations import parameters_to_fews
 
 LOGGER = logging.getLogger(__name__)
 
@@ -34,7 +36,7 @@ def get_time_series(
     document_format: str = "PI_JSON",
     verify: bool = False,
     logger=LOGGER,
-    series_key: str = "location_parameter",
+    series_key: SeriesKey | str = SeriesKey.LOCATION_PARAMETER,
 ) -> pd.DataFrame:
     """
     Get FEWS qualifiers as a pandas DataFrame
@@ -65,7 +67,7 @@ def get_time_series(
         "name" and "group_id".
 
     """
-    validate_series_key(series_key)
+    series_key = SeriesKey(series_key)
     report_string = _ts_or_headers(only_headers)
 
     # do the request

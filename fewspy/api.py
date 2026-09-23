@@ -5,14 +5,15 @@ The module contains one class and methods corresponding with the FEWS PI-REST re
 https://publicwiki.deltares.nl/display/FEWSDOC/FEWS+PI+REST+Web+Service
 """
 
-from fewspy.time_series import validate_series_key
-import pandas as pd
-from .utils.timer import Timer
-from .utils.url import validate_url
 import logging
-import urllib3
 from typing import Literal
 
+import pandas as pd
+import urllib3
+
+from fewspy.time_series import SeriesKey
+from fewspy.utils.timer import Timer
+from fewspy.utils.url import validate_url
 from fewspy.wrappers import (
     get_time_series_async,
     get_qualifiers,
@@ -168,7 +169,7 @@ class Api:
         show_statistics=False,
         parallel=False,
         document_format: str = "PI_JSON",
-        series_key: str = "location_parameter",
+        series_key: SeriesKey | str = SeriesKey.LOCATION_PARAMETER,
     ):
         """
         Get FEWS qualifiers as a pandas DataFrame
@@ -194,7 +195,7 @@ class Api:
             "name" and "group_id".
 
         """
-        validate_series_key(series_key)
+        series_key = SeriesKey(series_key)
         kwargs = self.__kwargs(url_post_fix="timeseries", kwargs=locals())
         if (self.document_format != "PI_JSON") and parallel:
             self.logger.warning(

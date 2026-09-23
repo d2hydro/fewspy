@@ -17,7 +17,6 @@ from fewspy._header import (
     SeriesKey as SeriesKey,
     TimeStepDict as TimeStepDict,
     canonical_json as canonical_json,
-    validate_series_key as validate_series_key,
 )
 from fewspy.io.header_file import get_header_file
 from fewspy.io.write_netcdf import _validate_file_naming, write_netcdf
@@ -224,22 +223,24 @@ class TimeSeriesSet:
 
         return list(set(flatten_list(qualifiers)))
 
-    def to_df(self, series_key: SeriesKey = "location_parameter") -> pd.DataFrame:
+    def to_df(
+        self, series_key: SeriesKey | str = SeriesKey.LOCATION_PARAMETER
+    ) -> pd.DataFrame:
         """Reliable values with location/parameter columns or seven header levels.
 
         Header mode stores complete headers in DataFrame.attrs for I/O. Timestep
         and qualifier levels are canonical JSON strings; no hashes are used.
         """
-        validate_series_key(series_key)
+        series_key = SeriesKey(series_key)
         columns = pd.MultiIndex.from_tuples(
             [i.header.series_identity(series_key) for i in self.time_series],
             names=(
                 HEADER_KEY_FIELDS
-                if series_key == "header"
+                if series_key == SeriesKey.HEADER
                 else ["location_id", "parameter_id"]
             ),
         )
-        if series_key == "header" and not self.time_series:
+        if series_key == SeriesKey.HEADER and not self.time_series:
             df = pd.DataFrame(
                 columns=columns, index=pd.DatetimeIndex([], name="datetime")
             )
@@ -252,7 +253,7 @@ class TimeSeriesSet:
         )
         df.columns = columns
 
-        if series_key == "header":
+        if series_key == SeriesKey.HEADER:
             df.attrs["fewspy_headers"] = [i.header.to_json() for i in self.time_series]
         return df
 
@@ -262,7 +263,7 @@ class TimeSeriesSet:
         global_attributes: dict = {"source": "fewspy"},
         file_template: str = "{parameter_id}.nc",
         remove_dir: bool = False,
-        series_key: SeriesKey = "location_parameter",
+        series_key: SeriesKey | str = SeriesKey.LOCATION_PARAMETER,
         file_naming: Literal["default", "archive"] = "default",
         include_time_series_type: bool = False,
     ) -> None:
@@ -281,9 +282,9 @@ class TimeSeriesSet:
             include_time_series_type: Append the full type to archive names when known.
                 Missing value_type and time_series_type are omitted from archive names.
         """
-        validate_series_key(series_key)
+        series_key = SeriesKey(series_key)
         _validate_file_naming(series_key, file_naming, include_time_series_type)
-        if not self.empty or (series_key == "header" and self.time_series):
+        if not self.empty or (series_key == SeriesKey.HEADER and self.time_series):
             df = self.to_df(series_key=series_key)
 
             write_netcdf(
@@ -301,7 +302,7 @@ class TimeSeriesSet:
         self,
         parquet_file: Path,
         include_header: bool = False,
-        series_key: SeriesKey = "location_parameter",
+        series_key: SeriesKey | str = SeriesKey.LOCATION_PARAMETER,
     ):
         """Write fewspy.TimeSeriesSet to arrow parquet file
 
@@ -312,14 +313,14 @@ class TimeSeriesSet:
                 always embeds complete headers in the event file's metadata.
         """
 
-        validate_series_key(series_key)
+        series_key = SeriesKey(series_key)
         # make dir-structure to file(s)
         parquet_file.parent.mkdir(exist_ok=True, parents=True)
         parquet_file.unlink(missing_ok=True)
 
         # concat events to one dataframe and write to parquet
         df = self.to_df(series_key=series_key)
-        if series_key == "header":
+        if series_key == SeriesKey.HEADER:
             # Parquet cannot reliably encode nested MultiIndex levels. Keep the
             # complete headers in pandas metadata and use positional columns.
             df.columns = [str(i) for i in range(len(df.columns))]
