@@ -1,5 +1,4 @@
 import logging
-from typing import Optional, Tuple, Union
 
 import requests
 
@@ -14,10 +13,10 @@ def get_timezone_id(
     filter_id: str | None = None,
     document_format: str = "PI_JSON",
     verify: bool = False,
-    cert: Optional[Union[str, Tuple[str, str]]] = None,
-    http_headers: dict = None,
+    cert: str | tuple[str, str] | None = None,
+    http_headers: dict | None = None,
     logger=LOGGER,
-    headers: dict = None,
+    headers: dict | None = None,
 ) -> str:
     """
     Get FEWS timezone id
@@ -44,13 +43,13 @@ def get_timezone_id(
     if http_headers is None:
         http_headers = headers
     parameters = parameters_to_fews(locals())
-    response = requests.get(
+    response = requests.get(  # noqa: S113 - Preserve the existing unlimited request timeout.
         url,
         parameters,
         verify=verify,
         cert=cert,
         headers=http_headers,
-    ) # noqa: S113 - Preserve existing request timeout/TLS behavior.
+    )
     timer.report("Timezone request")
 
     # parse the response

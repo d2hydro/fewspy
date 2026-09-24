@@ -1,6 +1,6 @@
-import os
 import base64
 import json
+import os
 import time
 from pathlib import Path
 
@@ -68,9 +68,7 @@ def _assert_temp_token_claims_not_expired(access_token: str):
         payload_b64 += "=" * (-len(payload_b64) % 4)
         payload = json.loads(base64.urlsafe_b64decode(payload_b64.encode("utf-8")))
     except Exception as err:
-        pytest.fail(
-            f"Could not decode FEWSPY_TEST_ACCESS_TOKEN as JWT: {err}"
-        )
+        pytest.fail(f"Could not decode FEWSPY_TEST_ACCESS_TOKEN as JWT: {err}")
 
     exp = payload.get("exp")
     if exp is None:
@@ -78,9 +76,7 @@ def _assert_temp_token_claims_not_expired(access_token: str):
 
     now = int(time.time())
     if int(exp) <= now:
-        pytest.fail(
-            "FEWSPY_TEST_ACCESS_TOKEN is expired based on JWT exp claim."
-        )
+        pytest.fail("FEWSPY_TEST_ACCESS_TOKEN is expired based on JWT exp claim.")
 
 
 def _assert_filters_request_with_token(fews_url: str, access_token: str, verify):
@@ -102,9 +98,7 @@ def _assert_filters_request_with_token(fews_url: str, access_token: str, verify)
 
 def _assert_not_expired_jwt(response):
     if (response.status_code == 401) and ("Expired JWT" in response.text):
-        pytest.fail(
-            "Provided FEWSPY_TEST_ACCESS_TOKEN is expired (Expired JWT)."
-        )
+        pytest.fail("Provided FEWSPY_TEST_ACCESS_TOKEN is expired (Expired JWT).")
 
 
 def _request_oauth_access_token(verify):
@@ -206,7 +200,7 @@ def test_temp_token_can_call_fews_timeseries_with_example_params():
         timeseries_url,
         params=params,
         headers={"Authorization": f"Bearer {access_token}"},
-        cert=cert if cert else None,
+        cert=cert or None,
         verify=verify,
         timeout=60,
     )

@@ -1,3 +1,6 @@
+# These mocked credentials are test data, never used with a live service.
+# ruff: noqa: S105, S106
+
 import pytest
 
 from fewspy.api import Api
@@ -29,7 +32,7 @@ def test_oauth2_provider_caches_access_token(monkeypatch):
         client_id="client-id",
         client_secret="secret",
         scope="api://example/.default",
-        cert="/tmp/client.pem",
+        cert="client.pem",
         verify=True,
         timeout=10,
     )
@@ -40,7 +43,7 @@ def test_oauth2_provider_caches_access_token(monkeypatch):
     assert token_1 == "token-1"
     assert token_2 == "token-1"
     assert len(calls) == 1
-    assert calls[0][1]["cert"] == "/tmp/client.pem"
+    assert calls[0][1]["cert"] == "client.pem"
 
 
 def test_api_oauth2_adds_bearer_header(monkeypatch):
@@ -67,12 +70,13 @@ def test_api_oauth2_adds_bearer_header(monkeypatch):
     api = Api(
         url="https://example.test/fews",
         ssl_verify=False,
+        cert="client.pem",
         oauth2={
             "token_url": "https://login.microsoftonline.com/example/oauth2/v2.0/token",
             "client_id": "client-id",
             "client_secret": "secret",
             "scope": "api://example/.default",
-            "cert": "/tmp/client.pem",
+            "cert": "client.pem",
         },
     )
 
@@ -81,7 +85,7 @@ def test_api_oauth2_adds_bearer_header(monkeypatch):
 
     assert len(token_calls) == 1
     assert len(filters_calls) == 2
-    assert filters_calls[0]["cert"] == "/tmp/client.pem"
+    assert filters_calls[0]["cert"] == "client.pem"
     assert filters_calls[0]["http_headers"]["Authorization"] == "Bearer oauth-token"
     assert filters_calls[1]["http_headers"]["Authorization"] == "Bearer oauth-token"
 

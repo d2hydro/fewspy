@@ -10,8 +10,6 @@ from ..utils.conversions import (
     geo_datum_to_crs,
     xy_array_to_point,
 )
-from typing import Literal, Optional, Tuple, Union
-
 from ..utils.timer import Timer
 from ..utils.transformations import parameters_to_fews
 
@@ -24,11 +22,11 @@ def get_locations(
     document_format: Literal["GEO_JSON", "PI_JSON"] = "GEO_JSON",
     attributes: list = [],  # noqa: B006 - Preserve the existing read-only API default.
     verify: bool = False,
-    cert: Optional[Union[str, Tuple[str, str]]] = None,
-    http_headers: dict = None,
+    cert: str | tuple[str, str] | None = None,
+    http_headers: dict | None = None,
     logger=LOGGER,
     remove_duplicates: bool = False,
-    headers: dict = None,
+    headers: dict | None = None,
 ) -> gpd.GeoDataFrame:
     """
     Get FEWS qualifiers as a pandas DataFrame
@@ -55,13 +53,13 @@ def get_locations(
     if http_headers is None:
         http_headers = headers
     parameters = parameters_to_fews(locals())
-    response = requests.get(
+    response = requests.get(  # noqa: S113 - Preserve the existing unlimited request timeout.
         url,
         parameters,
         verify=verify,
         cert=cert,
         headers=http_headers,
-    ) # noqa: S113 - Preserve existing request timeout/TLS behavior.
+    )
     timer.report("Locations request")
 
     # parse the response

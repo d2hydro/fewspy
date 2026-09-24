@@ -6,14 +6,12 @@ https://publicwiki.deltares.nl/display/FEWSDOC/FEWS+PI+REST+Web+Service
 """
 
 import logging
-import urllib3
-from typing import Literal, Optional, Tuple, Union
-
-from fewspy.auth import OAuth2ClientCredentialsTokenProvider
+from typing import Literal
 
 import pandas as pd
 import urllib3
 
+from fewspy.auth import OAuth2ClientCredentialsTokenProvider
 from fewspy.time_series import SeriesKey
 from fewspy.utils.timer import Timer
 from fewspy.utils.url import validate_url
@@ -45,9 +43,9 @@ class Api:
         logger=None,
         ssl_verify=None,
         validate_endpoint: bool = True,
-        bearer_token: Optional[str] = None,
-        oauth2: Optional[dict] = None,
-        cert: Optional[Union[str, Tuple[str, str]]] = None,
+        bearer_token: str | None = None,
+        oauth2: dict | None = None,
+        cert: str | tuple[str, str] | None = None,
     ):
         self.document_format = "PI_JSON"
         self.logger = logger
@@ -82,9 +80,7 @@ class Api:
             required_keys = ["token_url", "client_id", "client_secret", "scope"]
             missing = [key for key in required_keys if key not in oauth2]
             if missing:
-                raise ValueError(
-                    f"Missing oauth2 configuration keys: {', '.join(missing)}"
-                )
+                raise ValueError(f"Missing oauth2 configuration keys: {', '.join(missing)}")
 
             self._oauth2_provider = OAuth2ClientCredentialsTokenProvider(
                 token_url=oauth2["token_url"],
@@ -97,7 +93,7 @@ class Api:
                 logger=self.logger,
             )
 
-    def _request_headers(self) -> Optional[dict]:
+    def _request_headers(self) -> dict | None:
         headers = {}
         if self._bearer_token is not None:
             headers["Authorization"] = f"Bearer {self._bearer_token}"
@@ -108,18 +104,11 @@ class Api:
     def __kwargs(self, url_post_fix: str, kwargs: dict) -> dict:
         kwargs = {
             **kwargs,
-            **dict(
-                url=f"{self.url}{url_post_fix}",
-                verify=self.ssl_verify,
-                cert=self.cert,
-                logger=self.logger,
-                http_headers=self._request_headers(),
-            ),
-            **{
-                "url": f"{self.url}{url_post_fix}",
-                "verify": self.ssl_verify,
-                "logger": self.logger,
-            },
+            "url": f"{self.url}{url_post_fix}",
+            "verify": self.ssl_verify,
+            "cert": self.cert,
+            "logger": self.logger,
+            "http_headers": self._request_headers(),
         }
         kwargs.pop("self")
         kwargs.pop("parallel", None)

@@ -2,7 +2,6 @@ import logging
 from xml.etree import ElementTree
 
 import pandas as pd
-from typing import Optional, Tuple, Union
 import requests
 
 from ..utils.timer import Timer
@@ -43,10 +42,10 @@ def _element_to_tuple(qualifier_element: ElementTree.Element) -> tuple:
 def get_qualifiers(
     url: str,
     verify: bool = False,
-    cert: Optional[Union[str, Tuple[str, str]]] = None,
+    cert: str | tuple[str, str] | None = None,
     logger=LOGGER,
-    http_headers: dict = None,
-    headers: dict = None,
+    http_headers: dict | None = None,
+    headers: dict | None = None,
 ) -> pd.DataFrame:
     """
     Get FEWS qualifiers as Pandas DataFrame
@@ -71,7 +70,7 @@ def get_qualifiers(
         raise ValueError("Use either http_headers or headers, not both")
     if http_headers is None:
         http_headers = headers
-    response = requests.get(url, verify=verify, cert=cert, headers=http_headers) # noqa: S113, S501 - Preserve existing request timeout/TLS behavior.
+    response = requests.get(url, verify=verify, cert=cert, headers=http_headers)  # noqa: S113 - Preserve existing request timeout/TLS behavior.
     # Preserve the existing qualifier endpoint's TLS behavior.
     timer.report("Qualifiers request")
 

@@ -41,3 +41,19 @@ def test_validate_url_raises_for_missing_endpoint(monkeypatch):
 
     with pytest.raises(URLNotFoundError):
         validate_url("https://example.test/fews")
+
+
+@pytest.mark.parametrize("cert", [None, "client.pem", ("client.pem", "client.key")])
+@pytest.mark.parametrize("scheme", ["http", "https"])
+def test_validate_url_passes_client_certificate(monkeypatch, cert, scheme):
+    calls = []
+
+    def fake_get(url, **kwargs):
+        calls.append((url, kwargs))
+        return _Response(status_code=200, ok=True)
+
+    monkeypatch.setattr("fewspy.utils.url.requests.get", fake_get)
+    url = f"{scheme}://example.test/fews/"
+
+    assert validate_url(url, cert=cert) == (url, scheme == "https")
+    assert calls == [(f"{url}timezoneid", {"verify": False, "cert": cert})]

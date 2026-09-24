@@ -1,7 +1,6 @@
 import logging
 
 import pandas as pd
-from typing import List, Optional, Tuple, Union
 import requests
 
 from ..utils.conversions import camel_to_snake_case
@@ -25,11 +24,11 @@ def get_parameters(
     filter_id: str | None = None,
     document_format: str = "PI_JSON",
     verify: bool = False,
-    cert: Optional[Union[str, Tuple[str, str]]] = None,
-    http_headers: dict = None,
+    cert: str | tuple[str, str] | None = None,
+    http_headers: dict | None = None,
     logger=LOGGER,
-    headers: dict = None,
-) -> List[dict]:
+    headers: dict | None = None,
+) -> list[dict]:
     """
     Get FEWS qualifiers as a pandas DataFrame
 
@@ -56,14 +55,14 @@ def get_parameters(
     if http_headers is None:
         http_headers = headers
     parameters = parameters_to_fews(locals())
-    response = requests.get(
+    response = requests.get(  # noqa: S113 - Preserve the existing unlimited request timeout.
         url,
         parameters,
         verify=verify,
         cert=cert,
         headers=http_headers,
-    ) # noqa: S113 - Preserve existing request timeout/TLS behavior.
-    
+    )
+
     timer.report("Parameters request")
 
     # parse the response
