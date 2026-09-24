@@ -120,9 +120,8 @@ def get_time_series_async(
         except RuntimeError:
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
-        finally:
-            loop.set_debug(True)
-            return loop  # noqa: B012 - Preserve existing exception/return behavior in this lint-only change.
+        loop.set_debug(True)
+        return loop
 
     async def get_timeseries_async(location_id, parameter_id, qualifier_id, session):
         """Get timerseries using FEWS (asynchronously)"""
