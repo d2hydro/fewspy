@@ -1,9 +1,9 @@
-import requests
-import pandas as pd
-import geopandas as gpd
 import logging
-from ..utils.timer import Timer
-from ..utils.transformations import parameters_to_fews
+from typing import Literal
+
+import geopandas as gpd
+import requests
+
 from ..utils.conversions import (
     attributes_to_array,
     camel_to_snake_case,
@@ -12,22 +12,24 @@ from ..utils.conversions import (
 )
 from typing import Literal, Optional, Tuple, Union
 
+from ..utils.timer import Timer
+from ..utils.transformations import parameters_to_fews
 
 LOGGER = logging.getLogger(__name__)
 
 
 def get_locations(
     url: str,
-    filter_id: str = None,
+    filter_id: str | None = None,
     document_format: Literal["GEO_JSON", "PI_JSON"] = "GEO_JSON",
-    attributes: list = [],
+    attributes: list = [],  # noqa: B006 - Preserve the existing read-only API default.
     verify: bool = False,
     cert: Optional[Union[str, Tuple[str, str]]] = None,
     http_headers: dict = None,
     logger=LOGGER,
     remove_duplicates: bool = False,
     headers: dict = None,
-) -> pd.DataFrame:
+) -> gpd.GeoDataFrame:
     """
     Get FEWS qualifiers as a pandas DataFrame
 
@@ -41,12 +43,11 @@ def get_locations(
         Defaults to False.
         logger (logging.Logger, optional): Logger to pass logging to. By default, a logger will ge created.
 
-    Returns:
-        df (pandas.DataFrame): Pandas dataframe with index "id" and columns
-        "name" and "group_id".
+    Returns
+    -------
+        gdf (geopandas.GeoDataFrame): geopandas GeoDataFrame with index "id". Geometry is Point(x,y) if PI_JSON is requested. It is features geometry if GEO_JSON is requested
 
     """
-
     # do the request
     timer = Timer(logger)
     if (http_headers is not None) and (headers is not None):
@@ -60,23 +61,19 @@ def get_locations(
         verify=verify,
         cert=cert,
         headers=http_headers,
-    )
+    ) # noqa: S113 - Preserve existing request timeout/TLS behavior.
     timer.report("Locations request")
 
     # parse the response
     if response.status_code == 200:
         if document_format == "PI_JSON":
             # convert to gdf and snake_case
-            gdf = gpd.GeoDataFrame(
-                response.json()["locations"], geometry=gpd.GeoSeries()
-            )
+            gdf = gpd.GeoDataFrame(response.json()["locations"], geometry=gpd.GeoSeries())
             gdf.columns = [camel_to_snake_case(i) for i in gdf.columns]
 
             # remove duplicates
             if remove_duplicates:
-                gdf.drop_duplicates(
-                    subset="location_id", inplace=True, ignore_index=True
-                )
+                gdf.drop_duplicates(subset="location_id", inplace=True, ignore_index=True)
 
             # set index
             gdf.set_index("location_id", inplace=True)
@@ -94,28 +91,22 @@ def get_locations(
             gdf.columns = [camel_to_snake_case(i) for i in gdf.columns]
 
             # reproject if crs is provided
-            if "crs" in data.keys():
+            if "crs" in data:
                 target_epsg = data["crs"]["properties"]["code"]
                 if target_epsg != 4326:
                     gdf = gdf.to_crs(f"EPSG:{target_epsg}")
 
             # remove duplicates
             if remove_duplicates:
-                gdf.drop_duplicates(
-                    subset="location_id", inplace=True, ignore_index=True
-                )
+                gdf.drop_duplicates(subset="location_id", inplace=True, ignore_index=True)
 
             # set index
             gdf.set_index("location_id", inplace=True)
         else:
-            raise ValueError(
-                f"Reading document_format {document_format} not implemented"
-            )
+            raise ValueError(f"Reading document_format {document_format} not implemented")
         # handle attributes
         if attributes:
-            gdf.loc[:, attributes] = attributes_to_array(
-                gdf["attributes"].values, attributes
-            )
+            gdf.loc[:, attributes] = attributes_to_array(gdf["attributes"].values, attributes)
         gdf.drop(columns=["attributes"], inplace=True)
         timer.report("Locations parsed")
 

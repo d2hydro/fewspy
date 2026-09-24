@@ -12,7 +12,7 @@ jobs:
     name: Test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           ref: ${{ github.event.release.tag_name }}
           fetch-depth: 0
@@ -24,7 +24,7 @@ jobs:
           echo "SETUPTOOLS_SCM_PRETEND_VERSION=${tag_version#v}" >> "$GITHUB_ENV"
 
       - name: Set up Pixi
-        uses: prefix-dev/setup-pixi@v0.9.6
+        uses: prefix-dev/setup-pixi@v0.10.2
         with:
           pixi-version: v0.70.1
           cache: true
@@ -37,7 +37,7 @@ jobs:
     needs: tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           ref: ${{ github.event.release.tag_name }}
           fetch-depth: 0
@@ -49,7 +49,7 @@ jobs:
           echo "SETUPTOOLS_SCM_PRETEND_VERSION=${tag_version#v}" >> "$GITHUB_ENV"
 
       - name: Set up Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v7
         with:
           python-version: "3.13"
 

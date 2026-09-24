@@ -136,4 +136,7 @@ dmypy.json
 # Anything that can be executed by Windows
 *.cmd
 tests/hhnk/*
-!tests/hhnk/convert_twinpy.py
+!tests/hhnk/convert_tmx.py
+
+# .tmp dirs agents sometimes fail to clean (and shouldn't be committed)
+.tmp/*

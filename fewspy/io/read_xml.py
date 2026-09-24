@@ -1,5 +1,7 @@
-from lxml import etree
 from pathlib import Path
+
+from lxml import etree
+
 from fewspy.time_series import TimeSeriesSet
 
 ns = {"pi": "http://www.wldelft.nl/fews/PI"}
@@ -14,9 +16,7 @@ def _parse_xml_data(root) -> TimeSeriesSet:
     time_series_set = {"version": version, "timeZone": time_zone, "timeSeries": []}
 
     # Get children, filter out timezone.
-    rootchildren = [
-        child for child in root.getchildren() if child.tag.endswith("series")
-    ]
+    rootchildren = [child for child in root.getchildren() if child.tag.endswith("series")]
 
     # Loop over children (individual timeseries in the xml)
     for child in rootchildren:
@@ -26,9 +26,7 @@ def _parse_xml_data(root) -> TimeSeriesSet:
 
         for subchild in subchildren:
             # Write header to dict
-            if subchild.tag.endswith(
-                "header"
-            ):  # gewoonlijk eerste subchild is de header
+            if subchild.tag.endswith("header"):  # gewoonlijk eerste subchild is de header
                 header_childs = subchild.getchildren()
                 metadata = {"qualifierId": None}
 
@@ -47,11 +45,11 @@ def _parse_xml_data(root) -> TimeSeriesSet:
                         metadata[key] = item.text
                     else:
                         metadata[key] = {}
-                        for item_key, item_value in zip(item_keys, item.values()):
+                        for item_key, item_value in zip(item_keys, item.values(), strict=False):
                             metadata[key][item_key] = item_value
             # Get event data
             else:
-                data += [{k: v for k, v in zip(subchild.keys(), subchild.values())}]
+                data += [dict(zip(subchild.keys(), subchild.values(), strict=False))]
 
         time_series_set["timeSeries"] += [{"header": metadata, "events": data}]
 
@@ -64,10 +62,10 @@ def read_xml(xml_path: Path) -> TimeSeriesSet:
     Args:
         xml_path (Path): Path to xml-file
 
-    Returns:
+    Returns
+    -------
         TimeSeriesSet: timeseries
     """
-
     root = etree.parse(xml_path).getroot()  # Parse XML data
     return _parse_xml_data(root)
 
@@ -78,9 +76,9 @@ def read_xml_from_string(xml_string: str) -> TimeSeriesSet:
     Args:
         xml_string (str): string with PI_XML data
 
-    Returns:
+    Returns
+    -------
         TimeSeriesSet: timeseries
     """
-
     root = etree.fromstring(xml_string.encode("utf-8"))
     return _parse_xml_data(root)

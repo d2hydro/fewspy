@@ -1,6 +1,8 @@
-import requests
 import logging
 from typing import List, Optional, Tuple, Union
+
+import requests
+
 from ..utils.timer import Timer
 from ..utils.transformations import parameters_to_fews
 
@@ -9,7 +11,7 @@ LOGGER = logging.getLogger(__name__)
 
 def get_filters(
     url: str,
-    filter_id: str = None,
+    filter_id: str | None = None,
     document_format: str = "PI_JSON",
     verify: bool = False,
     cert: Optional[Union[str, Tuple[str, str]]] = None,
@@ -30,12 +32,12 @@ def get_filters(
         logger (logging.Logger, optional): Logger to pass logging to. By
         default, a logger will ge created.
 
-    Returns:
+    Returns
+    -------
         df (pandas.DataFrame): Pandas dataframe with index "id" and columns
         "name" and "group_id".
 
     """
-
     # do the request
     timer = Timer(logger)
     if (http_headers is not None) and (headers is not None):
@@ -49,13 +51,14 @@ def get_filters(
         verify=verify,
         cert=cert,
         headers=http_headers,
-    )
+    ) # noqa: S113 - Preserve existing request timeout/TLS behavior.
+    
     timer.report("Filters request")
 
     # parse the response
     result = []
     if response.status_code == 200:
-        if "filters" in response.json().keys():
+        if "filters" in response.json():
             result = response.json()["filters"]
         timer.report("Filters parsed")
     else:

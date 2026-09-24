@@ -1,6 +1,8 @@
-import requests
 import logging
 from typing import Optional, Tuple, Union
+
+import requests
+
 from ..utils.timer import Timer
 from ..utils.transformations import parameters_to_fews
 
@@ -9,7 +11,7 @@ LOGGER = logging.getLogger(__name__)
 
 def get_timezone_id(
     url: str,
-    filter_id: str = None,
+    filter_id: str | None = None,
     document_format: str = "PI_JSON",
     verify: bool = False,
     cert: Optional[Union[str, Tuple[str, str]]] = None,
@@ -30,11 +32,11 @@ def get_timezone_id(
         logger (logging.Logger, optional): Logger to pass logging to. By
         default, a logger will ge created.
 
-    Returns:
+    Returns
+    -------
         str: timezone string, e.g. GMT+01:00 expressing a GMT + 1 hour offset
 
     """
-
     # do the request
     timer = Timer(logger)
     if (http_headers is not None) and (headers is not None):
@@ -48,7 +50,7 @@ def get_timezone_id(
         verify=verify,
         cert=cert,
         headers=http_headers,
-    )
+    ) # noqa: S113 - Preserve existing request timeout/TLS behavior.
     timer.report("Timezone request")
 
     # parse the response

@@ -1,5 +1,6 @@
-import pandas as pd
 from pathlib import Path
+
+import pandas as pd
 
 DATA_PATH = Path(__file__).parent / "data"
 PARAMETERS_CSV = DATA_PATH / "parameters.csv"

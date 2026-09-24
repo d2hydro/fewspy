@@ -1,27 +1,33 @@
 import warnings
 from dataclasses import field
-from datetime import datetime
 from pathlib import Path
-from typing import List, Literal, TypedDict
-from pydantic.dataclasses import dataclass
-from pydantic import ConfigDict
-import pandas as pd
+from typing import Literal
 
+import pandas as pd
+from pydantic import ConfigDict
+from pydantic.dataclasses import dataclass
+
+from fewspy._header import (
+    HEADER_KEY_FIELDS,
+    Header,
+    SeriesKey,
+    TimeStepDict,
+)
 from fewspy.io.header_file import get_header_file
-from fewspy.io.write_netcdf import write_netcdf
-from fewspy.utils.conversions import camel_to_snake_case, dict_to_datetime
+from fewspy.io.write_netcdf import _validate_file_naming, write_netcdf
 from fewspy.utils.transformations import flatten_list
 
-DATETIME_KEYS = ["start_date", "end_date"]
-FLOAT_KEYS = ["miss_val", "lat", "lon", "x", "y", "z"]
-STRING_KEYS = ["module_instance_id"]
+__all__ = [
+    "Events",
+    "Header",
+    "SeriesKey",
+    "TimeSeries",
+    "TimeSeriesSet",
+    "TimeStepDict",
+    "reliables",
+]  # Header is publicly part of fewspy.time_series
+
 EVENT_COLUMNS = ["datetime", "value", "flag"]
-
-
-@dataclass(config=ConfigDict(arbitrary_types_allowed=False))
-class TimeStepDict(TypedDict, total=False):
-    unit: Literal["second", "minute", "hour", "day", "month", "year", "nonequidistant"]
-    multiplier: int | None
 
 
 def reliables(df: pd.DataFrame, threshold: int = 6) -> pd.DataFrame:
@@ -32,7 +38,8 @@ def reliables(df: pd.DataFrame, threshold: int = 6) -> pd.DataFrame:
         df (pd.DataFrame): input Events-type Pandas Dataframe
         threshold (int, optional): threshold for unreleables. Defaults to 6.
 
-    Returns:
+    Returns
+    -------
         pd.DataFrame: Pandas DataFrame with reliable data only
 
     """
@@ -42,94 +49,25 @@ def reliables(df: pd.DataFrame, threshold: int = 6) -> pd.DataFrame:
         return df.loc[df["flag"] < threshold]
 
 
-@dataclass(config=ConfigDict(arbitrary_types_allowed=True))
-class Header:
-    """FEWS-PI header-style dataclass"""
-
-    # required arguments
-    type: Literal["accumulative", "instantaneous"]
-    location_id: str
-    parameter_id: str
-    time_step: TimeStepDict
-    start_date: datetime
-    end_date: datetime
-
-    # Optional arguments
-    module_instance_id: str | None = None
-    miss_val: float = float("nan")
-    lat: float | None = None
-    lon: float | None = None
-    x: float | None = None
-    y: float | None = None
-    units: str | None = None
-    station_name: str | None = None
-    z: float | None = None
-    qualifier_id: List[str] | None = None
-
-    @classmethod
-    def from_pi_header(cls, pi_header: dict) -> "Header":
-        warnings.warn(
-            "from_pi_header is depricated, use from_dict instead.", DeprecationWarning
-        )
-        return cls.from_dict(pi_header=pi_header)
-
-    @classmethod
-    def from_dict(cls, pi_header: dict) -> "Header":
-        """
-        Parse Header from FEWS PI header dict.
-
-        Args:
-            pi_header (dict): FEWS PI header as dictionary
-
-        Returns:
-            Header: FEWS-PI header-style dataclass
-
-        """
-
-        def _convert_kv(k: str, v) -> dict:
-            k = camel_to_snake_case(k)
-            if k in DATETIME_KEYS:
-                v = dict_to_datetime(v)
-            elif k in FLOAT_KEYS:
-                v = float(v)
-            elif k in STRING_KEYS:
-                if v == "None":
-                    v = None
-                else:
-                    v = str(v)
-            elif k == "time_step":
-                if "multiplier" in v.keys():
-                    v["multiplier"] = float(v["multiplier"])
-            return k, v
-
-        args = (_convert_kv(k, v) for k, v in pi_header.items())
-        return cls(**{i[0]: i[1] for i in args})
-
-    def to_row(self):
-        flat = self.__dict__.copy()
-        ts = flat.pop("time_step", {})
-        flat["time_step.unit"] = ts.get("unit")
-        flat["time_step.multiplier"] = ts.get("multiplier")
-        return flat
-
-
 class Events(pd.DataFrame):
     """FEWS-PI events in pandas DataFrame"""
 
     @classmethod
     def from_pi_events(
-        cls, pi_events: list, missing_value: float | None = None, tz_offset: float | None = None
+        cls,
+        pi_events: list,
+        missing_value: float | None = None,
+        tz_offset: float | None = None,
     ) -> pd.DataFrame:
-        warnings.warn(
-            "from_pi_events is deprecated, use from_dict instead.", DeprecationWarning
-        )
-        return cls.from_dict(
-            pi_events=pi_events, missing_value=missing_value, tz_offset=tz_offset
-        )
+        warnings.warn("from_pi_events is deprecated, use from_dict instead.", DeprecationWarning, stacklevel=1)
+        return cls.from_dict(pi_events=pi_events, missing_value=missing_value, tz_offset=tz_offset)
 
     @classmethod
     def from_dict(
-        cls, pi_events: list, missing_value: float | None = None, tz_offset: float | None = None
+        cls,
+        pi_events: list,
+        missing_value: float | None = None,
+        tz_offset: float | None = None,
     ) -> pd.DataFrame:
         """
         Parse Events from FEWS PI events dict.
@@ -137,11 +75,11 @@ class Events(pd.DataFrame):
         Args:
             pi_events (dict): FEWS PI events as dictionary
 
-        Returns:
+        Returns
+        -------
             Events: pandas DataFrame
 
         """
-
         df = cls(pi_events)
 
         if df.empty:
@@ -149,9 +87,7 @@ class Events(pd.DataFrame):
 
         # set datetime
         if tz_offset is not None:
-            df["datetime"] = pd.to_datetime(
-                df["date"] + " " + df["time"]
-            ) - pd.Timedelta(hours=tz_offset)
+            df["datetime"] = pd.to_datetime(df["date"] + " " + df["time"]) - pd.Timedelta(hours=tz_offset)
         else:
             df["datetime"] = pd.to_datetime(df["date"] + " " + df["time"])
 
@@ -183,9 +119,7 @@ class TimeSeries:
 
     header: Header
     events: Events | pd.DataFrame = field(
-        default_factory=lambda: pd.DataFrame(columns=EVENT_COLUMNS).set_index(
-            "datetime"
-        )
+        default_factory=lambda: pd.DataFrame(columns=EVENT_COLUMNS).set_index("datetime")
     )
 
     def __len__(self):
@@ -196,6 +130,7 @@ class TimeSeries:
         warnings.warn(
             "from_pi_time_series is deprecated, use from_dict instead.",
             DeprecationWarning,
+            stacklevel=1,
         )
         return cls.from_dict(pi_time_series=pi_time_series, time_zone=time_zone)
 
@@ -207,15 +142,14 @@ class TimeSeries:
             pi_time_series (dict): FEWS PI timeseries as dictionary
             time_zone (float, optional): time_zone. Defaults to None.
 
-        Returns:
+        Returns
+        -------
             fewspy.TimeSeries: time series in FEWS PI format
         """
         header = Header.from_dict(pi_time_series["header"])
-        kwargs = dict(header=header)
-        if "events" in pi_time_series.keys():
-            kwargs["events"] = Events.from_dict(
-                pi_time_series["events"], header.miss_val, time_zone
-            )
+        kwargs = {"header": header}
+        if "events" in pi_time_series:
+            kwargs["events"] = Events.from_dict(pi_time_series["events"], header.miss_val, time_zone)
         return cls(**kwargs)
 
 
@@ -225,7 +159,7 @@ class TimeSeriesSet:
 
     version: str | None = None
     time_zone: float | None = None
-    time_series: List[TimeSeries] = field(default_factory=list)
+    time_series: list[TimeSeries] = field(default_factory=list)
 
     def __len__(self):
         return len(self.time_series)
@@ -235,6 +169,7 @@ class TimeSeriesSet:
         warnings.warn(
             "from_pi_time_series is deprecated, use from_dict instead.",
             DeprecationWarning,
+            stacklevel=1,
         )
         return cls.from_dict(pi_time_series_set)
 
@@ -245,22 +180,20 @@ class TimeSeriesSet:
         Args:
             pi_time_series_set (dict): FEWS PI time series set as dictionary
 
-        Returns:
+        Returns
+        -------
             fewspy.TimeSeriesSet: Time series set with multiple time series
         """
         kwargs = {}
-        if "version" in pi_time_series_set.keys():
+        if "version" in pi_time_series_set:
             kwargs["version"] = pi_time_series_set["version"]
-        if "timeZone" in pi_time_series_set.keys():
+        if "timeZone" in pi_time_series_set:
             time_zone = float(pi_time_series_set["timeZone"])
             kwargs["time_zone"] = time_zone
         else:
             time_zone = None
-        if "timeSeries" in pi_time_series_set.keys():
-            kwargs["time_series"] = [
-                TimeSeries.from_dict(i, time_zone)
-                for i in pi_time_series_set["timeSeries"]
-            ]
+        if "timeSeries" in pi_time_series_set:
+            kwargs["time_series"] = [TimeSeries.from_dict(i, time_zone) for i in pi_time_series_set["timeSeries"]]
         return cls(**kwargs)
 
     def add(self, time_series_set):
@@ -270,15 +203,15 @@ class TimeSeriesSet:
 
     @property
     def empty(self):
-        return all([i.events.empty for i in self.time_series])
+        return all(i.events.empty for i in self.time_series)
 
     @property
     def parameter_ids(self):
-        return list(set([i.header.parameter_id for i in self.time_series]))
+        return list({i.header.parameter_id for i in self.time_series})
 
     @property
     def location_ids(self):
-        return list(set([i.header.location_id for i in self.time_series]))
+        return list({i.header.location_id for i in self.time_series})
 
     @property
     def qualifier_ids(self):
@@ -287,11 +220,21 @@ class TimeSeriesSet:
 
         return list(set(flatten_list(qualifiers)))
 
-    def to_df(self) -> pd.DataFrame:
+    def to_df(self, series_key: SeriesKey | str = SeriesKey.LOCATION_PARAMETER) -> pd.DataFrame:
+        """Reliable values with location/parameter columns or seven header levels.
+
+        Header mode stores complete headers in DataFrame.attrs for I/O. Timestep
+        and qualifier levels are canonical JSON strings; no hashes are used.
+        """
+        series_key = SeriesKey(series_key)
         columns = pd.MultiIndex.from_tuples(
-            [(i.header.location_id, i.header.parameter_id) for i in self.time_series],
-            names=["location_id", "parameter_id"],
+            [i.header.series_identity(series_key) for i in self.time_series],
+            names=(HEADER_KEY_FIELDS if series_key == SeriesKey.HEADER else ["location_id", "parameter_id"]),
         )
+        if series_key == SeriesKey.HEADER and not self.time_series:
+            df = pd.DataFrame(columns=columns, index=pd.DatetimeIndex([], name="datetime"))
+            df.attrs["fewspy_headers"] = []
+            return df
         df = pd.concat(
             [reliables(i.events)["value"] for i in self.time_series],
             axis=1,
@@ -299,14 +242,19 @@ class TimeSeriesSet:
         )
         df.columns = columns
 
+        if series_key == SeriesKey.HEADER:
+            df.attrs["fewspy_headers"] = [i.header.to_json() for i in self.time_series]
         return df
 
     def to_netcdf(
         self,
         out_dir: Path,
-        global_attributes: dict = {"source": "fewspy"},
+        global_attributes: dict = {"source": "fewspy"},  # noqa: B006 - Preserve the existing read-only API default.
         file_template: str = "{parameter_id}.nc",
         remove_dir: bool = False,
+        series_key: SeriesKey | str = SeriesKey.LOCATION_PARAMETER,
+        file_naming: Literal["default", "archive"] = "default",
+        include_time_series_type: bool = False,
     ) -> None:
         """Write fewspy.TimeSeriesSet to netCDF files, one per parameter_id.
 
@@ -315,9 +263,18 @@ class TimeSeriesSet:
             global_attributes (dict, optional): Global attributes for the NetCDF files. Defaults to {"source": "fewspy"}.
             file_template (str, optional): Template for naming the NetCDF files. Defaults to "{parameter_id}.nc".
             remove_dir (bool, optional): If True, removes the output directory before writing. Defaults to False.
+            series_key: "location_parameter" (default) or "header". Header mode
+                groups matching identities across locations and uses archive-style
+                filenames. Custom templates can use {identity}.
+            file_naming: "default" preserves existing names; "archive" uses readable
+                names and requires series_key="header".
+            include_time_series_type: Append the full type to archive names when known.
+                Missing value_type and time_series_type are omitted from archive names.
         """
-        if not self.empty:
-            df = self.to_df()
+        series_key = SeriesKey(series_key)
+        _validate_file_naming(series_key, file_naming, include_time_series_type)
+        if not self.empty or (series_key == SeriesKey.HEADER and self.time_series):
+            df = self.to_df(series_key=series_key)
 
             write_netcdf(
                 df=df,
@@ -325,22 +282,36 @@ class TimeSeriesSet:
                 global_attributes=global_attributes,
                 file_template=file_template,
                 remove_dir=remove_dir,
+                series_key=series_key,
+                file_naming=file_naming,
+                include_time_series_type=include_time_series_type,
             )
 
-    def to_parquet(self, parquet_file: Path, include_header: bool = False):
+    def to_parquet(
+        self,
+        parquet_file: Path,
+        include_header: bool = False,
+        series_key: SeriesKey | str = SeriesKey.LOCATION_PARAMETER,
+    ):
         """Write fewspy.TimeSeriesSet to arrow parquet file
 
         Args:
             parquet_file (Path): parquet-file to store
             include_header (bool, optional): if true all headers will be stored as a parquet-file next to the timeseries. Defaults to False.
+            series_key: "location_parameter" (default) or "header". Header mode
+                always embeds complete headers in the event file's metadata.
         """
-
+        series_key = SeriesKey(series_key)
         # make dir-structure to file(s)
         parquet_file.parent.mkdir(exist_ok=True, parents=True)
         parquet_file.unlink(missing_ok=True)
 
         # concat events to one dataframe and write to parquet
-        df = self.to_df()
+        df = self.to_df(series_key=series_key)
+        if series_key == SeriesKey.HEADER:
+            # Parquet cannot reliably encode nested MultiIndex levels. Keep the
+            # complete headers in pandas metadata and use positional columns.
+            df.columns = [str(i) for i in range(len(df.columns))]
         df.to_parquet(parquet_file, engine="pyarrow")
 
         # if include_header, write header_file
