@@ -142,7 +142,7 @@ def get_time_series_async(
             response.raise_for_status()
         except Exception as err:
             logger.error(f"An error ocurred: {err} while executing url {url} with parameters {parameters}")
-            response = None
+            return None
         response_json = await response.json()
         return response_json
 

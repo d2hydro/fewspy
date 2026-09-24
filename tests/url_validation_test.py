@@ -56,4 +56,4 @@ def test_validate_url_passes_client_certificate(monkeypatch, cert, scheme):
     url = f"{scheme}://example.test/fews/"
 
     assert validate_url(url, cert=cert) == (url, scheme == "https")
-    assert calls == [(f"{url}timezoneid", {"verify": False, "cert": cert})]
+    assert calls == [(f"{url}timezoneid", {"verify": scheme == "https", "cert": cert})]

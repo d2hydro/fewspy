@@ -24,17 +24,17 @@ def validate_url(
     if not url.endswith("/"):
         url += "/"
 
+    # verify TLS certificates for https endpoints, matching the returned ssl_verify
+    ssl_verify = url.startswith("https")
+
     # test with request
     try:
-        response = requests.get(f"{url}{test_postfix}", verify=False, cert=cert)  # noqa: S113, S501 - Preserve existing request timeout/TLS behavior.
+        response = requests.get(f"{url}{test_postfix}", verify=ssl_verify, cert=cert)  # noqa: S113 - Preserve existing request timeout behavior.
     except requests.RequestException as err:
         raise URLNotFoundError(f"{url} is not a root to a live FEWS PI Rest WebService") from err
 
     # 401/403 means the endpoint exists but is protected.
     if response.status_code not in (401, 403) and not response.ok:
         raise URLNotFoundError(f"{url} is not a root to a live FEWS PI Rest WebService")
-
-    # estimate ssl_verify
-    ssl_verify = url.startswith("https")
 
     return url, ssl_verify
