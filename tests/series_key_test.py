@@ -376,7 +376,7 @@ def test_api_passes_header_mode(monkeypatch, series_key):
 
     module = importlib.import_module("fewspy.api")
     captured = []
-    monkeypatch.setattr(module, "validate_url", lambda url, cert=None: (url, False))
+    monkeypatch.setattr(module, "validate_url", lambda url, cert=None, ssl_verify=None: (url, False))
     monkeypatch.setattr(module, "get_time_series_async", lambda **kwargs: captured.append(kwargs))
     api = Api("https://example.com/", ssl_verify=False)
     api.get_time_series("filter", parallel=True, series_key=series_key)

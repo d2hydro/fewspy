@@ -57,3 +57,17 @@ def test_validate_url_passes_client_certificate(monkeypatch, cert, scheme):
 
     assert validate_url(url, cert=cert) == (url, scheme == "https")
     assert calls == [(f"{url}timezoneid", {"verify": scheme == "https", "cert": cert})]
+
+
+def test_validate_url_uses_explicit_ssl_verify(monkeypatch):
+    calls = []
+
+    def fake_get(url, **kwargs):
+        calls.append((url, kwargs))
+        return _Response(status_code=200, ok=True)
+
+    monkeypatch.setattr("fewspy.utils.url.requests.get", fake_get)
+    url = "https://example.test/fews/"
+
+    assert validate_url(url, ssl_verify=False) == (url, False)
+    assert calls == [(f"{url}timezoneid", {"verify": False, "cert": None})]

@@ -52,7 +52,7 @@ class Api:
         self.timer = Timer(logger)
         self.cert = cert
         if validate_endpoint:
-            self.url, verify = validate_url(url, cert=self.cert)
+            self.url, verify = validate_url(url, cert=self.cert, ssl_verify=ssl_verify)
         else:
             if not url.endswith("/"):
                 url += "/"

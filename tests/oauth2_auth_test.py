@@ -50,7 +50,7 @@ def test_api_oauth2_adds_bearer_header(monkeypatch):
     token_calls = []
     filters_calls = []
 
-    def _fake_validate_url(url, cert=None):
+    def _fake_validate_url(url, cert=None, ssl_verify=None):
         if not url.endswith("/"):
             url = f"{url}/"
         return url, False
@@ -91,7 +91,7 @@ def test_api_oauth2_adds_bearer_header(monkeypatch):
 
 
 def test_api_rejects_multiple_auth_methods(monkeypatch):
-    def _fake_validate_url(url, cert=None):
+    def _fake_validate_url(url, cert=None, ssl_verify=None):
         if not url.endswith("/"):
             url = f"{url}/"
         return url, False
@@ -112,7 +112,7 @@ def test_api_rejects_multiple_auth_methods(monkeypatch):
 
 
 def test_api_can_skip_preflight_validation(monkeypatch):
-    def _failing_validate_url(url, cert=None):
+    def _failing_validate_url(url, cert=None, ssl_verify=None):
         raise RuntimeError("preflight should not be called")
 
     monkeypatch.setattr("fewspy.api.validate_url", _failing_validate_url)

@@ -9,6 +9,7 @@ def validate_url(
     url: str,
     test_postfix: str = "timezoneid",
     cert: str | tuple[str, str] | None = None,
+    ssl_verify: bool | None = None,
 ) -> tuple[str, bool]:
     """Validate a FEWS PI REST service URL.
 
@@ -16,8 +17,10 @@ def validate_url(
         url: input url to be validated
         test_postfix: postfix to url used for testing. Defaults to 'timezoneid'.
         cert: client certificate path or certificate/key pair passed to requests.
+        ssl_verify: SSL verification setting used for the test request. Inferred from
+            the URL scheme when None.
 
-    Returns: validated URL and inferred SSL verification setting.
+    Returns: validated URL and SSL verification setting.
 
     """
     # add / if not in input_url
@@ -25,7 +28,8 @@ def validate_url(
         url += "/"
 
     # verify TLS certificates for https endpoints, matching the returned ssl_verify
-    ssl_verify = url.startswith("https")
+    if ssl_verify is None:
+        ssl_verify = url.startswith("https")
 
     # test with request
     try:
