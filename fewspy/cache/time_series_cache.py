@@ -1,15 +1,19 @@
-from fewspy.cache.manifest import Manifest
-from typing import Optional
 import threading
-import xarray as xr
-import pandas as pd
-from pathlib import Path
-import numpy as np
+from contextlib import suppress
 from datetime import datetime
+from pathlib import Path
+
+import numpy as np
+import pandas as pd
+import xarray as xr
+
+from fewspy.cache.manifest import Manifest
+from fewspy.io.read_netcdf import read_netcdf
+from fewspy.time_series import SeriesKey, TimeSeriesSet
 
 
 class TimeSeriesCache:
-    def __init__(self, manifest: Manifest, last_manifest_mtime: Optional[float] = None):
+    def __init__(self, manifest: Manifest, last_manifest_mtime: float | None = None):
         self.manifest = manifest
         self.last_manifest_mtime: float | None = last_manifest_mtime
         self._lock = threading.RLock()
@@ -27,9 +31,7 @@ class TimeSeriesCache:
             ds = self._datasets.get(key)
         if ds is None:
             # Fallback if not cached
-            entry = self.manifest.get_entry(
-                filter_id=filter_id, parameter_id=parameter_id
-            )
+            entry = self.manifest.get_entry(filter_id=filter_id, parameter_id=parameter_id)
             ds = xr.open_dataset(
                 entry.path,
                 engine="netcdf4",
@@ -56,17 +58,14 @@ class TimeSeriesCache:
             old = self._datasets
             self._datasets = new
         for dataset in old.values():
-            try:
+            # Preserve best-effort cleanup, including the existing BaseException handling.
+            with suppress(BaseException):
                 dataset.close()
-            except:
-                pass
 
     @property
     def common_time_axis(self) -> pd.DatetimeIndex:
         if not self._datasets:
-            raise ValueError(
-                "No NetCDF DataSets open in cache. Check manifest-file and run self._open_all()"
-            )
+            raise ValueError("No NetCDF DataSets open in cache. Check manifest-file and run self._open_all()")
 
         if self._common_time_axis is None:
             # init idx_all
@@ -76,10 +75,7 @@ class TimeSeriesCache:
             for dataset in self._datasets.values():
                 idx = pd.to_datetime(dataset["time"].values)
 
-                if idx_all is None:
-                    idx_all = idx
-                else:
-                    idx_all = idx_all.union(idx)
+                idx_all = idx if idx_all is None else idx_all.union(idx)
 
             if idx_all is not None:
                 self._common_time_axis = idx_all.sort_values()
@@ -89,6 +85,7 @@ class TimeSeriesCache:
     def _decode_station_ids(cls, sid: xr.DataArray) -> np.ndarray:
         """
         Retourneert een 1D numpy array met dtype 'U' (unicode) zonder Python-loop.
+
         Werkt voor:
         - fixed-width bytes: dtype.kind == 'S'
         - unicode strings:   dtype.kind == 'U'
@@ -108,16 +105,12 @@ class TimeSeriesCache:
         if vals.dtype.kind == "O":
             obj = vals
             # mask voor bytes
-            is_bytes = np.frompyfunc(lambda x: isinstance(x, (bytes, bytearray)), 1, 1)(
-                obj
-            ).astype(bool)
+            is_bytes = np.frompyfunc(lambda x: isinstance(x, (bytes, bytearray)), 1, 1)(obj).astype(bool)
 
             out = np.empty(obj.shape, dtype=object)
             if is_bytes.any():
                 # Alleen de bytes-subset in één keer decoden
-                out[is_bytes] = np.char.decode(
-                    obj[is_bytes].astype("S"), "utf-8", "replace"
-                )
+                out[is_bytes] = np.char.decode(obj[is_bytes].astype("S"), "utf-8", "replace")
             if (~is_bytes).any():
                 # Niet-bytes naar str (no-op voor str, netjes voor ints e.d.)
                 out[~is_bytes] = obj[~is_bytes].astype(str)
@@ -138,7 +131,8 @@ class TimeSeriesCache:
         Args:
             manifest_path (Path): Path to manifest.json
 
-        Returns:
+        Returns
+        -------
             bool: True if swapped, else False
         """
         mtime = manifest_path.stat().st_mtime
@@ -165,11 +159,12 @@ class TimeSeriesCache:
         self,
         filter_id: str,
         parameter_id: str,
-        start_time: Optional[datetime | str] = None,
-        end_time: Optional[datetime | str] = None,
-        location_ids: Optional[list[str]] = None,
+        start_time: datetime | str | None = None,
+        end_time: datetime | str | None = None,
+        location_ids: list[str] | None = None,
+        series_key: SeriesKey | str = SeriesKey.LOCATION_PARAMETER,
     ) -> pd.DataFrame:
-        """fetch time series data from NetCDF file based on filter_id and parameter_id
+        """Fetch time series data from NetCDF file based on filter_id and parameter_id
 
         Args:
             filter_id (str): filter_id
@@ -177,10 +172,30 @@ class TimeSeriesCache:
             start_time (Optional[datetime  |  str], optional): start_time Defaults to None.
             end_time (Optional[datetime  |  str], optional): end_time. Defaults to None.
             location_ids (Optional[list[str]], optional): location_ids. Defaults to None.
+            series_key: "location_parameter" (default) or "header"; header mode
+                selects all matching identities from header-mode NetCDF files.
 
-        Returns:
+        Returns
+        -------
             pd.DataFrame: DataFrame with datetime index and MultiIndex columns (location_id, parameter_id)
         """
+        series_key = SeriesKey(series_key)
+        if series_key == SeriesKey.HEADER:
+            result = TimeSeriesSet()
+            for entry in self.manifest.files:
+                if entry.path.parent.name != filter_id:
+                    continue
+                dataset = self._datasets[self._key_for(entry.path)]
+                if dataset.attrs.get("parameter_id") != parameter_id:
+                    continue
+                part = read_netcdf(entry.path, series_key=SeriesKey.HEADER)
+                result.time_series.extend(
+                    ts for ts in part.time_series if location_ids is None or ts.header.location_id in location_ids
+                )
+            if not result.time_series:
+                raise ValueError("No full-header series match the cache selection")
+            return result.to_df(series_key=SeriesKey.HEADER).loc[start_time:end_time]
+
         dataset = self._get_open_ds(filter_id=filter_id, parameter_id=parameter_id)
         da = dataset[parameter_id]
 

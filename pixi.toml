@@ -10,13 +10,16 @@ license-file = "LICENSE"
 [tasks]
 tests = "pytest --cov=fewspy --cov-report=term-missing ./tests"
 build = "python -m build"
+lint = "pre-commit run --all-files"
 
 [dependencies]
+python = "3.14.*"
+pre-commit = "*"
+ruff = ">=0.12"
 aiohttp = "*"
 geopandas = "*"
 ipykernel = "*"
 lxml = "*"
-nest-asyncio = "*"
 pandas = "*"
 pyarrow = "*"
 pydantic="*"

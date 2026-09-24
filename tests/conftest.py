@@ -1,7 +1,7 @@
 import pytest
+from config import DATA_DIR, FEWS_API_URL
 
 from fewspy import Api
-from config import DATA_DIR, FEWS_API_URL
 
 
 @pytest.fixture(scope="session")

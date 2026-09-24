@@ -1,10 +1,11 @@
-from pathlib import Path
 import json
+from pathlib import Path
+
 from fewspy.time_series import TimeSeriesSet
 
 DATA_PATH = Path(__file__).parent / "data"
 
-with open(DATA_PATH / "pi_time_series.json") as src:
+with (DATA_PATH / "pi_time_series.json").open() as src:
     pi_time_series = json.load(src)
 
 timeseriesset = TimeSeriesSet.from_dict(pi_time_series)
@@ -31,12 +32,7 @@ def test_parameter_ids():
 
 
 def test_location_ids():
-    assert all(
-        [
-            i in ["NL34.HL.KGM156.LWZ1", "NL34.HL.KGM156.HWZ1"]
-            for i in timeseriesset.location_ids
-        ]
-    )
+    assert all(i in ["NL34.HL.KGM156.LWZ1", "NL34.HL.KGM156.HWZ1"] for i in timeseriesset.location_ids)
 
 
 def test_qualifier_ids():

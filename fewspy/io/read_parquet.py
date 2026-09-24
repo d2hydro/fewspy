@@ -1,8 +1,11 @@
-# %%
-from fewspy.time_series import TimeSeriesSet, Header, TimeSeries
+import json
+from dataclasses import MISSING, fields
 from pathlib import Path
+
 import pandas as pd
+
 from fewspy.io.header_file import get_header_file
+from fewspy.time_series import Header, SeriesKey, TimeSeries, TimeSeriesSet
 
 
 def _row_to_header(row):
@@ -21,15 +24,47 @@ def _column_to_time_series(df, column):
     return df
 
 
-def read_parquet(parquet_file: Path) -> TimeSeriesSet:
+def read_parquet(parquet_file: Path, series_key: SeriesKey | str = SeriesKey.LOCATION_PARAMETER) -> TimeSeriesSet:
     """Parse parquet file to fewspy TimeSeriesSet
 
     Args:
         parquet_file (Path): path to parquet-file
+        series_key: "location_parameter" (default) or "header". Header mode
+            reads embedded complete headers instead of the legacy sidecar.
 
-    Returns:
+    Returns
+    -------
         TimeSeriesSet: timeseries
     """
+    series_key = SeriesKey(series_key)
+    if series_key == SeriesKey.HEADER:
+        df = pd.read_parquet(parquet_file, engine="pyarrow")
+        headers = df.attrs.get("fewspy_headers")
+        if headers is None:
+            raise ValueError("Parquet is missing FEWS header metadata: fewspy_headers")
+        if len(headers) != len(df.columns):
+            raise ValueError(f"Parquet has {len(headers)} FEWS headers for {len(df.columns)} columns")
+        required = {
+            field.name for field in fields(Header) if field.default is MISSING and field.default_factory is MISSING
+        }
+        parsed_headers = []
+        for column, header in zip(df.columns, headers, strict=False):
+            header = json.loads(header)
+            missing = required - header.keys()
+            if missing:
+                raise ValueError(
+                    f"Parquet header for column {column!r} is missing required fields: " + ", ".join(sorted(missing))
+                )
+            parsed_headers.append(Header(**header))
+        return TimeSeriesSet(
+            time_series=[
+                TimeSeries(
+                    header=header,
+                    events=df.iloc[:, [i]].set_axis(["value"], axis=1),
+                )
+                for i, header in enumerate(parsed_headers)
+            ]
+        )
     # header to list of dict
     header_df = pd.read_parquet(get_header_file(parquet_file))
     header_df.set_index(["location_id", "parameter_id"], drop=False, inplace=True)

@@ -1,4 +1,4 @@
-from .conversions import snake_to_camel_case, datetime_to_fews_str
+from .conversions import datetime_to_fews_str, snake_to_camel_case
 
 DATETIME_KEYS = ["start_time", "end_time"]
 API_KEYS = [
@@ -26,11 +26,11 @@ def flatten_list(list_of_lists: list) -> list:
     Args:
         list_of_lists (list): List of lists
 
-    Returns:
+    Returns
+    -------
         list: flattened list
 
     """
-
     return [i for j in list_of_lists for i in j]
 
 
@@ -41,7 +41,8 @@ def parameters_to_fews(parameters: dict, bool_to_string=False) -> dict:
     Args:
         parameters (dict): parameters passed by Python API
 
-    Returns:
+    Returns
+    -------
         dict: parameters prepard for FEWS API request
 
     """
@@ -54,7 +55,7 @@ def parameters_to_fews(parameters: dict, bool_to_string=False) -> dict:
             v = True
         k = snake_to_camel_case(k)
 
-        if bool_to_string and (type(v) == bool):
+        if bool_to_string and (type(v) is bool):
             v = str(v)
 
         return k, v

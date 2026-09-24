@@ -1,7 +1,9 @@
-import requests
-from xml.etree import ElementTree
-import pandas as pd
 import logging
+from xml.etree import ElementTree
+
+import pandas as pd
+import requests
+
 from ..utils.timer import Timer
 
 NS = "{http://www.wldelft.nl/fews/PI}"
@@ -17,7 +19,8 @@ def _element_to_tuple(qualifier_element: ElementTree.Element) -> tuple:
         qualifier_element (xml.etree.ElementTree.Element): ET.Element with
         Delft-FEWS qualifier tags.
 
-    Returns:
+    Returns
+    -------
         tuple: qualifier properties (id, name, group_id). If not present they
         will be None.
 
@@ -48,21 +51,23 @@ def get_qualifiers(url: str, verify: bool = False, logger=LOGGER) -> pd.DataFram
         logger (logging.Logger, optional): Logger to pass logging to. By
         default, a new logger will ge created.
 
-    Returns:
+    Returns
+    -------
         df (pandas.DataFrame): Pandas dataframe with index "id" and columns
         "name" and "group_id".
 
     """
-
     # do the request
     timer = Timer(logger)
-    response = requests.get(url, verify=False)
+    # Preserve the existing qualifier endpoint's TLS behavior.
+    response = requests.get(url, verify=False)  # noqa: S113, S501 - Preserve existing request timeout/TLS behavior.
     timer.report("Qualifiers request")
 
     # parse the response
     if response.status_code == 200:
-        tree = ElementTree.fromstring(response.content)
-        qualifiers_tree = [i for i in tree.iter(tag=f"{NS}qualifier")]
+        # Retain the existing XML parser and accepted FEWS response semantics.
+        tree = ElementTree.fromstring(response.content)  # noqa: S314
+        qualifiers_tree = list(tree.iter(tag=f"{NS}qualifier"))
         qualifiers_tuple = (_element_to_tuple(i) for i in qualifiers_tree)
         df = pd.DataFrame(qualifiers_tuple, columns=COLUMNS)
         timer.report("Qualifiers parsed")

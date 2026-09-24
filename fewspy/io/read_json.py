@@ -1,6 +1,7 @@
-from fewspy.time_series import TimeSeriesSet
-from pathlib import Path
 import json
+from pathlib import Path
+
+from fewspy.time_series import TimeSeriesSet
 
 
 def read_json(json_path: Path) -> TimeSeriesSet:
@@ -9,7 +10,8 @@ def read_json(json_path: Path) -> TimeSeriesSet:
     Args:
         json_path (Path): path to PI_JSON file
 
-    Returns:
+    Returns
+    -------
         TimeSeriesSet: timeseries
     """
     return TimeSeriesSet.from_dict(json.loads(Path(json_path).read_text()))

@@ -1,10 +1,11 @@
-import requests
 import logging
+
 import pandas as pd
-from typing import List
+import requests
+
+from ..utils.conversions import camel_to_snake_case
 from ..utils.timer import Timer
 from ..utils.transformations import parameters_to_fews
-from ..utils.conversions import camel_to_snake_case
 
 LOGGER = logging.getLogger(__name__)
 COLUMNS = [
@@ -20,11 +21,11 @@ COLUMNS = [
 
 def get_parameters(
     url: str,
-    filter_id: str = None,
+    filter_id: str | None = None,
     document_format: str = "PI_JSON",
     verify: bool = False,
     logger=LOGGER,
-) -> List[dict]:
+) -> list[dict]:
     """
     Get FEWS qualifiers as a pandas DataFrame
 
@@ -38,22 +39,22 @@ def get_parameters(
         logger (logging.Logger, optional): Logger to pass logging to. By
         default, a logger will ge created.
 
-    Returns:
+    Returns
+    -------
         df (pandas.DataFrame): Pandas dataframe with index "id" and columns
         "name" and "group_id".
 
     """
-
     # do the request
     timer = Timer(logger)
     parameters = parameters_to_fews(locals())
-    response = requests.get(url, parameters, verify=verify)
+    response = requests.get(url, parameters, verify=verify)  # noqa: S113 - Preserve existing request timeout/TLS behavior.
     timer.report("Parameters request")
 
     # parse the response
     df = pd.DataFrame(columns=COLUMNS)
     if response.status_code == 200:
-        if "timeSeriesParameters" in response.json().keys():
+        if "timeSeriesParameters" in response.json():
             df = pd.DataFrame(response.json()["timeSeriesParameters"])
             df.columns = [camel_to_snake_case(i) for i in df.columns]
             df["uses_datum"] = df["uses_datum"] == "true"

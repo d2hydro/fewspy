@@ -1,0 +1,48 @@
+# %%
+import os
+import pickle
+from pathlib import Path
+
+from tmx.app.TMX_get_timeseries import TMX_Timeserie
+
+from fewspy.time_series import Events, Header, TimeSeries, TimeSeriesSet
+
+data_dir = Path(__file__).parent / "data"
+os.environ["TMX_BASE_URL"] = ""
+
+with (data_dir / "tmx_response.pickle").open("rb") as src:
+    b = pickle.load(src)  # noqa: S301 - Trusted local conversion fixture.
+# df = pd.read_pickle(data_dir / "tmx_response.pickle")
+
+
+# %%
+
+
+def convert_timeseries(
+    time_series: TMX_Timeserie,
+    header_info: dict = {"type": "instantaneous", "time_step": {"unit": "nonequidistant"}},  # noqa: B006 - Preserve the existing read-only API default.
+) -> TimeSeries:
+    """Converts TMX_Timeserie to fewspy.TimeSeriesSet
+
+    Parameters
+    ----------
+    time_series : TMX_Timeserie
+    header_info : dict, optional
+        Header-info missing in TMX_Timeserie, by default {"type": "instantaneous", "time_step": {"unit": "nonequidistant"}}
+
+    Returns
+    -------
+    TimeSeries
+        _description_
+    """
+    header = {**time_series.ts_header, **header_info}
+    header["miss_val"] = header.pop("missing_val")
+    header["start_date"] = time_series.df.index.min()
+    header["end_date"] = time_series.df.index.min()
+
+    return TimeSeries(header=Header(**header), events=Events(time_series.df))
+
+
+time_series_set = TimeSeriesSet(time_series=[convert_timeseries(i) for i in b.values()])
+time_series_set.to_netcdf(out_dir=Path("netcdf"))
+# %%

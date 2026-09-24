@@ -1,6 +1,6 @@
 from pathlib import Path
-import pandas as pd
 
+import pandas as pd
 
 DATA_PATH = Path(__file__).parent / "data"
 QUALIFIERS_CSV = DATA_PATH / "qualifiers.csv"
