@@ -22,10 +22,10 @@ def get_locations(
     document_format: Literal["GEO_JSON", "PI_JSON"] = "GEO_JSON",
     attributes: list = [],  # noqa: B006 - Preserve the existing read-only API default.
     verify: bool = False,
-    cert: str | tuple[str, str] | None = None,
-    http_headers: dict | None = None,
     logger=LOGGER,
     remove_duplicates: bool = False,
+    cert: str | tuple[str, str] | None = None,
+    http_headers: dict | None = None,
     headers: dict | None = None,
 ) -> gpd.GeoDataFrame:
     """

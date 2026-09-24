@@ -34,11 +34,11 @@ def get_time_series(
     show_statistics: bool = False,
     document_format: str = "PI_JSON",
     verify: bool = False,
+    logger=LOGGER,
+    series_key: SeriesKey | str = SeriesKey.LOCATION_PARAMETER,
     cert: str | tuple[str, str] | None = None,
     http_headers: dict | None = None,
-    logger=LOGGER,
     headers: dict | None = None,
-    series_key: SeriesKey | str = SeriesKey.LOCATION_PARAMETER,
 ) -> pd.DataFrame:
     """
     Get FEWS qualifiers as a pandas DataFrame

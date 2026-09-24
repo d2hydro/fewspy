@@ -42,8 +42,8 @@ def _element_to_tuple(qualifier_element: ElementTree.Element) -> tuple:
 def get_qualifiers(
     url: str,
     verify: bool = False,
-    cert: str | tuple[str, str] | None = None,
     logger=LOGGER,
+    cert: str | tuple[str, str] | None = None,
     http_headers: dict | None = None,
     headers: dict | None = None,
 ) -> pd.DataFrame:

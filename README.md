@@ -83,8 +83,7 @@ If variables are missing, this integration test is skipped automatically.
 
 The integration tests are split into two steps:
 
-1. token ophalen (OAuth flow)\
-	prints `access_token` and `expires_in` for quick reuse during debugging;
+1. token ophalen (OAuth flow) without logging the access token;
 2. data ophalen (FEWS endpoint call with bearer token).
 
 When `FEWSPY_TEST_USE_TEMP_TOKEN=true`, OAuth token retrieval tests are skipped and the temporary bearer token is validated directly against FEWS endpoints. A clear failure is reported when the token is expired.

@@ -24,9 +24,9 @@ def get_parameters(
     filter_id: str | None = None,
     document_format: str = "PI_JSON",
     verify: bool = False,
+    logger=LOGGER,
     cert: str | tuple[str, str] | None = None,
     http_headers: dict | None = None,
-    logger=LOGGER,
     headers: dict | None = None,
 ) -> list[dict]:
     """

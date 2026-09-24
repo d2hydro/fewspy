@@ -57,11 +57,11 @@ def get_time_series_async(
     document_format: str = "PI_JSON",
     omit_missing: bool = True,
     verify: bool = False,
+    logger=LOGGER,
+    series_key: SeriesKey | str = SeriesKey.LOCATION_PARAMETER,
     cert: str | tuple[str, str] | None = None,
     http_headers: dict | None = None,
-    logger=LOGGER,
     headers: dict | None = None,
-    series_key: SeriesKey | str = SeriesKey.LOCATION_PARAMETER,
 ) -> pd.DataFrame:
     """Retrieve FEWS time series concurrently.
 
@@ -135,7 +135,7 @@ def get_time_series_async(
             response = await session.request(
                 method="GET",
                 url=url,
-                params=parameters,
+                params=request_parameters,
                 ssl=ssl_context,  # TODO use verify instead of ssl_context?
                 headers=http_headers,
             )

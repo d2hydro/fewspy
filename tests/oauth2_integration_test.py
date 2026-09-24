@@ -123,8 +123,7 @@ def _request_oauth_access_token(verify):
     access_token = payload["access_token"]
     expires_in = int(payload.get("expires_in", 0))
 
-    # Explicit print so developers can quickly reuse a temporary token while debugging.
-    print("Access token received:", access_token)
+    print("Access token received successfully")
     print("Access token expires_in (seconds):", expires_in)
 
     return access_token, expires_in
