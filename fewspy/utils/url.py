@@ -9,8 +9,8 @@ def validate_url(
     url: str,
     test_postfix: str = "timezoneid",
     cert: str | tuple[str, str] | None = None,
-    ssl_verify: bool | None = None,
-) -> tuple[str, bool]:
+    ssl_verify: bool | str | None = None,
+) -> tuple[str, bool | str]:
     """Validate a FEWS PI REST service URL.
 
     Args:

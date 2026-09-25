@@ -12,7 +12,7 @@ def get_timezone_id(
     url: str,
     filter_id: str | None = None,
     document_format: str = "PI_JSON",
-    verify: bool = False,
+    verify: bool | str = False,
     logger=LOGGER,
     cert: str | tuple[str, str] | None = None,
     http_headers: dict | None = None,

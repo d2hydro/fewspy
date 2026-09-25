@@ -56,7 +56,7 @@ def get_time_series_async(
     thinning: int | None = None,
     document_format: str = "PI_JSON",
     omit_missing: bool = True,
-    verify: bool = False,
+    verify: bool | str = False,
     logger=LOGGER,
     series_key: SeriesKey | str = SeriesKey.LOCATION_PARAMETER,
     cert: str | tuple[str, str] | None = None,
@@ -98,17 +98,20 @@ def get_time_series_async(
     series_key = SeriesKey(series_key)
     parameters = parameters_to_fews(locals(), bool_to_string=True)
 
-    def _ssl_context(verify: bool, cert: str | tuple[str, str] | None) -> bool | ssl.SSLContext:
-        if cert is None:
+    def _ssl_context(verify: bool | str, cert: str | tuple[str, str] | None) -> bool | ssl.SSLContext:
+        if (cert is None) and not isinstance(verify, str):
             return verify
 
-        context = (
-            ssl.create_default_context() if verify else ssl._create_unverified_context()  # noqa: S323 - Honor the caller's explicit verify=False setting.
-        )
+        if isinstance(verify, str):
+            context = ssl.create_default_context(cafile=verify)
+        else:
+            context = (
+                ssl.create_default_context() if verify else ssl._create_unverified_context()  # noqa: S323 - Honor the caller's explicit verify=False setting.
+            )
 
         if isinstance(cert, tuple):
             context.load_cert_chain(certfile=cert[0], keyfile=cert[1])
-        else:
+        elif cert is not None:
             context.load_cert_chain(certfile=cert)
         return context
 

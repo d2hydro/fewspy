@@ -2,22 +2,25 @@ import base64
 import json
 import os
 import time
+from datetime import datetime
 from pathlib import Path
 
 import pytest
-import requests
-from requests.auth import HTTPBasicAuth
+
+from fewspy import Api, BearerTokenAuth, OAuth2ClientCredentialsAuth
 
 REQUIRED_ENV_KEYS_OAUTH = [
-    "FEWSPY_TEST_FEWS_URL",
-    "FEWSPY_TEST_OAUTH2_TOKEN_URL",
-    "FEWSPY_TEST_OAUTH2_CLIENT_ID",
-    "FEWSPY_TEST_OAUTH2_CLIENT_SECRET",
-    "FEWSPY_TEST_OAUTH2_SCOPE",
+    "FEWSPY_OAUTH2_TOKEN_URL",
+    "FEWSPY_OAUTH2_CLIENT_ID",
+    "FEWSPY_OAUTH2_CLIENT_SECRET",
+    "FEWSPY_OAUTH2_SCOPE",
+]
+REQUIRED_ENV_KEYS_FEWS = [
+    "FEWSPY_FEWS_URL",
 ]
 REQUIRED_ENV_KEYS_TEMP_TOKEN = [
-    "FEWSPY_TEST_FEWS_URL",
-    "FEWSPY_TEST_ACCESS_TOKEN",
+    *REQUIRED_ENV_KEYS_FEWS,
+    "FEWSPY_ACCESS_TOKEN",
 ]
 
 
@@ -40,7 +43,7 @@ def _load_dotenv(dotenv_path: Path) -> None:
 _load_dotenv(Path.cwd() / ".env.development")
 _load_dotenv(Path.cwd() / ".env")
 
-use_temp_token = os.getenv("FEWSPY_TEST_USE_TEMP_TOKEN", "false").strip().lower() in {
+use_temp_token = os.getenv("FEWSPY_USE_TEMP_TOKEN", "false").strip().lower() in {
     "1",
     "true",
     "yes",
@@ -48,7 +51,19 @@ use_temp_token = os.getenv("FEWSPY_TEST_USE_TEMP_TOKEN", "false").strip().lower(
 }
 missing_temp = [k for k in REQUIRED_ENV_KEYS_TEMP_TOKEN if not os.getenv(k)]
 missing_oauth = [k for k in REQUIRED_ENV_KEYS_OAUTH if not os.getenv(k)]
+missing_oauth_fews = [k for k in [*REQUIRED_ENV_KEYS_OAUTH, *REQUIRED_ENV_KEYS_FEWS] if not os.getenv(k)]
 pytestmark = [pytest.mark.integration]
+
+
+class _Response:
+    def __init__(self, payload):
+        self._payload = payload
+
+    def raise_for_status(self):
+        return None
+
+    def json(self):
+        return self._payload
 
 
 def _parse_verify_setting(raw_value: str):
@@ -68,62 +83,26 @@ def _assert_temp_token_claims_not_expired(access_token: str):
         payload_b64 += "=" * (-len(payload_b64) % 4)
         payload = json.loads(base64.urlsafe_b64decode(payload_b64.encode("utf-8")))
     except Exception as err:
-        pytest.fail(f"Could not decode FEWSPY_TEST_ACCESS_TOKEN as JWT: {err}")
+        pytest.fail(f"Could not decode FEWSPY_ACCESS_TOKEN as JWT: {err}")
 
     exp = payload.get("exp")
     if exp is None:
-        pytest.fail("FEWSPY_TEST_ACCESS_TOKEN has no 'exp' claim.")
+        pytest.fail("FEWSPY_ACCESS_TOKEN has no 'exp' claim.")
 
     now = int(time.time())
     if int(exp) <= now:
-        pytest.fail("FEWSPY_TEST_ACCESS_TOKEN is expired based on JWT exp claim.")
+        pytest.fail("FEWSPY_ACCESS_TOKEN is expired based on JWT exp claim.")
 
 
-def _assert_filters_request_with_token(fews_url: str, access_token: str, verify):
-    filters_url = f"{fews_url.rstrip('/')}/filters"
-    response = requests.get(
-        filters_url,
-        headers={"Authorization": f"Bearer {access_token}"},
+def _oauth_auth(verify):
+    return OAuth2ClientCredentialsAuth(
+        token_url=os.environ["FEWSPY_OAUTH2_TOKEN_URL"],
+        client_id=os.environ["FEWSPY_OAUTH2_CLIENT_ID"],
+        client_secret=os.environ["FEWSPY_OAUTH2_CLIENT_SECRET"],
+        scope=os.environ["FEWSPY_OAUTH2_SCOPE"],
+        cert=os.getenv("FEWSPY_OAUTH2_CERT"),
         verify=verify,
-        timeout=30,
     )
-
-    _assert_not_expired_jwt(response)
-
-    response.raise_for_status()
-    payload = response.json()
-    assert isinstance(payload, dict)
-    assert "filters" in payload
-
-
-def _assert_not_expired_jwt(response):
-    if (response.status_code == 401) and ("Expired JWT" in response.text):
-        pytest.fail("Provided FEWSPY_TEST_ACCESS_TOKEN is expired (Expired JWT).")
-
-
-def _request_oauth_access_token(verify):
-    token_url = os.environ["FEWSPY_TEST_OAUTH2_TOKEN_URL"]
-    token_data = {
-        "grant_type": "client_credentials",
-        "scope": os.environ["FEWSPY_TEST_OAUTH2_SCOPE"],
-    }
-    response = requests.post(
-        token_url,
-        data=token_data,
-        auth=HTTPBasicAuth(
-            os.environ["FEWSPY_TEST_OAUTH2_CLIENT_ID"],
-            os.environ["FEWSPY_TEST_OAUTH2_CLIENT_SECRET"],
-        ),
-        cert=os.getenv("FEWSPY_TEST_OAUTH2_CERT"),
-        verify=verify,
-        timeout=30,
-    )
-    response.raise_for_status()
-    payload = response.json()
-    access_token = payload["access_token"]
-    expires_in = int(payload.get("expires_in", 0))
-
-    return access_token, expires_in
 
 
 def test_request_oauth_access_token_does_not_print_credentials(monkeypatch, capsys):
@@ -131,12 +110,10 @@ def test_request_oauth_access_token_does_not_print_credentials(monkeypatch, caps
     for key in REQUIRED_ENV_KEYS_OAUTH:
         monkeypatch.setenv(key, "dummy-value")
 
-    response = requests.Response()
-    response.status_code = 200
-    response._content = json.dumps({"access_token": access_token, "expires_in": 3600}).encode()
-    monkeypatch.setattr(requests, "post", lambda *args, **kwargs: response)
+    response = _Response({"access_token": access_token, "expires_in": 3600})
+    monkeypatch.setattr("fewspy.auth.requests.post", lambda *args, **kwargs: response)
 
-    assert _request_oauth_access_token(verify=True) == (access_token, 3600)
+    assert _oauth_auth(verify=True).get_access_token() == access_token
     captured = capsys.readouterr()
     assert captured.out == ""
     assert captured.err == ""
@@ -145,78 +122,72 @@ def test_request_oauth_access_token_does_not_print_credentials(monkeypatch, caps
 @pytest.mark.integration
 @pytest.mark.skipif(
     use_temp_token,
-    reason="Token-request test is skipped when FEWSPY_TEST_USE_TEMP_TOKEN=true.",
+    reason="Token-request test is skipped when FEWSPY_USE_TEMP_TOKEN=true.",
 )
 @pytest.mark.skipif(
     bool(missing_oauth),
     reason="Missing OAuth env vars: " + ", ".join(missing_oauth),
 )
 def test_oauth2_can_request_access_token():
-    verify = _parse_verify_setting(os.getenv("FEWSPY_TEST_OAUTH2_VERIFY", "true"))
-    access_token, expires_in = _request_oauth_access_token(verify=verify)
+    verify = _parse_verify_setting(os.getenv("FEWSPY_OAUTH2_VERIFY", "true"))
+    access_token = _oauth_auth(verify=verify).get_access_token()
 
     assert isinstance(access_token, str)
     assert len(access_token) > 20
-    assert expires_in > 0
 
 
 @pytest.mark.integration
 @pytest.mark.skipif(
     use_temp_token,
-    reason="OAuth data-call test is skipped when FEWSPY_TEST_USE_TEMP_TOKEN=true.",
+    reason="OAuth data-call test is skipped when FEWSPY_USE_TEMP_TOKEN=true.",
 )
 @pytest.mark.skipif(
-    bool(missing_oauth),
-    reason="Missing OAuth env vars: " + ", ".join(missing_oauth),
+    bool(missing_oauth_fews),
+    reason="Missing OAuth or FEWS env vars: " + ", ".join(missing_oauth_fews),
 )
 def test_oauth2_token_can_call_fews_filters():
-    verify = _parse_verify_setting(os.getenv("FEWSPY_TEST_OAUTH2_VERIFY", "true"))
-    fews_url = os.environ["FEWSPY_TEST_FEWS_URL"]
-    access_token, _ = _request_oauth_access_token(verify=verify)
-
-    _assert_filters_request_with_token(
-        fews_url=fews_url,
-        access_token=access_token,
-        verify=verify,
+    oauth_verify = _parse_verify_setting(os.getenv("FEWSPY_OAUTH2_VERIFY", "true"))
+    fews_verify = _parse_verify_setting(os.getenv("FEWSPY_FEWS_VERIFY", "true"))
+    api = Api(
+        url=os.environ["FEWSPY_FEWS_URL"],
+        auth=_oauth_auth(verify=oauth_verify),
+        cert=os.getenv("FEWSPY_FEWS_CERT"),
+        ssl_verify=fews_verify,
+        validate_endpoint=False,
     )
+
+    assert api.get_filters()
 
 
 @pytest.mark.integration
 @pytest.mark.skipif(
     not use_temp_token,
-    reason="Set FEWSPY_TEST_USE_TEMP_TOKEN=true to run temp-token timeseries test.",
+    reason="Set FEWSPY_USE_TEMP_TOKEN=true to run temp-token timeseries test.",
 )
 @pytest.mark.skipif(
     bool(missing_temp),
     reason="Missing temp-token env vars: " + ", ".join(missing_temp),
 )
 def test_temp_token_can_call_fews_timeseries_with_example_params():
-    verify = _parse_verify_setting(os.getenv("FEWSPY_TEST_OAUTH2_VERIFY", "true"))
-    fews_url = os.environ["FEWSPY_TEST_FEWS_URL"]
-    access_token = os.environ["FEWSPY_TEST_ACCESS_TOKEN"]
+    verify = _parse_verify_setting(os.getenv("FEWSPY_FEWS_VERIFY", "true"))
+    fews_url = os.environ["FEWSPY_FEWS_URL"]
+    access_token = os.environ["FEWSPY_ACCESS_TOKEN"]
     _assert_temp_token_claims_not_expired(access_token)
-    cert = os.getenv("FEWSPY_TEST_OAUTH2_CERT")
-
-    params = {
-        "documentFormat": "PI_XML",
-        "documentVersion": "1.34",
-        "parameterIds": "Q.meting",
-        "locationIds": "MPN-E-1071",
-        "startTime": "2025-07-02T12:44:53Z",
-        "endTime": "2025-07-02T13:44:53Z",
-        "convertDatum": "true",
-    }
-
-    timeseries_url = f"{fews_url.rstrip('/')}/timeseries/"
-    response = requests.get(
-        timeseries_url,
-        params=params,
-        headers={"Authorization": f"Bearer {access_token}"},
-        cert=cert or None,
-        verify=verify,
-        timeout=60,
+    api = Api(
+        url=fews_url,
+        auth=BearerTokenAuth(access_token),
+        cert=os.getenv("FEWSPY_FEWS_CERT"),
+        ssl_verify=verify,
+        validate_endpoint=False,
     )
 
-    _assert_not_expired_jwt(response)
-    response.raise_for_status()
-    assert response.content
+    result = api.get_time_series(
+        filter_id=None,
+        parameter_ids=["Q.meting"],
+        location_ids=["MPN-E-1071"],
+        start_time=datetime(2025, 7, 2, 12, 44, 53),
+        end_time=datetime(2025, 7, 2, 13, 44, 53),
+        document_format="PI_XML",
+    )
+
+    assert not result.empty

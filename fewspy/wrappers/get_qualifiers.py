@@ -41,7 +41,7 @@ def _element_to_tuple(qualifier_element: ElementTree.Element) -> tuple:
 
 def get_qualifiers(
     url: str,
-    verify: bool = False,
+    verify: bool | str = False,
     logger=LOGGER,
     cert: str | tuple[str, str] | None = None,
     http_headers: dict | None = None,

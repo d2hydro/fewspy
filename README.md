@@ -39,13 +39,11 @@ auth = OAuth2ClientCredentialsAuth(
 	client_id="YOUR_CLIENT_ID_HERE",
 	client_secret="YOUR_CLIENT_SECRET_HERE",
 	scope="api://<application-id>/.default",
-	cert="/path/to/token-endpoint-cert.pem",
 )
 
 api = Api(
 	url="https://<mijn.domein.nl>/FewsWebServices/rest/fewspiservice/v1/",
 	auth=auth,
-	cert="/path/to/fews-api-cert.pem",
 	ssl_verify=True,
 )
 
@@ -56,7 +54,7 @@ ts = api.get_time_series(
 )
 ```
 
-The certificate on `OAuth2ClientCredentialsAuth` is used only for the token endpoint. The certificate on `Api` is used only for FEWS requests, so they can be different. OAuth2 access tokens are cached and refreshed before they expire.
+The optional certificate on `OAuth2ClientCredentialsAuth` is used only if the token endpoint requires mTLS. Microsoft Entra client credentials with a client secret normally do not require it. The certificate on `Api` is used only for FEWS requests. OAuth2 access tokens are cached and refreshed before they expire.
 
 For other authentication methods, use `BearerTokenAuth(token)` or `BasicAuth(username, password)`. Custom authentication methods can implement `get_headers() -> dict[str, str]`; wrappers receive only those headers and the FEWS client certificate.
 
@@ -68,16 +66,18 @@ If you want to run a real OAuth2 integration test against a FEWS endpoint:
 
 1. Copy `.env.development.example` to `.env.development` (or place the same variables in `.env`).
 2. Fill in your real values for:
-	- `FEWSPY_TEST_FEWS_URL`
-	- `FEWSPY_TEST_OAUTH2_TOKEN_URL`
-	- `FEWSPY_TEST_OAUTH2_CLIENT_ID`
-	- `FEWSPY_TEST_OAUTH2_CLIENT_SECRET`
-	- `FEWSPY_TEST_OAUTH2_SCOPE`
+	- `FEWSPY_FEWS_URL`
+	- `FEWSPY_OAUTH2_TOKEN_URL`
+	- `FEWSPY_OAUTH2_CLIENT_ID`
+	- `FEWSPY_OAUTH2_CLIENT_SECRET`
+	- `FEWSPY_OAUTH2_SCOPE`
 3. Optionally set:
-	- `FEWSPY_TEST_OAUTH2_CERT`
-	- `FEWSPY_TEST_OAUTH2_VERIFY` (`true` or `false`)
-	- `FEWSPY_TEST_USE_TEMP_TOKEN` (`true` or `false`)
-	- `FEWSPY_TEST_ACCESS_TOKEN` (required when `FEWSPY_TEST_USE_TEMP_TOKEN=true`)
+	- `FEWSPY_FEWS_CERT` (only for a FEWS deployment that explicitly requires mTLS)
+	- `FEWSPY_FEWS_VERIFY` (`true`, `false`, or a CA bundle path)
+	- `FEWSPY_OAUTH2_CERT` (only for a token endpoint that explicitly requires mTLS)
+	- `FEWSPY_OAUTH2_VERIFY` (`true`, `false`, or a CA bundle path)
+	- `FEWSPY_USE_TEMP_TOKEN` (`true` or `false`)
+	- `FEWSPY_ACCESS_TOKEN` (required when `FEWSPY_USE_TEMP_TOKEN=true`)
 4. Run:
 
 ```
@@ -91,7 +91,7 @@ The integration tests are split into two steps:
 1. token ophalen (OAuth flow) without logging the access token;
 2. data ophalen (FEWS endpoint call with bearer token).
 
-When `FEWSPY_TEST_USE_TEMP_TOKEN=true`, OAuth token retrieval tests are skipped and the temporary bearer token is validated directly against FEWS endpoints. A clear failure is reported when the token is expired.
+When `FEWSPY_USE_TEMP_TOKEN=true`, OAuth token retrieval tests are skipped and the temporary bearer token is validated directly against FEWS endpoints. A clear failure is reported when the token is expired.
 
 To run only the temporary-token timeseries test (using the example parameters):
 

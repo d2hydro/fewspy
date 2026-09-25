@@ -33,7 +33,7 @@ def get_time_series(
     omit_missing: bool = True,
     show_statistics: bool = False,
     document_format: str = "PI_JSON",
-    verify: bool = False,
+    verify: bool | str = False,
     logger=LOGGER,
     series_key: SeriesKey | str = SeriesKey.LOCATION_PARAMETER,
     cert: str | tuple[str, str] | None = None,

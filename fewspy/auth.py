@@ -53,7 +53,7 @@ class OAuth2ClientCredentialsAuth:
         client_secret: str,
         scope: str,
         cert: str | tuple[str, str] | None = None,
-        verify: bool = True,
+        verify: bool | str = True,
         timeout: int = 30,
         logger=LOGGER,
     ):

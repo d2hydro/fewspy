@@ -48,6 +48,27 @@ def test_oauth2_auth_caches_access_token(monkeypatch):
     assert calls[0][1]["cert"] == "client.pem"
 
 
+def test_oauth2_auth_does_not_require_mtls_certificate(monkeypatch):
+    calls = []
+
+    def _fake_post(*args, **kwargs):
+        calls.append((args, kwargs))
+        return _Response({"access_token": "token-1", "expires_in": 3600})
+
+    monkeypatch.setattr("fewspy.auth.requests.post", _fake_post)
+
+    auth = OAuth2ClientCredentialsAuth(
+        token_url="https://identity.example.test/token",
+        client_id="client-id",
+        client_secret="secret",
+        scope="api://example/.default",
+    )
+
+    auth.get_access_token()
+
+    assert calls[0][1]["cert"] is None
+
+
 def test_api_keeps_token_and_fews_certificates_separate(monkeypatch):
     token_calls = []
     filters_calls = []
