@@ -35,13 +35,13 @@ Fewspy continues to support the existing unauthenticated usage pattern. If your 
 from fewspy import Api
 
 api = Api(
-	url="https://fewsapi.hhnk.nl/FewsWebServices/rest/fewspiservice/v1/",
+	url="https://<mijn.domein.nl>/FewsWebServices/rest/fewspiservice/v1/",
 	ssl_verify=True,
 	oauth2={
 		"token_url": "https://login.microsoftonline.com/<tenant-id>/oauth2/v2.0/token",
 		"client_id": "YOUR_CLIENT_ID_HERE",
 		"client_secret": "YOUR_CLIENT_SECRET_HERE",
-		"scope": "api://9905a90b-de6b-4251-a721-0acc7dadcd76/.default",
+		"scope": "api://<application-id>/.default",
 		"cert": "/path/to/client_cert.pem",
 	},
 )

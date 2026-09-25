@@ -123,10 +123,23 @@ def _request_oauth_access_token(verify):
     access_token = payload["access_token"]
     expires_in = int(payload.get("expires_in", 0))
 
-    print("Access token received successfully")
-    print("Access token expires_in (seconds):", expires_in)
-
     return access_token, expires_in
+
+
+def test_request_oauth_access_token_does_not_print_credentials(monkeypatch, capsys):
+    access_token = "dummy-access-token-for-output-regression"  # noqa: S105 - Mock credential.
+    for key in REQUIRED_ENV_KEYS_OAUTH:
+        monkeypatch.setenv(key, "dummy-value")
+
+    response = requests.Response()
+    response.status_code = 200
+    response._content = json.dumps({"access_token": access_token, "expires_in": 3600}).encode()
+    monkeypatch.setattr(requests, "post", lambda *args, **kwargs: response)
+
+    assert _request_oauth_access_token(verify=True) == (access_token, 3600)
+    captured = capsys.readouterr()
+    assert captured.out == ""
+    assert captured.err == ""
 
 
 @pytest.mark.integration
