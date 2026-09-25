@@ -27,6 +27,72 @@ Install Fewspy in your Python environment:
 python -m pip install fewspy
 ```
 
+## Authentication
+
+Fewspy continues to support the existing unauthenticated usage pattern. If your FEWS endpoint is protected by OAuth2 (Azure AD client credentials), you can pass an `oauth2` configuration to `Api`.
+
+```python
+from fewspy import Api
+
+api = Api(
+	url="https://<mijn.domein.nl>/FewsWebServices/rest/fewspiservice/v1/",
+	ssl_verify=True,
+	oauth2={
+		"token_url": "https://login.microsoftonline.com/<tenant-id>/oauth2/v2.0/token",
+		"client_id": "YOUR_CLIENT_ID_HERE",
+		"client_secret": "YOUR_CLIENT_SECRET_HERE",
+		"scope": "api://<application-id>/.default",
+		"cert": "/path/to/client_cert.pem",
+	},
+)
+
+ts = api.get_time_series(
+	filter_id="WDB_OW_KGM",
+	parameter_ids=["Q.meting"],
+	location_ids=["MPN-E-1071"],
+)
+```
+
+For already-issued tokens, you can also pass `bearer_token="..."` to `Api`.
+
+## OAuth2 integration tests (optional)
+
+The OAuth2 unit tests run without real credentials because they mock the token endpoint.
+
+If you want to run a real OAuth2 integration test against a FEWS endpoint:
+
+1. Copy `.env.development.example` to `.env.development` (or place the same variables in `.env`).
+2. Fill in your real values for:
+	- `FEWSPY_TEST_FEWS_URL`
+	- `FEWSPY_TEST_OAUTH2_TOKEN_URL`
+	- `FEWSPY_TEST_OAUTH2_CLIENT_ID`
+	- `FEWSPY_TEST_OAUTH2_CLIENT_SECRET`
+	- `FEWSPY_TEST_OAUTH2_SCOPE`
+3. Optionally set:
+	- `FEWSPY_TEST_OAUTH2_CERT`
+	- `FEWSPY_TEST_OAUTH2_VERIFY` (`true` or `false`)
+	- `FEWSPY_TEST_USE_TEMP_TOKEN` (`true` or `false`)
+	- `FEWSPY_TEST_ACCESS_TOKEN` (required when `FEWSPY_TEST_USE_TEMP_TOKEN=true`)
+4. Run:
+
+```
+pixi run pytest tests/oauth2_integration_test.py -q
+```
+
+If variables are missing, this integration test is skipped automatically.
+
+The integration tests are split into two steps:
+
+1. token ophalen (OAuth flow) without logging the access token;
+2. data ophalen (FEWS endpoint call with bearer token).
+
+When `FEWSPY_TEST_USE_TEMP_TOKEN=true`, OAuth token retrieval tests are skipped and the temporary bearer token is validated directly against FEWS endpoints. A clear failure is reported when the token is expired.
+
+To run only the temporary-token timeseries test (using the example parameters):
+
+```
+pixi run pytest tests/oauth2_integration_test.py -q -k temp_token
+```
 Pip installs all required dependencies automatically.
 
 ## About

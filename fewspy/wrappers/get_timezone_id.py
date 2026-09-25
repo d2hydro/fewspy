@@ -14,6 +14,9 @@ def get_timezone_id(
     document_format: str = "PI_JSON",
     verify: bool = False,
     logger=LOGGER,
+    cert: str | tuple[str, str] | None = None,
+    http_headers: dict | None = None,
+    headers: dict | None = None,
 ) -> str:
     """
     Get FEWS timezone id
@@ -35,8 +38,18 @@ def get_timezone_id(
     """
     # do the request
     timer = Timer(logger)
+    if (http_headers is not None) and (headers is not None):
+        raise ValueError("Use either http_headers or headers, not both")
+    if http_headers is None:
+        http_headers = headers
     parameters = parameters_to_fews(locals())
-    response = requests.get(url, parameters, verify=verify)  # noqa: S113 - Preserve existing request timeout/TLS behavior.
+    response = requests.get(  # noqa: S113 - Preserve the existing unlimited request timeout.
+        url,
+        parameters,
+        verify=verify,
+        cert=cert,
+        headers=http_headers,
+    )
     timer.report("Timezone request")
 
     # parse the response

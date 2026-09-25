@@ -1,18 +1,19 @@
 import asyncio
 import logging
+import ssl
 import sys
 from datetime import datetime
 
 import aiohttp
 import pandas as pd
 
+from fewspy.time_series import SeriesKey, TimeSeriesSet
+from fewspy.utils.transformations import parameters_to_fews
+
 if sys.version_info >= (3, 14):
     import nest_asyncio2 as nest_asyncio
 else:
     import nest_asyncio
-
-from fewspy.time_series import SeriesKey, TimeSeriesSet
-from fewspy.utils.transformations import parameters_to_fews
 
 nest_asyncio.apply()
 
@@ -58,6 +59,9 @@ def get_time_series_async(
     verify: bool = False,
     logger=LOGGER,
     series_key: SeriesKey | str = SeriesKey.LOCATION_PARAMETER,
+    cert: str | tuple[str, str] | None = None,
+    http_headers: dict | None = None,
+    headers: dict | None = None,
 ) -> pd.DataFrame:
     """Retrieve FEWS time series concurrently.
 
@@ -86,8 +90,29 @@ def get_time_series_async(
         "name" and "group_id".
 
     """
+    if (http_headers is not None) and (headers is not None):
+        raise ValueError("Use either http_headers or headers, not both")
+    if http_headers is None:
+        http_headers = headers
+
     series_key = SeriesKey(series_key)
     parameters = parameters_to_fews(locals(), bool_to_string=True)
+
+    def _ssl_context(verify: bool, cert: str | tuple[str, str] | None) -> bool | ssl.SSLContext:
+        if cert is None:
+            return verify
+
+        context = (
+            ssl.create_default_context() if verify else ssl._create_unverified_context()  # noqa: S323 - Honor the caller's explicit verify=False setting.
+        )
+
+        if isinstance(cert, tuple):
+            context.load_cert_chain(certfile=cert[0], keyfile=cert[1])
+        else:
+            context.load_cert_chain(certfile=cert)
+        return context
+
+    ssl_context = _ssl_context(verify=verify, cert=cert)
 
     def _get_loop():
         try:
@@ -95,9 +120,8 @@ def get_time_series_async(
         except RuntimeError:
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
-        finally:
-            loop.set_debug(True)
-            return loop  # noqa: B012 - Preserve existing exception/return behavior in this lint-only change.
+        loop.set_debug(True)
+        return loop
 
     async def get_timeseries_async(location_id, parameter_id, qualifier_id, session):
         """Get timerseries using FEWS (asynchronously)"""
@@ -107,11 +131,17 @@ def get_time_series_async(
         if qualifier_id is not None:
             request_parameters["qualifierIds"] = qualifier_id
         try:
-            response = await session.request(method="GET", url=url, params=request_parameters, ssl=verify)
+            response = await session.request(
+                method="GET",
+                url=url,
+                params=request_parameters,
+                ssl=ssl_context,  # TODO use verify instead of ssl_context?
+                headers=http_headers,
+            )
             response.raise_for_status()
         except Exception as err:
             logger.error(f"An error ocurred: {err} while executing url {url} with parameters {parameters}")
-            response = None
+            return None
         response_json = await response.json()
         return response_json
 
