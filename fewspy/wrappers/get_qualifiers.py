@@ -39,7 +39,14 @@ def _element_to_tuple(qualifier_element: ElementTree.Element) -> tuple:
     return (ident, name, group_id)
 
 
-def get_qualifiers(url: str, verify: bool = False, logger=LOGGER) -> pd.DataFrame:
+def get_qualifiers(
+    url: str,
+    verify: bool | str = False,
+    logger=LOGGER,
+    cert: str | tuple[str, str] | None = None,
+    http_headers: dict | None = None,
+    headers: dict | None = None,
+) -> pd.DataFrame:
     """
     Get FEWS qualifiers as Pandas DataFrame
 
@@ -59,8 +66,12 @@ def get_qualifiers(url: str, verify: bool = False, logger=LOGGER) -> pd.DataFram
     """
     # do the request
     timer = Timer(logger)
+    if (http_headers is not None) and (headers is not None):
+        raise ValueError("Use either http_headers or headers, not both")
+    if http_headers is None:
+        http_headers = headers
+    response = requests.get(url, verify=verify, cert=cert, headers=http_headers)  # noqa: S113 - Preserve existing request timeout/TLS behavior.
     # Preserve the existing qualifier endpoint's TLS behavior.
-    response = requests.get(url, verify=False)  # noqa: S113, S501 - Preserve existing request timeout/TLS behavior.
     timer.report("Qualifiers request")
 
     # parse the response
