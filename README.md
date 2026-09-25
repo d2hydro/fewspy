@@ -29,21 +29,24 @@ python -m pip install fewspy
 
 ## Authentication
 
-Fewspy continues to support the existing unauthenticated usage pattern. If your FEWS endpoint is protected by OAuth2 (Azure AD client credentials), you can pass an `oauth2` configuration to `Api`.
+Fewspy continues to support unauthenticated FEWS endpoints. For an endpoint protected by OpenID Connect/OAuth2, create an authentication object and pass it to `Api`:
 
 ```python
-from fewspy import Api
+from fewspy import Api, OAuth2ClientCredentialsAuth
+
+auth = OAuth2ClientCredentialsAuth(
+	token_url="https://login.microsoftonline.com/<tenant-id>/oauth2/v2.0/token",
+	client_id="YOUR_CLIENT_ID_HERE",
+	client_secret="YOUR_CLIENT_SECRET_HERE",
+	scope="api://<application-id>/.default",
+	cert="/path/to/token-endpoint-cert.pem",
+)
 
 api = Api(
 	url="https://<mijn.domein.nl>/FewsWebServices/rest/fewspiservice/v1/",
+	auth=auth,
+	cert="/path/to/fews-api-cert.pem",
 	ssl_verify=True,
-	oauth2={
-		"token_url": "https://login.microsoftonline.com/<tenant-id>/oauth2/v2.0/token",
-		"client_id": "YOUR_CLIENT_ID_HERE",
-		"client_secret": "YOUR_CLIENT_SECRET_HERE",
-		"scope": "api://<application-id>/.default",
-		"cert": "/path/to/client_cert.pem",
-	},
 )
 
 ts = api.get_time_series(
@@ -53,7 +56,9 @@ ts = api.get_time_series(
 )
 ```
 
-For already-issued tokens, you can also pass `bearer_token="..."` to `Api`.
+The certificate on `OAuth2ClientCredentialsAuth` is used only for the token endpoint. The certificate on `Api` is used only for FEWS requests, so they can be different. OAuth2 access tokens are cached and refreshed before they expire.
+
+For other authentication methods, use `BearerTokenAuth(token)` or `BasicAuth(username, password)`. Custom authentication methods can implement `get_headers() -> dict[str, str]`; wrappers receive only those headers and the FEWS client certificate.
 
 ## OAuth2 integration tests (optional)
 

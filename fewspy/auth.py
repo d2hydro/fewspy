@@ -1,7 +1,9 @@
 """Authentication utilities for FEWS API clients."""
 
+import base64
 import logging
 import time
+from typing import Protocol
 
 import requests
 from requests.auth import HTTPBasicAuth
@@ -9,8 +11,40 @@ from requests.auth import HTTPBasicAuth
 LOGGER = logging.getLogger(__name__)
 
 
-class OAuth2ClientCredentialsTokenProvider:
-    """Fetch and cache OAuth2 client-credentials access tokens."""
+class Auth(Protocol):
+    """Authentication method that supplies headers for a FEWS request."""
+
+    def get_headers(self) -> dict[str, str]:
+        """Return authentication headers for a FEWS request."""
+
+
+class BearerTokenAuth:
+    """Authenticate FEWS requests with an existing Bearer token."""
+
+    def __init__(self, token: str):
+        self.token = token
+
+    def get_headers(self) -> dict[str, str]:
+        """Return the Bearer Authorization header."""
+        return {"Authorization": f"Bearer {self.token}"}
+
+
+class BasicAuth:
+    """Authenticate FEWS requests with HTTP Basic Authentication."""
+
+    def __init__(self, username: str, password: str):
+        self.username = username
+        self.password = password
+
+    def get_headers(self) -> dict[str, str]:
+        """Return the Basic Authorization header."""
+        credentials = f"{self.username}:{self.password}".encode("latin1")
+        encoded_credentials = base64.b64encode(credentials).decode("ascii")
+        return {"Authorization": f"Basic {encoded_credentials}"}
+
+
+class OAuth2ClientCredentialsAuth:
+    """Authenticate with cached OAuth2 client-credentials access tokens."""
 
     def __init__(
         self,
@@ -35,7 +69,7 @@ class OAuth2ClientCredentialsTokenProvider:
         self._access_token = None
         self._expires_at = 0.0
 
-    def get_auth_header(self) -> dict:
+    def get_headers(self) -> dict[str, str]:
         """Return an Authorization header with a valid Bearer token."""
         return {"Authorization": f"Bearer {self.get_access_token()}"}
 

@@ -11,7 +11,7 @@ from typing import Literal
 import pandas as pd
 import urllib3
 
-from fewspy.auth import OAuth2ClientCredentialsTokenProvider
+from fewspy.auth import Auth
 from fewspy.time_series import SeriesKey
 from fewspy.utils.timer import Timer
 from fewspy.utils.url import validate_url
@@ -43,8 +43,7 @@ class Api:
         logger=None,
         ssl_verify=None,
         validate_endpoint: bool = True,
-        bearer_token: str | None = None,
-        oauth2: dict | None = None,
+        auth: Auth | None = None,
         cert: str | tuple[str, str] | None = None,
     ):
         self.document_format = "PI_JSON"
@@ -58,9 +57,6 @@ class Api:
                 url += "/"
             self.url = url
             verify = url.startswith("https")
-        self._bearer_token = bearer_token
-        self._oauth2_provider = None
-
         # set ssl_verify
         if ssl_verify is None:
             self.ssl_verify = verify
@@ -73,33 +69,12 @@ class Api:
         else:
             self.logger = logger
 
-        if (self._bearer_token is not None) and (oauth2 is not None):
-            raise ValueError("Use either bearer_token or oauth2, not both")
-
-        if oauth2 is not None:
-            required_keys = ["token_url", "client_id", "client_secret", "scope"]
-            missing = [key for key in required_keys if key not in oauth2]
-            if missing:
-                raise ValueError(f"Missing oauth2 configuration keys: {', '.join(missing)}")
-
-            self._oauth2_provider = OAuth2ClientCredentialsTokenProvider(
-                token_url=oauth2["token_url"],
-                client_id=oauth2["client_id"],
-                client_secret=oauth2["client_secret"],
-                scope=oauth2["scope"],
-                cert=oauth2.get("cert", self.cert),
-                verify=oauth2.get("verify", self.ssl_verify),
-                timeout=oauth2.get("timeout", 30),
-                logger=self.logger,
-            )
+        self.auth = auth
 
     def _request_headers(self) -> dict | None:
-        headers = {}
-        if self._bearer_token is not None:
-            headers["Authorization"] = f"Bearer {self._bearer_token}"
-        if self._oauth2_provider is not None:
-            headers.update(self._oauth2_provider.get_auth_header())
-        return headers or None
+        if self.auth is None:
+            return None
+        return self.auth.get_headers() or None
 
     def __kwargs(self, url_post_fix: str, kwargs: dict) -> dict:
         kwargs = {

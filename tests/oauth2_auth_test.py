@@ -1,10 +1,12 @@
 # These mocked credentials are test data, never used with a live service.
 # ruff: noqa: S105, S106
 
+import base64
+
 import pytest
 
 from fewspy.api import Api
-from fewspy.auth import OAuth2ClientCredentialsTokenProvider
+from fewspy.auth import BasicAuth, BearerTokenAuth, OAuth2ClientCredentialsAuth
 
 
 class _Response:
@@ -18,7 +20,7 @@ class _Response:
         return self._payload
 
 
-def test_oauth2_provider_caches_access_token(monkeypatch):
+def test_oauth2_auth_caches_access_token(monkeypatch):
     calls = []
 
     def _fake_post(*args, **kwargs):
@@ -27,7 +29,7 @@ def test_oauth2_provider_caches_access_token(monkeypatch):
 
     monkeypatch.setattr("fewspy.auth.requests.post", _fake_post)
 
-    provider = OAuth2ClientCredentialsTokenProvider(
+    auth = OAuth2ClientCredentialsAuth(
         token_url="https://login.microsoftonline.com/example/oauth2/v2.0/token",
         client_id="client-id",
         client_secret="secret",
@@ -37,8 +39,8 @@ def test_oauth2_provider_caches_access_token(monkeypatch):
         timeout=10,
     )
 
-    token_1 = provider.get_access_token()
-    token_2 = provider.get_access_token()
+    token_1 = auth.get_access_token()
+    token_2 = auth.get_access_token()
 
     assert token_1 == "token-1"
     assert token_2 == "token-1"
@@ -46,69 +48,56 @@ def test_oauth2_provider_caches_access_token(monkeypatch):
     assert calls[0][1]["cert"] == "client.pem"
 
 
-def test_api_oauth2_adds_bearer_header(monkeypatch):
+def test_api_keeps_token_and_fews_certificates_separate(monkeypatch):
     token_calls = []
     filters_calls = []
-
-    def _fake_validate_url(url, cert=None, ssl_verify=None):
-        if not url.endswith("/"):
-            url = f"{url}/"
-        return url, False
 
     def _fake_post(*args, **kwargs):
         token_calls.append((args, kwargs))
         return _Response({"access_token": "oauth-token", "expires_in": 3600})
 
-    def _fake_get_filters(**kwargs):
-        filters_calls.append(kwargs)
-        return []
-
-    monkeypatch.setattr("fewspy.api.validate_url", _fake_validate_url)
     monkeypatch.setattr("fewspy.auth.requests.post", _fake_post)
-    monkeypatch.setattr("fewspy.api.get_filters", _fake_get_filters)
+    monkeypatch.setattr("fewspy.api.get_filters", lambda **kwargs: filters_calls.append(kwargs))
 
+    auth = OAuth2ClientCredentialsAuth(
+        token_url="https://identity.example.test/token",
+        client_id="client-id",
+        client_secret="secret",
+        scope="api://example/.default",
+        cert="token-endpoint.pem",
+    )
     api = Api(
         url="https://example.test/fews",
-        ssl_verify=False,
-        cert="client.pem",
-        oauth2={
-            "token_url": "https://login.microsoftonline.com/example/oauth2/v2.0/token",
-            "client_id": "client-id",
-            "client_secret": "secret",
-            "scope": "api://example/.default",
-            "cert": "client.pem",
-        },
+        auth=auth,
+        cert="fews-api.pem",
+        validate_endpoint=False,
     )
 
     api.get_filters()
+
+    assert token_calls[0][1]["cert"] == "token-endpoint.pem"
+    assert filters_calls[0]["cert"] == "fews-api.pem"
+    assert filters_calls[0]["http_headers"] == {"Authorization": "Bearer oauth-token"}
+
+
+@pytest.mark.parametrize(
+    ("auth", "expected_header"),
+    [
+        (BearerTokenAuth("existing-token"), "Bearer existing-token"),
+        (
+            BasicAuth("username", "password"),
+            f"Basic {base64.b64encode(b'username:password').decode('ascii')}",
+        ),
+    ],
+)
+def test_api_supports_header_authentication_methods(monkeypatch, auth, expected_header):
+    filters_calls = []
+    monkeypatch.setattr("fewspy.api.get_filters", lambda **kwargs: filters_calls.append(kwargs))
+
+    api = Api(url="https://example.test/fews", auth=auth, validate_endpoint=False)
     api.get_filters()
 
-    assert len(token_calls) == 1
-    assert len(filters_calls) == 2
-    assert filters_calls[0]["cert"] == "client.pem"
-    assert filters_calls[0]["http_headers"]["Authorization"] == "Bearer oauth-token"
-    assert filters_calls[1]["http_headers"]["Authorization"] == "Bearer oauth-token"
-
-
-def test_api_rejects_multiple_auth_methods(monkeypatch):
-    def _fake_validate_url(url, cert=None, ssl_verify=None):
-        if not url.endswith("/"):
-            url = f"{url}/"
-        return url, False
-
-    monkeypatch.setattr("fewspy.api.validate_url", _fake_validate_url)
-
-    with pytest.raises(ValueError):
-        Api(
-            url="https://example.test/fews",
-            bearer_token="token",
-            oauth2={
-                "token_url": "https://login.microsoftonline.com/example/oauth2/v2.0/token",
-                "client_id": "client-id",
-                "client_secret": "secret",
-                "scope": "api://example/.default",
-            },
-        )
+    assert filters_calls[0]["http_headers"] == {"Authorization": expected_header}
 
 
 def test_api_can_skip_preflight_validation(monkeypatch):
