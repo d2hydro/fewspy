@@ -67,6 +67,11 @@ convention = "numpy"
 [tool.ruff.lint.isort]
 combine-as-imports = true
 
+[tool.pytest.ini_options]
+markers = [
+    "integration: marks tests that call external services and require credentials",
+]
+
 [tool.hatch.version]
 source = "vcs"
 tag-pattern = '^v?(?P<version>\d{4}\.\d{1,2}\.\d+(?:(?:a|b|rc)\d+)?(?:\.post\d+)?(?:\.dev\d+)?)$'
