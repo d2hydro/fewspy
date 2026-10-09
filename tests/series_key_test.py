@@ -362,8 +362,7 @@ def test_cache_preserves_full_header_selection(header_series, tmp_path, series_k
         assert df.columns.is_unique
         assert set(df.columns.get_level_values("location_id")) == {"L"}
     finally:
-        for ds in cache._datasets.values():
-            ds.close()
+        cache.close()
 
 
 @pytest.mark.parametrize("series_key", ["location_parameter", SeriesKey.LOCATION_PARAMETER])
