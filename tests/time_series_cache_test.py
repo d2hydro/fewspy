@@ -177,7 +177,7 @@ def test_integer_fill_error_outside_selection_is_preserved(tmp_path):
         cache.get_time_series("filter", "P", location_ids=["A"], series_key="header")
 
 
-def test_constructor_closes_all_datasets_even_on_failure(tmp_path, monkeypatch):
+def test_first_read_closes_all_datasets_even_on_decode_failure(tmp_path, monkeypatch):
     manifest = make_manifest(tmp_path)
     original = TimeSeriesCache._open_dataset
     active = []
@@ -196,8 +196,10 @@ def test_constructor_closes_all_datasets_even_on_failure(tmp_path, monkeypatch):
                 active.pop()
 
     monkeypatch.setattr(TimeSeriesCache, "_open_dataset", staticmethod(tracked))
-    with pytest.raises(ValueError, match="second file"):
-        TimeSeriesCache(manifest)
+    with TimeSeriesCache(manifest) as cache:
+        assert not opened
+        with pytest.raises(ValueError, match="second file"):
+            cache.get_time_series("filter", "P", series_key="header")
     assert len(opened) == 1
     assert not active
 
@@ -224,7 +226,15 @@ def test_validation_includes_unselected_headers(tmp_path, damage):
 def test_metadata_reuse_eviction_and_disabled_cache(tmp_path, monkeypatch, size, expected):
     manifest = make_manifest(tmp_path)
     calls = []
+    decoded = []
+    original_open = TimeSeriesCache._open_dataset
     original = cache_module.read_metadata
+
+    def counted_open(path):
+        decoded.append(path)
+        return original_open(path)
+
+    monkeypatch.setattr(TimeSeriesCache, "_open_dataset", staticmethod(counted_open))
 
     def counted(dataset):
         calls.append(dataset.filepath())
@@ -238,6 +248,7 @@ def test_metadata_reuse_eviction_and_disabled_cache(tmp_path, monkeypatch, size,
         assert_exact(second, reference(manifest, locations=["B"]))
         assert len(cache._metadata) <= size
         assert len(calls) == expected
+        assert len(decoded) == expected
 
 
 def test_selects_before_loading_values(tmp_path, monkeypatch):
@@ -449,3 +460,96 @@ def test_legacy_selection(tmp_path):
             cache.get_time_series("missing", "P")
     # All resources are closed even on the failure paths (also on Windows).
     shutil.rmtree(path.parent)
+
+
+def damage_auxiliary_time(path):
+    """Add a variable ignored by header selection but rejected by xarray decoding."""
+    with Dataset(path, "a") as dataset:
+        variable = dataset.createVariable("unused_time", "f8", ("time",))
+        variable[:] = np.arange(len(dataset.dimensions["time"]))
+        variable.units = "hours since not-a-date"
+
+
+def test_decoding_is_deferred_to_the_used_file(tmp_path):
+    manifest = make_manifest(tmp_path)
+    other = write_file(tmp_path / manifest.current_cache / "unused" / "P.nc")
+    damage_auxiliary_time(other)
+    manifest.files.append(FieldEndtry.from_file(other))
+    manifest.expected_file_count += 1
+    manifest.atomic_write(manifest.filepath, clean_old_caches=False)
+    with TimeSeriesCache.from_manifest_file(manifest.filepath) as cache:
+        expected = reference(make_manifest(tmp_path / "reference"))
+        assert_exact(cache.get_time_series("filter", "P", series_key="header"), expected)
+        for _ in range(2):
+            with pytest.raises(ValueError, match=r"[Dd]ecode"):
+                cache.get_time_series("unused", "P", series_key="header")
+            assert all(key[1] != other for key in cache._metadata)
+        # The default mode and the full time axis retain xarray's validation too.
+        with pytest.raises(ValueError, match=r"[Dd]ecode"):
+            cache.get_time_series("unused", "P")
+        with pytest.raises(ValueError, match=r"[Dd]ecode"):
+            _ = cache.common_time_axis
+    # Even a failed validation releases both the raw and xarray file handles.
+    other.unlink()
+
+
+def test_fallback_validates_later_files_before_returning(tmp_path):
+    manifest = make_manifest(tmp_path)
+    write_file(manifest.files[0].path, times=[24, 0, 25, 1])
+    damage_auxiliary_time(manifest.files[1].path)
+    with TimeSeriesCache(manifest) as cache, pytest.raises(ValueError, match=r"[Dd]ecode"):
+        cache.get_time_series("filter", "P", series_key="header")
+
+
+def test_refresh_defers_content_errors_without_reusing_previous_data(tmp_path):
+    old = make_manifest(tmp_path)
+    new = make_manifest(tmp_path, "20240102T000000", offset=1000)
+    damage_auxiliary_time(new.files[1].path)
+    new.files[1] = FieldEndtry.from_file(new.files[1].path)
+    new.atomic_write(new.filepath, clean_old_caches=False)
+    with TimeSeriesCache(old, last_manifest_mtime=-1) as cache:
+        cache.get_time_series("filter", "P", series_key="header")
+        assert cache.refresh_if_changed(new.filepath)
+        assert not cache._metadata
+        assert cache.manifest.current_cache == new.current_cache
+        with pytest.raises(ValueError, match=r"[Dd]ecode"):
+            cache.get_time_series("filter", "P", series_key="header")
+        assert all(key[0] is cache._snapshot for key in cache._metadata)
+
+
+@pytest.mark.parametrize("size", [0, 1])
+def test_later_location_selection_still_decodes_retained_headers(tmp_path, size):
+    path = write_file(tmp_path / "filter" / "P.nc")
+    damage_auxiliary_time(path)
+    manifest = Manifest(current_cache="20240101T000000", files=[FieldEndtry.from_file(path)])
+    with TimeSeriesCache(manifest, metadata_cache_size=size) as cache:
+        with pytest.raises(ValueError, match="No full-header series"):
+            cache.get_time_series("filter", "P", location_ids=["absent"], series_key="header")
+        assert all(not metadata.decoded for metadata in cache._metadata.values())
+        for _ in range(2):
+            with pytest.raises(ValueError, match=r"[Dd]ecode"):
+                cache.get_time_series("filter", "P", location_ids=["A"], series_key="header")
+        assert all(not metadata.decoded for metadata in cache._metadata.values())
+
+
+def test_first_matching_location_decodes_once(tmp_path, monkeypatch):
+    path = write_file(tmp_path / "filter" / "P.nc")
+    manifest = Manifest(current_cache="20240101T000000", files=[FieldEndtry.from_file(path)])
+    decoded = []
+    original = TimeSeriesCache._open_dataset
+
+    def counted(path):
+        decoded.append(path)
+        return original(path)
+
+    monkeypatch.setattr(TimeSeriesCache, "_open_dataset", staticmethod(counted))
+    with TimeSeriesCache(manifest) as cache:
+        with pytest.raises(ValueError, match="No full-header series"):
+            cache.get_time_series("filter", "P", location_ids=["absent"], series_key="header")
+        assert not decoded
+        for location in ["A", "B"]:
+            assert_exact(
+                cache.get_time_series("filter", "P", location_ids=[location], series_key="header"),
+                reference(manifest, locations=[location]),
+            )
+        assert decoded == [path]

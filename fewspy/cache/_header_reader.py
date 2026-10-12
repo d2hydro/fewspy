@@ -16,6 +16,7 @@ class HeaderMetadata:
     time: pd.DatetimeIndex
     locations: dict[str, list[int]]
     selective: bool
+    decoded: bool = False
 
 
 def read_metadata(dataset) -> HeaderMetadata:

@@ -38,6 +38,8 @@ class TimeSeriesCache:
 
         metadata_cache_size bounds retained file entries, not bytes. Zero disables
         reuse. Active reads may retain evicted metadata until they finish.
+        Construction reads routing attributes only. Content decoding checks run
+        on first use of each file, before any selected data are returned.
         """
         if isinstance(metadata_cache_size, bool) or not isinstance(metadata_cache_size, int) or metadata_cache_size < 0:
             raise ValueError("metadata_cache_size must be a non-negative integer")
@@ -54,14 +56,13 @@ class TimeSeriesCache:
     def _open_dataset(path):
         return xr.open_dataset(path, engine="netcdf4", decode_times=True, mask_and_scale=True, cache=False)
 
-    def _prepare_snapshot(self, manifest):
-        # Preserve constructor-time xarray decoding/validation, without keeping
-        # every file open or retaining the large fewspy_headers attributes.
+    def _prepare_snapshot(self, manifest: Manifest) -> _Snapshot:
+        """Capture routing attributes; defer content decoding until a file is used."""
         manifest = manifest.model_copy(deep=True)
         parameters = {}
         for entry in manifest.files:
-            with _NETCDF_LOCK, self._open_dataset(entry.path) as dataset:
-                parameters[entry.path] = dataset.attrs.get("parameter_id")
+            with _NETCDF_LOCK, Dataset(entry.path, mode="r") as dataset:
+                parameters[entry.path] = getattr(dataset, "parameter_id", None)
         return _Snapshot(manifest, parameters)
 
     def _acquire_snapshot(self):
@@ -158,7 +159,8 @@ class TimeSeriesCache:
         """Validate and atomically publish a new snapshot when mtime changes.
 
         Publishers must retain immutable old files until their readers finish.
-        Failed validation leaves the current manifest, mtime and metadata intact.
+        Failed publication checks leave the previous snapshot intact. Content
+        decoding errors are deferred to reads of the newly published files.
         """
         # Prevent concurrent refreshes from publishing generations out of order.
         with self._refresh_lock:
@@ -181,14 +183,23 @@ class TimeSeriesCache:
                 self._metadata.clear()
             return True
 
-    def _get_metadata(self, snapshot, path, dataset):
+    def _get_metadata(
+        self, snapshot: _Snapshot, path: Path, dataset: Dataset, location_ids: list[str] | None
+    ) -> HeaderMetadata:
+        """Reuse headers and decode the file before any matching values are read."""
         key = (snapshot, path)
         with self._lock:
             metadata = self._metadata.get(key)
-            if metadata is not None:
-                self._metadata.move_to_end(key)
-                return metadata
-        metadata = read_metadata(dataset)
+        if metadata is None:
+            metadata = read_metadata(dataset)
+        # Header inspection can rule out a file without returning its data.
+        # A later selection must still decode it before using cached metadata.
+        needs_values = location_ids is None or any(location in metadata.locations for location in location_ids)
+        if not metadata.decoded and (needs_values or not metadata.selective):
+            # Check every variable, including those outside the selection.
+            with self._open_dataset(path):
+                pass
+            metadata.decoded = True
         with self._lock:
             # Old/closed readers can finish but must not repopulate this cache.
             if not self._closed and snapshot is self._snapshot and self._metadata_cache_size:
@@ -200,7 +211,7 @@ class TimeSeriesCache:
 
     def _read_header_file(self, snapshot, path, start_time, end_time, location_ids):
         with _NETCDF_LOCK, Dataset(path, mode="r") as dataset:
-            metadata = self._get_metadata(snapshot, path, dataset)
+            metadata = self._get_metadata(snapshot, path, dataset, location_ids)
             if not metadata.selective:
                 return None
             positions = select_positions(metadata, location_ids)
@@ -209,11 +220,14 @@ class TimeSeriesCache:
             time_slice = metadata.time.slice_indexer(start_time, end_time)
             return read_selection(dataset, metadata, positions, time_slice)
 
-    @staticmethod
-    def _read_header_fallback(paths, location_ids):
+    @classmethod
+    def _read_header_fallback(cls, paths: list[Path], location_ids: list[str] | None) -> TimeSeriesSet:
+        """Retain complete decoding checks for every file in the fallback read."""
         result = TimeSeriesSet()
         for path in paths:
-            with _NETCDF_LOCK:
+            # A fallback can skip the selective reader for later files. Those
+            # files must still pass all decoding checks before returning data.
+            with _NETCDF_LOCK, cls._open_dataset(path):
                 part = read_netcdf(path, series_key=SeriesKey.HEADER)
             result.time_series.extend(
                 ts for ts in part.time_series if location_ids is None or ts.header.location_id in location_ids

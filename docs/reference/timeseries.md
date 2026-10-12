@@ -122,12 +122,29 @@ catalog and the separately computed `common_time_axis` are outside this limit.
 Active readers may temporarily retain evicted or previous-generation metadata.
 Returned DataFrames do not share mutable header metadata with the cache.
 
-Construction still checks that every manifest dataset opens and decodes, but
-closes each immediately. `from_manifest_file()` and refresh retain the complete
-manifest size and SHA-256 validation. On a metadata miss the reader validates
-every header in the matching file, including unselected locations. The first
-read consequently has more work than a repeated read. `common_time_axis` reads
-all time coordinates on demand, and is recomputed after successful refresh.
+Construction opens each manifest dataset only to read its routing attributes,
+then closes it immediately. Content decoding is deferred until that file is
+used for values. On a header metadata miss the reader validates every header
+in the matching file, including unselected locations. If any requested location
+occurs in the file, it also performs the same complete xarray decoding check
+that previously ran during construction, before returning selected data.
+Files without requested locations retain only validated header metadata; a
+later matching selection must still pass the full decoding check. No selected
+data are returned if either check fails. This saves work when files contain
+none of the requested locations; a selection using every file still needs all
+decoding checks and may incur additional file-opening overhead.
+Successful validation is reused only
+with the bounded metadata entry for that immutable generation; eviction or
+`metadata_cache_size=0` causes it to run again. Legacy reads and fallback reads
+retain xarray decoding checks on every read.
+
+`from_manifest_file()` and refresh retain complete manifest file-count, size
+and SHA-256 validation. Content errors in unused files can now be reported
+later, on their first read rather than at construction or refresh. A successful
+refresh can therefore be followed by a content error when a new file is read;
+that read raises instead of returning partial data or falling back to an old
+generation. `common_time_axis` still opens and decodes all files on demand,
+and is recomputed after successful refresh.
 
 Concurrent cache reads and `refresh_if_changed()` are supported within a
 process. Native NetCDF access is serialized across cache instances. Each read
@@ -171,7 +188,9 @@ For the small fixtures, replace the station and step counts with 128 and 168.
 The default baseline is revision `0037f92fb43b9b503ff72376fb739965cb4f6309`;
 `--revision` selects a different local Git revision. Each output includes the
 candidate source-file SHA-256 digests and every individual timing. The raw
-measurements from this change are in `benchmarks/results/cache-*.json`.
+measurements from the initial selective-reader implementation are in
+`benchmarks/results/cache-*.json`. The numbers and file-open counts below
+predate deferred decoding; they are not measurements of that follow-up change.
 
 On the recorded Windows 11 / Python 3.14.6 environment, five-run medians for
 the dense 21,095-station, 720-timestep fixture were:
