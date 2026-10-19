@@ -11,6 +11,7 @@ from typing import Literal
 import pandas as pd
 import urllib3
 
+from fewspy.auth import Auth
 from fewspy.time_series import SeriesKey
 from fewspy.utils.timer import Timer
 from fewspy.utils.url import validate_url
@@ -36,12 +37,26 @@ class Api:
     For more info on how-to work with the FEWS REST Web Service, visit the Deltares Website: https://publicwiki.deltares.nl/display/FEWSDOC/FEWS+PI+REST+Web+Service
     """
 
-    def __init__(self, url, logger=None, ssl_verify=None):
+    def __init__(
+        self,
+        url,
+        logger=None,
+        ssl_verify=None,
+        validate_endpoint: bool = True,
+        auth: Auth | None = None,
+        cert: str | tuple[str, str] | None = None,
+    ):
         self.document_format = "PI_JSON"
         self.logger = logger
         self.timer = Timer(logger)
-        self.url, verify = validate_url(url)
-
+        self.cert = cert
+        if validate_endpoint:
+            self.url, verify = validate_url(url, cert=self.cert, ssl_verify=ssl_verify)
+        else:
+            if not url.endswith("/"):
+                url += "/"
+            self.url = url
+            verify = url.startswith("https")
         # set ssl_verify
         if ssl_verify is None:
             self.ssl_verify = verify
@@ -54,14 +69,21 @@ class Api:
         else:
             self.logger = logger
 
+        self.auth = auth
+
+    def _request_headers(self) -> dict | None:
+        if self.auth is None:
+            return None
+        return self.auth.get_headers() or None
+
     def __kwargs(self, url_post_fix: str, kwargs: dict) -> dict:
         kwargs = {
             **kwargs,
-            **{
-                "url": f"{self.url}{url_post_fix}",
-                "verify": self.ssl_verify,
-                "logger": self.logger,
-            },
+            "url": f"{self.url}{url_post_fix}",
+            "verify": self.ssl_verify,
+            "cert": self.cert,
+            "logger": self.logger,
+            "http_headers": self._request_headers(),
         }
         kwargs.pop("self")
         kwargs.pop("parallel", None)
@@ -141,7 +163,13 @@ class Api:
 
         """
         url = f"{self.url}qualifiers"
-        result = get_qualifiers(url, verify=self.ssl_verify, logger=self.logger)
+        result = get_qualifiers(
+            url,
+            verify=self.ssl_verify,
+            cert=self.cert,
+            logger=self.logger,
+            http_headers=self._request_headers(),
+        )
         return result
 
     def get_timezone_id(self):
@@ -154,7 +182,13 @@ class Api:
 
         """
         url = f"{self.url}timezoneid"
-        result = get_timezone_id(url, verify=self.ssl_verify, logger=self.logger)
+        result = get_timezone_id(
+            url,
+            verify=self.ssl_verify,
+            cert=self.cert,
+            logger=self.logger,
+            http_headers=self._request_headers(),
+        )
         return result
 
     def get_time_series(

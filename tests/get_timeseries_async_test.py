@@ -68,6 +68,40 @@ def test_parallel_requests_preserve_asyncio_tasks(monkeypatch, data_dir, nested)
     assert len(result) == 2
 
 
+def test_async_request_loads_ca_bundle(monkeypatch):
+    wrapper = importlib.import_module("fewspy.wrappers.get_time_series_async")
+    calls = []
+
+    class Session:
+        def __init__(self, **kwargs):
+            pass
+
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, *args):
+            pass
+
+    def create_default_context(**kwargs):
+        calls.append(kwargs)
+        return object()
+
+    monkeypatch.setattr(wrapper.aiohttp, "ClientSession", Session)
+    monkeypatch.setattr(wrapper.ssl, "create_default_context", create_default_context)
+
+    wrapper.get_time_series_async(
+        url="https://example.invalid/timeseries",
+        filter_id="test",
+        location_ids=[],
+        parameter_ids=[],
+        start_time=datetime(2022, 5, 1),
+        end_time=datetime(2022, 5, 5),
+        verify="ca-bundle.pem",
+    )
+
+    assert calls == [{"cafile": "ca-bundle.pem"}]
+
+
 @pytest.fixture(scope="module")
 def time_series_set(api):
     return api.get_time_series(
