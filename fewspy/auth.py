@@ -2,13 +2,17 @@
 
 import base64
 import logging
+import os
 import time
+from collections.abc import Mapping
 from typing import Protocol
 
 import requests
 from requests.auth import HTTPBasicAuth
 
 LOGGER = logging.getLogger(__name__)
+
+OAUTH2_ENV_PREFIX = "FEWSPY_OAUTH2_"
 
 
 class Auth(Protocol):
@@ -103,3 +107,54 @@ class OAuth2ClientCredentialsAuth:
         self._expires_at = time.time() + max(expires_in - refresh_margin, 0)
         self.logger.debug("Fetched new OAuth2 access token")
         return access_token
+
+
+def _parse_verify(raw_value: str) -> bool | str:
+    raw = raw_value.strip()
+    if raw.lower() in {"true", "1", "yes", "on"}:
+        return True
+    if raw.lower() in {"false", "0", "no", "off"}:
+        return False
+    return raw
+
+
+def oauth2_from_env(environ: Mapping[str, str] | None = None) -> OAuth2ClientCredentialsAuth | None:
+    """Return client-credentials authentication from the ``FEWSPY_OAUTH2_*`` environment variables.
+
+    ``FEWSPY_OAUTH2_TOKEN_URL`` switches it on. ``FEWSPY_OAUTH2_CLIENT_ID``, ``FEWSPY_OAUTH2_CLIENT_SECRET`` and
+    ``FEWSPY_OAUTH2_SCOPE`` are then required; ``FEWSPY_OAUTH2_CERT``, ``FEWSPY_OAUTH2_VERIFY`` and
+    ``FEWSPY_OAUTH2_TIMEOUT`` are optional. This lets an application that creates ``Api(url)`` without ``auth``
+    run against a protected endpoint by configuration only.
+
+    Args:
+        environ: the variables to read. Defaults to ``os.environ``.
+
+    Returns: the authentication, or None when ``FEWSPY_OAUTH2_TOKEN_URL`` is not set.
+
+    """
+    env = os.environ if environ is None else environ
+
+    def get(name: str) -> str | None:
+        value = env.get(f"{OAUTH2_ENV_PREFIX}{name}", "").strip()
+        return value or None
+
+    token_url = get("TOKEN_URL")
+    if token_url is None:
+        return None
+
+    required = {name: get(name) for name in ("CLIENT_ID", "CLIENT_SECRET", "SCOPE")}
+    missing = [f"{OAUTH2_ENV_PREFIX}{name}" for name, value in required.items() if value is None]
+    if missing:
+        raise ValueError(f"{OAUTH2_ENV_PREFIX}TOKEN_URL is set, but these are not: {', '.join(missing)}")
+
+    verify = get("VERIFY")
+    timeout = get("TIMEOUT")
+    return OAuth2ClientCredentialsAuth(
+        token_url=token_url,
+        client_id=required["CLIENT_ID"],
+        client_secret=required["CLIENT_SECRET"],
+        scope=required["SCOPE"],
+        cert=get("CERT"),
+        verify=True if verify is None else _parse_verify(verify),
+        timeout=30 if timeout is None else int(timeout),
+    )
