@@ -11,7 +11,7 @@ from typing import Literal
 import pandas as pd
 import urllib3
 
-from fewspy.auth import Auth
+from fewspy.auth import Auth, oauth2_from_env
 from fewspy.time_series import SeriesKey
 from fewspy.utils.timer import Timer
 from fewspy.utils.url import validate_url
@@ -69,7 +69,8 @@ class Api:
         else:
             self.logger = logger
 
-        self.auth = auth
+        # without auth, the FEWSPY_OAUTH2_* environment variables may configure it (see oauth2_from_env)
+        self.auth = auth if auth is not None else oauth2_from_env()
 
     def _request_headers(self) -> dict | None:
         if self.auth is None:

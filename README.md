@@ -56,6 +56,8 @@ ts = api.get_time_series(
 
 The optional certificate on `OAuth2ClientCredentialsAuth` is used only if the token endpoint requires mTLS. Microsoft Entra client credentials with a client secret normally do not require it. The certificate on `Api` is used only for FEWS requests. OAuth2 access tokens are cached and refreshed before they expire.
 
+An application that creates `Api(url)` without `auth` can be configured by environment variables instead: when `FEWSPY_OAUTH2_TOKEN_URL` is set, `Api` uses `OAuth2ClientCredentialsAuth` from `FEWSPY_OAUTH2_TOKEN_URL`, `FEWSPY_OAUTH2_CLIENT_ID`, `FEWSPY_OAUTH2_CLIENT_SECRET` and `FEWSPY_OAUTH2_SCOPE`, and the optional `FEWSPY_OAUTH2_CERT`, `FEWSPY_OAUTH2_VERIFY` (`true`, `false` or a CA bundle path) and `FEWSPY_OAUTH2_TIMEOUT` (see `fewspy.oauth2_from_env`). An `auth` argument always wins over the environment.
+
 For other authentication methods, use `BearerTokenAuth(token)` or `BasicAuth(username, password)`. Custom authentication methods can implement `get_headers() -> dict[str, str]`; wrappers receive only those headers and the FEWS client certificate.
 
 ## OAuth2 integration tests (optional)

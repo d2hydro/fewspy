@@ -1,7 +1,7 @@
 from importlib.metadata import PackageNotFoundError, version
 
 from fewspy.api import Api
-from fewspy.auth import Auth, BasicAuth, BearerTokenAuth, OAuth2ClientCredentialsAuth
+from fewspy.auth import Auth, BasicAuth, BearerTokenAuth, OAuth2ClientCredentialsAuth, oauth2_from_env
 from fewspy.io.read_json import read_json
 from fewspy.io.read_netcdf import read_netcdf
 from fewspy.io.read_parquet import read_parquet
@@ -18,6 +18,7 @@ __all__ = [
     "SeriesKey",
     "TimeSeries",
     "TimeSeriesSet",
+    "oauth2_from_env",
     "read_json",
     "read_netcdf",
     "read_parquet",
